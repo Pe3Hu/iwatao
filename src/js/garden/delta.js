@@ -2,12 +2,12 @@
 class delta {
   constructor ( index, orientation, center ){
     this.index =  index;
-    this.center = center;
     this.orientation = {
       flag: orientation,
       name: null,
       num: null
     };
+    this.center = center;
     this.const = {
       r: cellSize / 4,
       R: cellSize / 2
@@ -18,7 +18,24 @@ class delta {
       c: null
     }
     this.color = null;
-    this.visiable = false;
+    this.array = {
+      vertex: []
+    };
+
+    this.init();
+  }
+
+  initVertexs(){
+    for( let i = 0; i < 3; i++ ){
+      let vec = createVector(
+        Math.sin( Math.PI * 2 / 3 * ( i + this.orientation.num )) * this.const.R,
+        Math.cos( Math.PI * 2 / 3 * ( i + this.orientation.num )) * this.const.R );
+      vec.add( this.center );
+      this.array.vertex.push( vec );
+    }
+  }
+
+  init(){
     this.status = 'forgotten'; //forgotten proposed selected
     switch ( this.orientation.flag ) {
       case true:
@@ -32,21 +49,8 @@ class delta {
         this.color = color( colorMax );
         break;
     }
-    this.array = {
-      vertex: []
-    };
-
+    
     this.initVertexs();
-  }
-
-  initVertexs(){
-    for( let i = 0; i < 3; i++ ){
-      let vec = createVector(
-        Math.sin( Math.PI * 2 / 3 * ( i + this.orientation.num )) * this.const.R,
-        Math.cos( Math.PI * 2 / 3 * ( i + this.orientation.num )) * this.const.R );
-      vec.add( this.center );
-      this.array.vertex.push( vec );
-    }
   }
 
   //determine the display method
@@ -84,11 +88,13 @@ class delta {
     switch ( this.status ) {
       case 'proposed':
         noFill();
+        stroke( 1 );
         if ( plantStatus == 'soloEdit' )
           triangle(
             this.array.vertex[0].x + offset.x, this.array.vertex[0].y + offset.y,
             this.array.vertex[1].x + offset.x, this.array.vertex[1].y + offset.y,
             this.array.vertex[2].x + offset.x, this.array.vertex[2].y + offset.y );
+        noStroke();
         break;
       case 'selected':
         fill( this.color );

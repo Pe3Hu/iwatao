@@ -1,3 +1,4 @@
+//use strict;
 //character development material
 class plant {
   constructor ( index, orientation ){
@@ -39,7 +40,7 @@ class plant {
 
     this.initNeighbors();
 
-    this.addRandDeltas( this.index * this.index );
+    this.addRandDeltas( this.index * ( this.index + 1 ) );
 
     //console.log( this.array.trace )
   }

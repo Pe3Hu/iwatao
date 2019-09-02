@@ -8,7 +8,7 @@ class pika {
     this.aspect = {
       num: aNum,
       name: null
-    }
+    };
 
     this.setType( this.aspect.num );
   }
@@ -35,39 +35,39 @@ class pika {
     this.aspect.num = num;
     switch ( this.aspect.num ) {
       case 0:
-        this.color = color( 0 );
+        this.color = color( 0, 0, 0 );
         this.aspect.name = 'dark';
         break;
       case 1:
-        this.color = color( 360 );
+        this.color = color( 0, 0, colorMax );
         this.aspect.name = 'light';
         break;
       case 2:
-        this.color = color( 0, 360, 360 );
+        this.color = color( 0, colorMax, colorMax * 0.5 );
         this.aspect.name = 'fire';
         break;
       case 3:
-        this.color = color( 90, 360, 360 );
+        this.color = color( 90, colorMax, colorMax * 0.5 );
         this.aspect.name = 'earth';
         break;
       case 4:
-        this.color = color( 210, 360, 360 ); //origin hue = 180 DLFEABTWI
+        this.color = color( 210, colorMax, colorMax * 0.5 ); //origin hue = 180 DLFEABTWI
         this.aspect.name = 'aqua';
         break;
       case 5:
-        this.color = color( 300, 360, 360 );
+        this.color = color( 300, colorMax, colorMax * 0.5 );
         this.aspect.name = 'breeze';
         break;
       case 6:
-        this.color = color( 60, 360, 360 );
+        this.color = color( 60, colorMax, colorMax * 0.5 );
         this.aspect.name = 'thunder';
         break;
       case 7:
-        this.color = color( 150, 360, 360 );
+        this.color = color( 150, colorMax, colorMax * 0.5 );
         this.aspect.name = 'wood';
         break;
       case 8:
-        this.color = color( 270, 360, 360 );
+        this.color = color( 270, colorMax, colorMax * 0.5 );
         this.aspect.name = 'iron';
         break;
       case 9:

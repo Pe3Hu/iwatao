@@ -1,4 +1,4 @@
-let cellSize = 30;
+let cellSize = 24;
 let daoNum = 9;
 let colorMax = 360;
 let infinity = 999999999;
@@ -14,14 +14,14 @@ function preload() {
 }
 
 function setup() {
-  canvasSize = createVector( 1280, 1024 );
+  canvasSize = createVector( 800, 600 );
   createCanvas( canvasSize.x, canvasSize.y );
 
   textFont( font );
   textSize( fontSize );
   textAlign( CENTER );
 
-  colorMode( HSB, colorMax );
+  colorMode( HSL, colorMax );
 
   offset = createVector( cellSize * 3, cellSize * 3 );
 

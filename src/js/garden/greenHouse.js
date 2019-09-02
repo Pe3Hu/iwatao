@@ -1,6 +1,8 @@
+//use strict;
 //plant growth process display
 class greenHouse {
   constructor ( offset ){
+    this.offset = offset;
     this.const = {
       a: cellSize * Math.sqrt( 3 ) / 3 * 8,
       l: 7
@@ -16,7 +18,6 @@ class greenHouse {
       secondID: 1,
       mode: 'growth'
     }
-    this.offset = offset;
 
     this.initDots();
 
@@ -41,10 +42,9 @@ class greenHouse {
     let vec = createVector( cellSize * 4.5, cellSize * 3.5 );
     while( vec.x < ( canvasSize.x - 6.5 * cellSize ) ){
       this.array.view.push( vec.copy() );
-      vec.x +=  7.5 * cellSize;
+      vec.x +=  8 * cellSize;
     }
-
-    this.array.edit.push( createVector( canvasSize.x / 2, cellSize * 11.5 ));
+    this.array.edit.push( createVector( cellSize * ( 8 * this.array.view.length / 2 + 0.5 ), cellSize * 11.5 ));
   }
 
   initPlants(){
@@ -56,8 +56,6 @@ class greenHouse {
     this.array.id.splice( this.var.firstID, 1 );
 
     this.updatePlants( 0, 0 );
-
-    console.log( this.array.plant[this.var.firstID] )
   }
 
   cleanPlants(){

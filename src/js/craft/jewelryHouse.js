@@ -18,9 +18,7 @@ class jewelryHouse {
     }
     this.offset = createVector();
 
-    this.initDots();
-
-    this.initTptpts();
+    this.init();
   }
 
   switchMode(){
@@ -39,25 +37,30 @@ class jewelryHouse {
 
   initDots(){
     let vec = createVector( cellSize, cellSize );
-    while( vec.x < ( canvasSize.x - 11 * cellSize ) ){
+    while( vec.x < ( canvasSize.x - 10 * cellSize ) ){
       this.array.view.push( vec.copy() );
-      vec.x += 10 * cellSize;
+      vec.x += 9 * cellSize;
     }
 
-    this.array.edit.push( createVector( canvasSize.x / 2 - cellSize * 4, cellSize * 12 ));
-    this.array.edit.push( createVector( canvasSize.x / 2 - cellSize * 12, cellSize * 12 ));
-    this.array.edit.push( createVector( canvasSize.x / 2 + cellSize * 4, cellSize * 12 ));
+    this.array.edit.push( createVector( cellSize * ( this.array.view.length * 9 / 2 - 3.5 ), cellSize * 12 ));
+    this.array.edit.push( createVector( cellSize * ( this.array.view.length * 9 / 2 - 9.5 ), cellSize * 12 ));
+    this.array.edit.push( createVector( cellSize * ( this.array.view.length * 9 / 2 + 2.5 ), cellSize * 12 ));
   }
 
   initTptpts(){
     for ( let i = 0; i < this.const.l; i++ ){
-      this.array.tptpt.push( new tptpt( i, i ));
+      this.array.tptpt.push( new tptpt( i, 12  ));
       this.array.id.push( i );
     }
 
     this.array.id.splice( this.var.firstID, 1 );
 
     this.updateTptpts( 0, 0 );
+  }
+
+  init(){
+    this.initDots();
+    this.initTptpts();
   }
 
   cleanTptpts(){

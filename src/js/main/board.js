@@ -11,10 +11,14 @@ class board {
         x: 8,
         y: 8
       },
+      grid: {
+        x: null,
+        y: null
+      },
       a: cellSize
     }
     this.var = {
-      layer: 2,
+      layer: 4,
       buttonID: 0,
       borderID: 0
     }
@@ -28,48 +32,67 @@ class board {
   }
 
   init(){
+    this.initGrid();
     this.initWorkshop();
     this.initBorders();
     this.initButtons();
   }
 
+  initGrid(){
+    this.const.grid.x = Math.floor( canvasSize.x / cellSize );
+    this.const.grid.y = Math.floor( canvasSize.y / cellSize );
+
+  }
+
   initWorkshop(){
-    this.array.layer.push( new battleMap( offset ));
-    this.array.layer.push( new jewelryHouse( offset ));
-    this.array.layer.push( new greenHouse( offset ));
+    //this.array.layer.push( new battleMap( offset ));
+    this.array.layer.push( new jewelryHouse() );
+    this.array.layer.push( new greenHouse() );
+    this.array.layer.push( new gamingHouse());
+    this.array.layer.push( new playGround() );
+    this.array.layer.push( new fogOfWar() );
+    this.array.layer.push( new whirlPool() );
   }
 
   initBorders(){
-    let layer = 1;
+    let craftView = this.array.layer[0].array.view.length * 9;
+    let gardenView = this.array.layer[1].array.view.length * 8;
+    let layer = 0;
     let name = 'craftView';
     let offset = createVector( cellSize * 0.5, cellSize * 0.5 );
-    let size = createVector( canvasSize.x - cellSize * 3.5, cellSize * 9 );
+    let size = createVector( cellSize * craftView, cellSize * 9 );
     this.addBorder( layer, name, offset, size );
 
     name = 'craftSoloEdit';
-    offset = createVector( canvasSize.x / 2 - cellSize * 5.5, cellSize * 10.5 );
+    offset = createVector( cellSize * ( craftView / 2 - 5 ), cellSize * 10.5 );
     size = createVector( cellSize * 11, cellSize * 11 );
     this.addBorder( layer, name, offset, size );
 
     name = 'craftFirstEdit';
-    offset = createVector( canvasSize.x / 2 - cellSize * 13.5, cellSize * 10.5 );
+    offset = createVector( cellSize * ( craftView / 2 - 11 ), cellSize * 10.5 );
     size = createVector( cellSize * 11, cellSize * 11 );
     this.addBorder( layer, name, offset, size );
 
     name = 'craftSecondEdit';
-    offset = createVector( canvasSize.x / 2 + cellSize * 2.5, cellSize * 10.5 );
-    size = createVector( cellSize * 12, cellSize * 12 );
+    offset = createVector( cellSize * ( craftView / 2 + 1 ), cellSize * 10.5 );
+    size = createVector( cellSize * 11, cellSize * 11 );
     this.addBorder( layer, name, offset, size );
 
-    layer = 2;
+    layer = 1;
     name = 'gardenView';
     offset = createVector( cellSize * 0.5, cellSize * 0.5 );
-    size = createVector( canvasSize.x - cellSize * 3.5, cellSize * 6.5 );
+    size = createVector( cellSize * gardenView, cellSize * 6.5 );
     this.addBorder( layer, name, offset, size );
 
     name = 'gardenSoloEdit';
-    offset = createVector( canvasSize.x / 2 - cellSize * 4, cellSize * 8 );
+    offset = createVector( cellSize * ( gardenView / 2 - 3.5 ), cellSize * 8 );
     size = createVector( cellSize * 8, cellSize * 7.5 );
+    this.addBorder( layer, name, offset, size );
+
+    layer = 2;
+    name = 'casinoView';
+    offset = createVector( cellSize * 0.5, cellSize * 0.5 );
+    size = createVector( cellSize * 11, cellSize * 7 );
     this.addBorder( layer, name, offset, size );
 
     this.updateBorders();
@@ -90,7 +113,7 @@ class board {
     this.cleanBorders();
 
     switch ( this.var.layer ) {
-      case 1:
+      case 0:
         offsetID = 0;
         this.array.border[offsetID].onScreen = true;
 
@@ -104,16 +127,21 @@ class board {
             break;
         }
         break;
-      case 2:
+      case 1:
         offsetID = 4;
         this.array.border[offsetID].onScreen = true;
         this.array.border[offsetID + 1].onScreen = true;
-
+        break;
+      case 2:
+        offsetID = 6;
+        this.array.border[offsetID].onScreen = true;
         break;
     }
   }
 
   initButtons(){
+    let craftView = this.array.layer[0].array.view.length * 9;
+    let gardenView = this.array.layer[1].array.view.length * 7.5;
     let layer;
     let name;
     let type;
@@ -123,7 +151,7 @@ class board {
     layer = 99;
     name = 'switchToCraft';
     type = 0;
-    vec = createVector( canvasSize.x - cellSize * 1.5, cellSize * 1.5 );
+    vec = createVector( cellSize * ( craftView + 1.5 ), cellSize * 1.5 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'switchToGarden';
@@ -131,13 +159,44 @@ class board {
     vec.y += cellSize;
     this.addButton( layer, name, type, vec.copy() );
 
-    layer = 1;
-    vec = createVector( canvasSize.x / 2 - cellSize * 4, cellSize * 12 );
+    name = 'switchToCasino';
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'switchToSport';
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'switchToVortex';
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
+    layer = 0;
+    vec = createVector( cellSize * ( craftView / 2 - 3.5 ), cellSize * 12 );
 
     //set the row / column shift buttons
     for ( let i = 0; i < this.const.edge.x; i++ ){
       name = 'shift';
-      type = i + 3;
+      type = i + 10;
       let borderVec = createVector();
       let stepVec = createVector();
 
@@ -173,63 +232,69 @@ class board {
     //set rotate buttons
     name = 'firstRotateCounterclockwise';
     type++;
-    vec = createVector( canvasSize.x / 2 - cellSize * 12.5, cellSize * 11.5 );
+    vec = createVector(  cellSize * ( craftView / 2 - 9.5 ), cellSize * 12 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'firstRotateClockwise';
     type++;
-    vec = createVector( canvasSize.x / 2 - cellSize * 3.5, cellSize * 11.5 );
+    vec = createVector(  cellSize * ( craftView / 2 - 1.5 ), cellSize * 12 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'secondRotateCounterclockwise';
     type--;
-    vec = createVector( canvasSize.x / 2 + cellSize * 3.5, cellSize * 11.5 );
+    vec = createVector( cellSize * ( craftView / 2 + 2.5 ), cellSize * 12 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'secondRotateClockwise';
     type++;
-    vec = createVector( canvasSize.x / 2 + cellSize * 13.5, cellSize * 11.5 );
+    vec = createVector( cellSize * ( craftView / 2 + 10.5 ), cellSize * 12 );
     this.addButton( layer, name, type, vec.copy() );
 
     //set scroll buttons
     name = 'soloScrollForward';
     type++;
-    vec = createVector( canvasSize.x / 2 - cellSize * 6.5, cellSize * 15.5 );
+    vec = createVector( cellSize * ( craftView / 2 - 6 ), cellSize * 15 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'soloScrollBack';
     type++;
-    vec = createVector( canvasSize.x / 2 - cellSize * 6.5, cellSize * 16.5 );
+    vec = createVector( cellSize * ( craftView / 2 - 6 ), cellSize * 16 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'firstScrollForward';
     type--;
-    vec = createVector( canvasSize.x / 2 - cellSize * 14.5, cellSize * 15.5 );
+    vec = createVector( cellSize * ( craftView / 2 - 12 ), cellSize * 15.5 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'firstScrollBack';
     type++;
-    vec = createVector( canvasSize.x / 2 - cellSize * 14.5, cellSize * 16.5 );
+    vec = createVector( cellSize * ( craftView / 2 - 12 ), cellSize * 16.5 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'secondScrollForward';
     type--;
-    vec = createVector( canvasSize.x / 2 + cellSize * 15.5, cellSize * 15.5 );
+    vec = createVector( cellSize * ( craftView / 2 + 13 ), cellSize * 15.5 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'secondScrollBack';
     type++;
-    vec = createVector( canvasSize.x / 2 + cellSize * 15.5, cellSize * 16.5 );
+    vec = createVector( cellSize * ( craftView / 2 + 13 ), cellSize * 16.5 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'switchCraftMode';
     type++;
-    vec = createVector( canvasSize.x - cellSize * 1.5, cellSize * 10.5 );
+    vec = createVector( cellSize * ( craftView - 0.5 ), cellSize * 10.5 );
+    this.addButton( layer, name, type, vec.copy() );
+
+    layer = 1;
+    name = 'switchGardenMode';
+    vec = createVector( cellSize * ( craftView - 0.5 ), cellSize * 10.5 );
     this.addButton( layer, name, type, vec.copy() );
 
     layer = 2;
-    name = 'switchGardenMode';
-    vec = createVector( canvasSize.x - cellSize * 1.5, cellSize * 10.5 );
+    name = 'spinBandit';
+    type++;
+    vec = createVector( cellSize * 12.5, cellSize * 1.5 );
     this.addButton( layer, name, type, vec.copy() );
 
 
@@ -238,7 +303,7 @@ class board {
         this.array.button[i].onScreen = true;
 
     this.updateButtons();
-    console.log( this.array.button)
+    //console.log( this.array.button)
   }
 
   addButton( layer, name, type, center ){
@@ -247,7 +312,7 @@ class board {
   }
 
   cleanButtons(){
-    for ( let i = 2; i < this.array.button.length; i++ )
+    for ( let i = 10; i < this.array.button.length; i++ )
         this.array.button[i].onScreen = false;
   }
 
@@ -256,12 +321,12 @@ class board {
 
     let offsetID = null;
     switch ( this.var.layer ) {
-      case 1:
+      case 0:
         //edit mode button
-        offsetID = 36;
+        offsetID = 44;
         this.array.button[offsetID].onScreen = true;
 
-        offsetID = 2;
+        offsetID = 10;
 
         switch ( this.array.layer[this.var.layer].var.mode ) {
           case 'solo':
@@ -269,21 +334,21 @@ class board {
             for( let i = offsetID; i < offsetID + 24; i++ )
               this.detectShift( i );
 
-            offsetID = 30;
+            offsetID = 38;
             //change visiable status for scroll buttons
             this.array.button[offsetID].onScreen = true;
             this.array.button[offsetID + 1].onScreen = true;
 
             break;
           case 'duo':
-            offsetID = 26;
+            offsetID = 34;
             //change visiable status for rotate buttons
             this.array.button[offsetID].onScreen = true;
             this.array.button[offsetID + 1].onScreen = true;
             this.array.button[offsetID + 2].onScreen = true;
             this.array.button[offsetID + 3].onScreen = true;
 
-            offsetID = 32;
+            offsetID = 40;
             //change visiable status for scroll buttons
             this.array.button[offsetID].onScreen = true;
             this.array.button[offsetID + 1].onScreen = true;
@@ -291,9 +356,14 @@ class board {
             this.array.button[offsetID + 3].onScreen = true;
           }
           break;
-      case 2:
+      case 1:
         //edit mode button
-        offsetID = 37;
+        offsetID = 45;
+        this.array.button[offsetID].onScreen = true;
+        break;
+      case 2:
+        //babdit spin button
+        offsetID = 46;
         this.array.button[offsetID].onScreen = true;
         break;
       }
@@ -320,31 +390,35 @@ class board {
         return;
 
     //change board layer
-    if( buttonID >= 0 && buttonID < 2 )
+    if( buttonID >= 0 && buttonID < 10 )
       this.switchLayer( buttonID );
 
     //checking the ability to move the row and column
-    if( buttonID >= 2 && buttonID < 26 )
+    if( buttonID >= 10 && buttonID < 34 )
       this.shift( buttonID );
 
     //rotate tptpts
-    if( buttonID >= 26 && buttonID < 30 )
+    if( buttonID >= 34 && buttonID < 38 )
       this.rotate( buttonID );
 
     //scroll tptpts
-    if( buttonID >= 30 && buttonID < 36 )
+    if( buttonID >= 38 && buttonID < 44 )
       this.scroll( buttonID );
 
     //change edit mode
-    if( buttonID >= 36 && buttonID < 38 )
+    if( buttonID >= 44 && buttonID < 46 )
       this.array.layer[this.var.layer].switchMode();
 
+
+    if( buttonID == 46 )
+      this.array.layer[this.var.layer].bandit.spin();
+
     this.update();
-      //console.log(mouseX, mouseY, minDist, buttonID, this.array.button[30].center)
+    //console.log(mouseX, mouseY, minDist, buttonID, this.array.button)
   }
 
   plantClickCheck(){
-    if( this.var.layer != 2 )
+    if( this.var.layer != 1 )
       return;
     let editedID = this.array.layer[this.var.layer].var.firstID;
     let editedPlant = this.array.layer[this.var.layer].array.plant[editedID];
@@ -357,18 +431,18 @@ class board {
   }
 
   switchLayer( buttonID ){
-    let buttonOffset = -1;
+    let buttonOffset = 0;
     this.var.layer = buttonID - buttonOffset;
   }
 
   detectShift( buttonID ){
-    let j = Math.floor( ( buttonID - 2 ) / this.const.edge.y );
-    let i = ( buttonID - 2 ) % this.const.edge.y;
+    let j = Math.floor( ( buttonID - 10 ) / this.const.edge.y );
+    let i = ( buttonID - 10 ) % this.const.edge.y;
     let x = null;
     let y = null;
     let editedID = this.array.layer[this.var.layer].var.firstID;
     let editedTptpt = this.array.layer[this.var.layer].array.tptpt[editedID];
-    let flag = false;
+    let flag = false;//
 
     switch ( j ) {
       case 0:
@@ -410,8 +484,8 @@ class board {
   }
 
   shift( buttonID ){
-    let type = Math.floor( ( buttonID - 2 ) / this.const.edge.y );
-    let num = ( buttonID - 2 ) % this.const.edge.y + 1;
+    let type = Math.floor( ( buttonID - 10 ) / this.const.edge.y );
+    let num = ( buttonID - 10 ) % this.const.edge.y + 1;
     let editedID = this.array.layer[this.var.layer].var.firstID;
     let editedTptpt = this.array.layer[this.var.layer].array.tptpt[editedID];
 
@@ -454,7 +528,7 @@ class board {
   rotate( buttonID ){
     let clockwise;
     let editedID = this.array.layer[this.var.layer].var.firstID;
-    if ( buttonID > 27 )
+    if ( buttonID > 35 )
       editedID = this.array.layer[this.var.layer].var.secondID;
     let editedTptpt = this.array.layer[this.var.layer].array.tptpt[editedID];
     if ( ( buttonID % 2 ) == 1 )
@@ -504,7 +578,7 @@ class board {
 
   scroll( buttonID ){
     let step = null;
-    let target = Math.floor( ( buttonID - 30 ) / 2 );
+    let target = Math.floor( ( buttonID - 38 ) / 2 );
 
     if ( ( buttonID % 2 ) == 1 )
       step = 1;
@@ -526,5 +600,15 @@ class board {
     //draw buttons
     for( let i = 0; i < this.array.button.length; i++ )
       this.array.button[i].draw( this.var.layer );
+
+    //draw grid
+    for( let i = 0; i < this.const.grid.x; i++ )
+      for( let j = 0; j < this.const.grid.x; j++ ){
+        let x = i * cellSize;
+        let y = j * cellSize;
+        stroke('red');
+        noFill();
+        rect(x, y, cellSize, cellSize);
+      }
   }
 }
