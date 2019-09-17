@@ -1,12 +1,13 @@
 //random event
 class halt{
-  constructor ( index, center, type , grade ){
+  constructor ( index, center, type , grade, parent ){
     this.index  = index;
     this.center = center;
     this.status = 'forgotten'; //forgotten proposed selected
     this.data = {
       type: null,
-      grade: null
+      grade: null,
+      parent: parent
     };
     this.size = createVector( cellSize, cellSize );
 

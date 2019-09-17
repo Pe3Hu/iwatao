@@ -18,7 +18,7 @@ class board {
       a: cellSize
     }
     this.var = {
-      layer: 4,
+      layer: 5,
       buttonID: 0,
       borderID: 0
     }
@@ -41,7 +41,6 @@ class board {
   initGrid(){
     this.const.grid.x = Math.floor( canvasSize.x / cellSize );
     this.const.grid.y = Math.floor( canvasSize.y / cellSize );
-
   }
 
   initWorkshop(){
@@ -51,16 +50,23 @@ class board {
     this.array.layer.push( new gamingHouse());
     this.array.layer.push( new playGround() );
     this.array.layer.push( new fogOfWar() );
+    this.array.layer.push( new shipYard() );
     this.array.layer.push( new whirlPool() );
   }
 
   initBorders(){
     let craftView = this.array.layer[0].array.view.length * 9;
     let gardenView = this.array.layer[1].array.view.length * 8;
-    let layer = 0;
-    let name = 'craftView';
-    let offset = createVector( cellSize * 0.5, cellSize * 0.5 );
-    let size = createVector( cellSize * craftView, cellSize * 9 );
+    let layer = 99;
+    let name = 'layerMenu';
+    let offset = createVector( cellSize * ( canvasGrid.x - 2.5 ), cellSize * 0.5 );
+    let size = createVector( cellSize * 2, cellSize * 10 );
+    this.addBorder( layer, name, offset, size );
+
+    layer = 0;
+    name = 'craftView';
+    offset = createVector( cellSize * 0.5, cellSize * 0.5 );
+    size = createVector( cellSize * craftView, cellSize * 9 );
     this.addBorder( layer, name, offset, size );
 
     name = 'craftSoloEdit';
@@ -95,17 +101,46 @@ class board {
     size = createVector( cellSize * 11, cellSize * 7 );
     this.addBorder( layer, name, offset, size );
 
+    layer = 3;
+    name = 'sportCourt';
+    offset = createVector( cellSize * 0.5, cellSize * 0.5 );
+    size = createVector( cellSize * 17, cellSize * 10 );
+    this.addBorder( layer, name, offset, size );
+
+    layer = 4;
+    name = 'huntGrounds';
+    offset = createVector( cellSize * 0.5, cellSize * 0.5 );
+    size = createVector( cellSize * 24, cellSize * 6 );
+    this.addBorder( layer, name, offset, size );
+
+    layer = 5;
+    name = 'shipHull';
+    offset = createVector( cellSize * 1, cellSize * 6 );
+    size = createVector( cellSize * ( canvasGrid.x - 4.5 ), cellSize * ( canvasGrid.y - 6.5 ) );
+    this.addBorder( layer, name, offset, size );
+
+    name = 'shipChallenger';
+    offset = createVector( cellSize * 2.5, cellSize * 0.5 );
+    size = createVector( cellSize * 5, cellSize * 5 );
+    this.addBorder( layer, name, offset, size );
+
+    name = 'shipView';
+    offset = createVector( cellSize * 8, cellSize * 0.5 );
+    size = createVector( cellSize * 18, cellSize * 5 );
+    this.addBorder( layer, name, offset, size );
+
     this.updateBorders();
   }
 
   addBorder( layer, name, offset, size ){
-    this.array.border.push( new border( this.var.buttonID, layer, name, offset, size ));
+    this.array.border.push( new border( this.var.borderID, layer, name, offset, size ));
     this.var.borderID++;
   }
 
   cleanBorders(){
     for ( let i = 0; i < this.array.border.length; i++ )
-      this.array.border[i].onScreen = false;
+      if( this.array.border[i].layer != 99 )
+        this.array.border[i].onScreen = false;
   }
 
   updateBorders(){
@@ -114,7 +149,7 @@ class board {
 
     switch ( this.var.layer ) {
       case 0:
-        offsetID = 0;
+        offsetID = 1;
         this.array.border[offsetID].onScreen = true;
 
         switch ( this.array.layer[this.var.layer].var.mode ) {
@@ -128,13 +163,34 @@ class board {
         }
         break;
       case 1:
-        offsetID = 4;
+        offsetID = 5;
         this.array.border[offsetID].onScreen = true;
         this.array.border[offsetID + 1].onScreen = true;
         break;
       case 2:
-        offsetID = 6;
+        offsetID = 7;
         this.array.border[offsetID].onScreen = true;
+        break;
+      case 3:
+        offsetID = 8;
+        this.array.border[offsetID].onScreen = true;
+        break;
+      case 4:
+        offsetID = 9;
+        switch ( this.array.layer[this.var.layer].var.mode ){
+          case 'search':
+            this.array.border[offsetID].onScreen = true;
+            break;
+          case 'fight':
+            //this.array.border[offsetID + 1].onScreen = true;
+            break;
+        }
+        break;
+      case 5:
+        offsetID = 10;
+        this.array.border[offsetID].onScreen = true;
+        this.array.border[offsetID + 1].onScreen = true;
+        this.array.border[offsetID + 2].onScreen = true;
         break;
     }
   }
@@ -151,7 +207,7 @@ class board {
     layer = 99;
     name = 'switchToCraft';
     type = 0;
-    vec = createVector( cellSize * ( craftView + 1.5 ), cellSize * 1.5 );
+    vec = createVector( cellSize * ( canvasGrid.x - 1.5 ), cellSize * 1.5 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'switchToGarden';
@@ -169,14 +225,16 @@ class board {
     vec.y += cellSize;
     this.addButton( layer, name, type, vec.copy() );
 
+    name = 'switchToHunt';
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
     name = 'switchToVortex';
     type++;
     vec.y += cellSize;
     this.addButton( layer, name, type, vec.copy() );
 
-    type++;
-    vec.y += cellSize;
-    this.addButton( layer, name, type, vec.copy() );
     type++;
     vec.y += cellSize;
     this.addButton( layer, name, type, vec.copy() );
@@ -297,13 +355,48 @@ class board {
     vec = createVector( cellSize * 12.5, cellSize * 1.5 );
     this.addButton( layer, name, type, vec.copy() );
 
+    layer = 5;
+    name = 'firstModuleMode';
+    type++;
+    vec = createVector( cellSize * ( canvasGrid.x - 4 ), cellSize * 1.5 );
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'secondModuleMode';
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'thirdModuleMode';
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'fourthModuleMode';
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'moduleScrollForward';
+    type++;
+    vec = createVector( cellSize * ( canvasGrid.x - 6 ), cellSize * 3 );
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'moduleScrollBack';
+    type++;
+    vec = createVector( cellSize * 1.5, cellSize * 3 );
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'generateModule';
+    type++;
+    vec = createVector( cellSize * ( canvasGrid.x - 6 ), cellSize * 4.5 );
+    this.addButton( layer, name, type, vec.copy() );
+
 
     for ( let i = 0; i < this.array.button.length; i++ )
       if( this.array.button[i].layer == 99 )
         this.array.button[i].onScreen = true;
 
     this.updateButtons();
-    //console.log( this.array.button)
   }
 
   addButton( layer, name, type, center ){
@@ -362,9 +455,20 @@ class board {
         this.array.button[offsetID].onScreen = true;
         break;
       case 2:
-        //babdit spin button
+        //bandit spin button
         offsetID = 46;
         this.array.button[offsetID].onScreen = true;
+        break;
+      case 5:
+        //module edit buttons
+        offsetID = 47;
+        this.array.button[offsetID].onScreen = true;
+        this.array.button[offsetID + 1].onScreen = true;
+        this.array.button[offsetID + 2].onScreen = true;
+        this.array.button[offsetID + 3].onScreen = true;
+        this.array.button[offsetID + 4].onScreen = true;
+        this.array.button[offsetID + 5].onScreen = true;
+        this.array.button[offsetID + 6].onScreen = true;
         break;
       }
   }
@@ -403,7 +507,7 @@ class board {
 
     //scroll tptpts
     if( buttonID >= 38 && buttonID < 44 )
-      this.scroll( buttonID );
+      this.scroll( buttonID, 0 );
 
     //change edit mode
     if( buttonID >= 44 && buttonID < 46 )
@@ -413,6 +517,18 @@ class board {
     if( buttonID == 46 )
       this.array.layer[this.var.layer].bandit.spin();
 
+    //change modules mode
+    if( buttonID >= 47 && buttonID < 51 )
+        this.array.layer[this.var.layer].switchMode( buttonID );
+
+    //scroll module
+    if( buttonID >= 51 && buttonID < 53 )
+      this.scroll( buttonID, 1 );
+
+    //generate new module
+    if( buttonID == 53 )
+      this.array.layer[this.var.layer].addModule();
+
     this.update();
     //console.log(mouseX, mouseY, minDist, buttonID, this.array.button)
   }
@@ -420,7 +536,8 @@ class board {
   plantClickCheck(){
     if( this.var.layer != 1 )
       return;
-    let editedID = this.array.layer[this.var.layer].var.firstID;
+
+    let editedID = this.array.layer[this.var.layer].var.firstShift;
     let editedPlant = this.array.layer[this.var.layer].array.plant[editedID];
     editedPlant.check();
   }
@@ -440,7 +557,7 @@ class board {
     let i = ( buttonID - 10 ) % this.const.edge.y;
     let x = null;
     let y = null;
-    let editedID = this.array.layer[this.var.layer].var.firstID;
+    let editedID = this.array.layer[this.var.layer].var.firstShift;
     let editedTptpt = this.array.layer[this.var.layer].array.tptpt[editedID];
     let flag = false;//
 
@@ -486,7 +603,7 @@ class board {
   shift( buttonID ){
     let type = Math.floor( ( buttonID - 10 ) / this.const.edge.y );
     let num = ( buttonID - 10 ) % this.const.edge.y + 1;
-    let editedID = this.array.layer[this.var.layer].var.firstID;
+    let editedID = this.array.layer[this.var.layer].var.firstShift;
     let editedTptpt = this.array.layer[this.var.layer].array.tptpt[editedID];
 
     switch ( type ) {
@@ -527,9 +644,9 @@ class board {
 
   rotate( buttonID ){
     let clockwise;
-    let editedID = this.array.layer[this.var.layer].var.firstID;
+    let editedID = this.array.layer[this.var.layer].var.firstShift;
     if ( buttonID > 35 )
-      editedID = this.array.layer[this.var.layer].var.secondID;
+      editedID = this.array.layer[this.var.layer].var.secondShift;
     let editedTptpt = this.array.layer[this.var.layer].array.tptpt[editedID];
     if ( ( buttonID % 2 ) == 1 )
       clockwise = true;
@@ -576,16 +693,28 @@ class board {
       this.updateButtons();
     }
 
-  scroll( buttonID ){
+  scroll( buttonID, type ){
     let step = null;
     let target = Math.floor( ( buttonID - 38 ) / 2 );
 
-    if ( ( buttonID % 2 ) == 1 )
-      step = 1;
-    else
-      step = -1;
+    switch ( type ) {
+      case 0:
+        if ( ( buttonID % 2 ) == 1 )
+          step = 1;
+        else
+          step = -1;
 
-    this.array.layer[this.var.layer].updateTptpts( step, target );
+        this.array.layer[this.var.layer].updateTptpts( step, target );
+        break;
+      case 1:
+        if ( ( buttonID % 2 ) == 0 )
+          step = 1;
+        else
+          step = -1;
+
+        this.array.layer[this.var.layer].updateModules( step );
+        break;
+    }
   }
 
   //drawing game frame
@@ -606,9 +735,19 @@ class board {
       for( let j = 0; j < this.const.grid.x; j++ ){
         let x = i * cellSize;
         let y = j * cellSize;
-        stroke('red');
+        stroke('grey');
         noFill();
         rect(x, y, cellSize, cellSize);
       }
+
+    for( let i = 0; i < 3; i++ )
+      for( let j = 0; j < 3; j++ ){
+        let x = i * cellSize * 10;
+        let y = j * cellSize * 10;
+        stroke('white');
+        noFill();
+        rect(x, y, cellSize * 10, cellSize * 10);
+      }
+      noStroke();
   }
 }

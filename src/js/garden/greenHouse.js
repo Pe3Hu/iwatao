@@ -14,8 +14,8 @@ class greenHouse {
       id: []
     };
     this.var = {
-      firstID: 0,
-      secondID: 1,
+      firstShift: 0,
+      secondShift: 1,
       mode: 'growth'
     }
 
@@ -28,11 +28,11 @@ class greenHouse {
     switch ( this.var.mode ) {
       case 'growth':
         this.var.mode = 'duo';
-        this.var.secondID = this.array.id.shift();
+        this.var.secondShift = this.array.id.shift();
         break;
       case 'duo':
         this.var.mode = 'growth';
-        this.array.id.unshift( this.var.secondID );
+        this.array.id.unshift( this.var.secondShift );
         break;
     }
     this.updatePlants( 0, null );
@@ -53,7 +53,7 @@ class greenHouse {
       this.array.id.push( i );
     }
 
-    this.array.id.splice( this.var.firstID, 1 );
+    this.array.id.splice( this.var.firstShift, 1 );
 
     this.updatePlants( 0, 0 );
   }
@@ -84,14 +84,14 @@ class greenHouse {
     //set position and status for editable Plants
     switch ( this.var.mode ) {
       case 'growth':
-        this.array.plant[this.var.firstID].setStatus( 2 );
-        this.array.plant[this.var.firstID].setOffset( this.array.edit[0] );
+        this.array.plant[this.var.firstShift].setStatus( 2 );
+        this.array.plant[this.var.firstShift].setOffset( this.array.edit[0] );
         break;
       case 'duo':
-        this.array.plant[this.var.firstID].setStatus( 3 );
-        this.array.plant[this.var.firstID].setOffset( this.array.edit[1] );
-        this.array.plant[this.var.secondID].setStatus( 3 );
-        this.array.plant[this.var.secondID].setOffset( this.array.edit[2] );
+        this.array.plant[this.var.firstShift].setStatus( 3 );
+        this.array.plant[this.var.firstShift].setOffset( this.array.edit[1] );
+        this.array.plant[this.var.secondShift].setStatus( 3 );
+        this.array.plant[this.var.secondShift].setOffset( this.array.edit[2] );
         break;
     }
 
@@ -108,12 +108,12 @@ class greenHouse {
       case 'first':
         //return the index of the first sample to an array of options
         if( step > 0 ){
-          this.array.id.push( this.var.firstID );
-          this.var.firstID = this.array.id.shift();
+          this.array.id.push( this.var.firstShift );
+          this.var.firstShift = this.array.id.shift();
         }
         if( step < 0 ){
-          this.array.id.unshift( this.var.firstID );
-          this.var.firstID = this.array.id.pop();
+          this.array.id.unshift( this.var.firstShift );
+          this.var.firstShift = this.array.id.pop();
         }
       break;
       case 'second':
@@ -122,12 +122,12 @@ class greenHouse {
 
         //return the index of the second sample to an array of options
         if( step > 0 ){
-          this.array.id.push( this.var.secondID );
-          this.var.secondID = this.array.id.shift();
+          this.array.id.push( this.var.secondShift );
+          this.var.secondShift = this.array.id.shift();
         }
         else{
-          this.array.id.unshift( this.var.secondID );
-          this.var.secondID = this.array.id.pop();
+          this.array.id.unshift( this.var.secondShift );
+          this.var.secondShift = this.array.id.pop();
         }
         break;
     }

@@ -1,10 +1,13 @@
 let cellSize = 24;
 let daoNum = 9;
 let colorMax = 360;
+let colorBG = colorMax * 2 / 3;
+let colorButton = colorMax / 2;
 let infinity = 999999999;
 let font;
 let fontSize = 18;
 let canvasSize;
+let canvasGrid;
 let interfaceBoundaries;
 let gameBoard;
 let offset;
@@ -15,6 +18,7 @@ function preload() {
 
 function setup() {
   canvasSize = createVector( 800, 600 );
+  canvasGrid = createVector( Math.floor( canvasSize.x / cellSize ), Math.floor( canvasSize.y / cellSize ) );
   createCanvas( canvasSize.x, canvasSize.y );
 
   textFont( font );
@@ -29,7 +33,7 @@ function setup() {
 }
 
 function draw() {
-  background( 240 );
+  background( colorBG );
   gameBoard.draw();
 }
 

@@ -8,19 +8,32 @@ class fogOfWar{
       vertex: []
     };
     this.var = {
-
-    }
+      mode: 'search' //'search' fight
+    };
 
     this.init();
   }
 
   init(){
-    this.array.vertex.push( createVector( cellSize * 2, cellSize * 2 ) );
-    this.grounds = new grounds( this.array.vertex[0] );
+    this.initVertex();
+    this.grounds = new grounds();
+    this.hearth = new hearth();
+  }
+
+  initVertex(){
+    this.array.vertex.push( createVector( cellSize * 0.5, cellSize * 1.5 ) );
+    this.array.vertex.push( createVector( cellSize * 0, cellSize * 0 ) );
   }
 
   //drawing hunting grounds
   draw(){
-    this.grounds.draw( this.array.vertex[0] );
+    switch ( this.var.mode ) {
+      case 'search':
+        this.grounds.draw( this.array.vertex[0] );
+        break;
+      case 'fight':
+        this.hearth.draw( this.array.vertex[1] );
+        break;
+    }
   }
 }

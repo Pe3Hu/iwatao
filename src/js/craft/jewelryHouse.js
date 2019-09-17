@@ -12,8 +12,8 @@ class jewelryHouse {
       id: []
     };
     this.var = {
-      firstID: 0,
-      secondID: 1,
+      firstShift: 0,
+      secondShift: 1,
       mode: 'solo'
     }
     this.offset = createVector();
@@ -25,11 +25,11 @@ class jewelryHouse {
     switch ( this.var.mode ) {
       case 'solo':
         this.var.mode = 'duo';
-        this.var.secondID = this.array.id.shift();
+        this.var.secondShift = this.array.id.shift();
         break;
       case 'duo':
         this.var.mode = 'solo';
-        this.array.id.unshift( this.var.secondID );
+        this.array.id.unshift( this.var.secondShift );
         break;
     }
     this.updateTptpts( 0, null );
@@ -53,7 +53,7 @@ class jewelryHouse {
       this.array.id.push( i );
     }
 
-    this.array.id.splice( this.var.firstID, 1 );
+    this.array.id.splice( this.var.firstShift, 1 );
 
     this.updateTptpts( 0, 0 );
   }
@@ -64,7 +64,7 @@ class jewelryHouse {
   }
 
   cleanTptpts(){
-    for ( let i = 0; i < this.array.tptpt.length; i++ )
+    for( let i = 0; i < this.array.tptpt.length; i++ )
       this.array.tptpt[i].setStatus( 0 );
   }
 
@@ -80,23 +80,22 @@ class jewelryHouse {
       case 2:
         target = 'second';
         break;
-      default:
-
     }
+
     this.cleanTptpts();
     this.nextIndex( step, target );
 
     //set position and status for editable tptpts
     switch ( this.var.mode ) {
       case 'solo':
-        this.array.tptpt[this.var.firstID].setStatus( 2 );
-        this.array.tptpt[this.var.firstID].setOffset( this.array.edit[0] );
+        this.array.tptpt[this.var.firstShift].setStatus( 2 );
+        this.array.tptpt[this.var.firstShift].setOffset( this.array.edit[0] );
         break;
       case 'duo':
-        this.array.tptpt[this.var.firstID].setStatus( 3 );
-        this.array.tptpt[this.var.firstID].setOffset( this.array.edit[1] );
-        this.array.tptpt[this.var.secondID].setStatus( 3 );
-        this.array.tptpt[this.var.secondID].setOffset( this.array.edit[2] );
+        this.array.tptpt[this.var.firstShift].setStatus( 3 );
+        this.array.tptpt[this.var.firstShift].setOffset( this.array.edit[1] );
+        this.array.tptpt[this.var.secondShift].setStatus( 3 );
+        this.array.tptpt[this.var.secondShift].setOffset( this.array.edit[2] );
         break;
     }
 
@@ -113,12 +112,12 @@ class jewelryHouse {
       case 'first':
         //return the index of the first sample to an array of options
         if( step > 0 ){
-          this.array.id.push( this.var.firstID );
-          this.var.firstID = this.array.id.shift();
+          this.array.id.push( this.var.firstShift );
+          this.var.firstShift = this.array.id.shift();
         }
         if( step < 0 ){
-          this.array.id.unshift( this.var.firstID );
-          this.var.firstID = this.array.id.pop();
+          this.array.id.unshift( this.var.firstShift );
+          this.var.firstShift = this.array.id.pop();
         }
       break;
       case 'second':
@@ -127,12 +126,12 @@ class jewelryHouse {
 
         //return the index of the second sample to an array of options
         if( step > 0 ){
-          this.array.id.push( this.var.secondID );
-          this.var.secondID = this.array.id.shift();
+          this.array.id.push( this.var.secondShift );
+          this.var.secondShift = this.array.id.shift();
         }
         else{
-          this.array.id.unshift( this.var.secondID );
-          this.var.secondID = this.array.id.pop();
+          this.array.id.unshift( this.var.secondShift );
+          this.var.secondShift = this.array.id.pop();
         }
         break;
     }

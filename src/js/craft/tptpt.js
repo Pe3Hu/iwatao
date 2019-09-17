@@ -19,13 +19,16 @@ class tptpt {
       freeEdge: []
     };
     this.offset = createVector();
-    this.offset = createVector();
     this.status = 'wait';
 
-    this.initPikas();
-    this.initEdges();
+    this.init();
 
     this.addRandPikaEdge( steps );
+  }
+
+  init(){
+    this.initPikas();
+    this.initEdges();
   }
 
   //set array of pika
@@ -94,8 +97,8 @@ class tptpt {
     this.offset = offset;
   }
 
-  setStatus( stat ){
-    switch ( stat ) {
+  setStatus( status ){
+    switch ( status ) {
       //do not show
       case 0:
         this.status = 'wait';
