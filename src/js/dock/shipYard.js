@@ -17,13 +17,21 @@ class shipYard{
       edit: []
     };
     this.var = {
-      mode: 2,
+      mode: 0,
       border: null
     };
 
     this.init();
 
-    console.log( this.array.module )
+    let m = this.array.shift[this.var.mode];
+    let mod = this.array.module[this.var.mode][m];
+    console.log( mod )
+    let pIndex = 545;
+    let cIndex = null;
+    for( let i = 0; i < 4; i ++ )
+      cIndex = mod.array.gateway[i][0];
+
+    this.attachToHull( mod, pIndex, cIndex );
   }
 
   initDots(){
@@ -34,7 +42,7 @@ class shipYard{
     let blockSize = 0.5;
     let layerMenu = 2;
     let shiftButtons = 4.5;
-    let offsetModule = 3;
+    let offsetModule = 2.5;
     let currentModule = 5;
     let shoot;
     let undershoot = [];
@@ -50,27 +58,29 @@ class shipYard{
         vec.x += ( ( blockCount + 1 ) * blockSize ) * cellSize;
       }
       stop = this.var.border.x - this.array.view[i][this.array.view[i].length - 1].x;
-      shoot = stop / cellSize - blockCount * blockSize / 2 - 0.5;
+      shoot = stop / cellSize - blockCount * blockSize / 2;
       undershoot.push( shoot / 2 );
       blockCount += 2;
       offset++;
     }
 
     for( let i = 0; i < this.const.n; i++ )
-      for ( let j = 0; j < this.array.view[i].length; j++ ){
+      for ( let j = 0; j < this.array.view[i].length; j++ )
         this.array.view[i][j].x += undershoot[i] * cellSize;
-      }
 
-    this.array.edit.push( createVector( cellSize * 5, cellSize * 3 ));
+    this.array.edit.push( createVector( cellSize * 4.5, cellSize * 3 ));
+    let x = ( canvasGrid.x - 4 ) / 2 + 0.5;
+    let y = ( canvasGrid.y - 6.5 ) / 2 + 6;
+    this.array.edit.push( createVector( cellSize * x, cellSize * y ));
   }
 
   initModules(){
-    /*for ( let i = 0; i < this.const.n; i++ ){
-      for ( let j = 0; j < this.array.view[i].length; j++ )
+    for ( let i = 0; i < this.const.n; i++ ){
+      for ( let j = 0; j < this.array.view[i].length + 1; j++ )
         this.addModule();
       this.var.mode++;
-    }*/
-
+    }
+    this.var.mode = 2;
   }
 
   initDistribution(){
@@ -95,19 +105,18 @@ class shipYard{
     this.addHull();
   }
 
+  //
   addHull(){
     this.array.hull.push( new hull( this.array.hull.length, 0 ) );
   }
 
+  //change the type of displayed modules
   switchMode( buttonID ){
     let buttonOffset = 47;
     this.var.mode = buttonID - buttonOffset;
   }
 
-  scroll( buttonID ){
-
-  }
-
+  //
   addModule(){
     let i = this.var.mode;
     let index = this.array.module[i].length;
@@ -120,21 +129,22 @@ class shipYard{
       this.array.shift[i] = 0;
       this.updateModules( 0 );
     }
-    else{      
+    else{
       this.array.id[i].push( index );
       this.updateModules( -1 );
     }
 
   }
 
+  //bring the statuses of all the block to the default value
   cleanModules(){
     for( let i = 0; i < this.array.module.length; i++ )
       for( let j = 0; j < this.array.module[i].length; j++ )
         this.array.module[i][j].setStatus( 0 );
   }
 
-  nextIndex( step ){
-    //return the index of the first sample to an array of options
+  //insert the current shift at the beginning or at the end of the id array
+  updateShift( step ){
     if( step > 0 ){
       this.array.id[this.var.mode].push( this.array.shift[this.var.mode] );
       this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
@@ -143,19 +153,15 @@ class shipYard{
       this.array.id[this.var.mode].unshift( this.array.shift[this.var.mode] );
       this.array.shift[this.var.mode] = this.array.id[this.var.mode].pop();
     }
-    if( step == 0 ){
-
-    }
-    console.log( step, this.array.id[this.var.mode] )
   }
 
+  //change the status and location of all modules
   updateModules( step ){
     if( this.array.module[this.var.mode] == 0 )
       return;
 
-
     this.cleanModules();
-    this.nextIndex( step );
+    this.updateShift( step );
 
     let i = this.var.mode;
     let j = this.array.shift[i];
@@ -163,8 +169,6 @@ class shipYard{
     //set position and status for editable module
     this.array.module[i][j].setStatus( 2 );
     this.array.module[i][j].setOffset( this.array.edit[0] );
-
-    console.log( this.array.shift[i], j );
 
     //set position and status for visible modules
     for( let l = 0; l < this.array.view[i].length; l++ ){
@@ -179,6 +183,29 @@ class shipYard{
 
   }
 
+  attachToHull( module, parentIndex, childIndex ){
+    let childVec = module.convertIndex( childIndex );
+    let parentVec = this.array.hull[0].convertIndex( parentIndex );
+    let originVec = parentVec.copy();
+    originVec.sub( childVec );
+    console.log( childVec.x, childVec.y, childIndex );
+    console.log( parentVec.x, parentVec.y, parentIndex );
+    console.log( originVec.x, originVec.y );
+
+    for(  let i = 0; i < module.array.block.length; i++ )
+      for(  let j = 0; j < module.array.block[i].length; j++ ){
+        let x = i + originVec.x;
+        let y = j + originVec.y;
+        let partition = module.array.block[i][j].partition;
+        console.log(x, y)
+        console.log(this.array.hull[0].array.grid[x][y])
+        this.array.hull[0].array.grid[x][y].setPartition( partition );
+      }
+
+
+
+  }
+
   //drawing ship creating
   draw(){
     if( this.array.module.length == 0 )
@@ -189,8 +216,7 @@ class shipYard{
     this.array.module[i].forEach( function( element ){
       element.draw();
     });
-    /*for ( let j = 0; j < this.array.view[i].length; j++ )
-      if( this.array.module[i].length > j )
-        this.array.module[i][j].draw( this.array.view[i][j], this.var.mode );*/
+
+    this.array.hull[0].draw( this.array.edit[1] );
   }
 }

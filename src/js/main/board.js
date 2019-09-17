@@ -115,18 +115,18 @@ class board {
 
     layer = 5;
     name = 'shipHull';
-    offset = createVector( cellSize * 1, cellSize * 6 );
-    size = createVector( cellSize * ( canvasGrid.x - 4.5 ), cellSize * ( canvasGrid.y - 6.5 ) );
+    offset = createVector( cellSize * 0.5, cellSize * 6 );
+    size = createVector( cellSize * ( canvasGrid.x - 4 ), cellSize * ( canvasGrid.y - 6.5 ) );
     this.addBorder( layer, name, offset, size );
 
     name = 'shipChallenger';
-    offset = createVector( cellSize * 2.5, cellSize * 0.5 );
-    size = createVector( cellSize * 5, cellSize * 5 );
+    offset = createVector( cellSize * 0.5, cellSize * 0.5 );
+    size = createVector( cellSize * 6.5, cellSize * 5 );
     this.addBorder( layer, name, offset, size );
 
     name = 'shipView';
-    offset = createVector( cellSize * 8, cellSize * 0.5 );
-    size = createVector( cellSize * 18, cellSize * 5 );
+    offset = createVector( cellSize * 7.5, cellSize * 0.5 );
+    size = createVector( cellSize * ( canvasGrid.x - 11 ), cellSize * 5 );
     this.addBorder( layer, name, offset, size );
 
     this.updateBorders();
@@ -358,7 +358,7 @@ class board {
     layer = 5;
     name = 'firstModuleMode';
     type++;
-    vec = createVector( cellSize * ( canvasGrid.x - 4 ), cellSize * 1.5 );
+    vec = createVector( cellSize * ( canvasGrid.x - 4.5 ), cellSize * 1.5 );
     this.addButton( layer, name, type, vec.copy() );
 
     name = 'secondModuleMode';
@@ -731,23 +731,25 @@ class board {
       this.array.button[i].draw( this.var.layer );
 
     //draw grid
-    for( let i = 0; i < this.const.grid.x; i++ )
-      for( let j = 0; j < this.const.grid.x; j++ ){
-        let x = i * cellSize;
-        let y = j * cellSize;
-        stroke('grey');
-        noFill();
-        rect(x, y, cellSize, cellSize);
-      }
+    if( this.var.layer != 6 ){
+      for( let i = 0; i < this.const.grid.x; i++ )
+        for( let j = 0; j < this.const.grid.x; j++ ){
+          let x = i * cellSize;
+          let y = j * cellSize;
+          stroke('grey');
+          noFill();
+          rect(x, y, cellSize, cellSize);
+        }
 
-    for( let i = 0; i < 3; i++ )
-      for( let j = 0; j < 3; j++ ){
-        let x = i * cellSize * 10;
-        let y = j * cellSize * 10;
-        stroke('white');
-        noFill();
-        rect(x, y, cellSize * 10, cellSize * 10);
-      }
-      noStroke();
+      for( let i = 0; i < 3; i++ )
+        for( let j = 0; j < 3; j++ ){
+          let x = i * cellSize * 10;
+          let y = j * cellSize * 10;
+          stroke('white');
+          noFill();
+          rect(x, y, cellSize * 10, cellSize * 10);
+        }
+        noStroke();
+    }
   }
 }

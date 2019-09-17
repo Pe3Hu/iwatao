@@ -16,11 +16,12 @@ class module {
       m: 4
     };
     this.array = {
-      block: [],
-      edge: [],
+      freeCorner: [],
       freeEdge: [],
+      gateway: [ [], [], [], [] ],
       corner: [],
-      freeCorner: []
+      block: [],
+      edge: []
     };
     this.status = 'wait';
     this.offset = createVector();
@@ -44,8 +45,9 @@ class module {
         //add block
         let index = this.const.block.x * i + j;
         let center = createVector( this.const.a * ( j + 0.5 ), this.const.a * ( i + 0.5 ));
-        let status = 0;//Math.floor( Math.random * this.const.m );
-        this.array.block[i].push( new block( index, center, status ) );
+        let scale = 0.5;
+        let partition = this.calculatePartition( i, j );
+        this.array.block[i].push( new block( index, center, scale, partition ) );
         }
       }
   }
@@ -167,16 +169,12 @@ class module {
         this.addGateway( 5 );
         break;
     }
-
-    this.updateVerge();
   }
 
   //convert block index to type
   determineBlockType( index ){
     let blockType = null;
     let vec = this.convertIndex( index );
-    let obj;
-    let id;
 
     //corner
     if( vec.x == 0 && vec.y == 0 )
@@ -359,7 +357,7 @@ class module {
       for( let j = edge.length - 1; j >= 0; j-- )
         if( edge[j] == this.array.freeEdge[i] ){
           let vec = this.convertIndex( this.array.freeEdge[i] );
-          this.array.block[vec.x][vec.y].setStatus( 0 );
+          this.array.block[vec.x][vec.y].setKind( 0 );
           this.array.freeEdge.splice( i, 1 );
         }
 
@@ -368,7 +366,7 @@ class module {
       for( let j = corner.length - 1; j >= 0; j-- )
         if( corner[j] == this.array.freeCorner[i] ){
           let vec = this.convertIndex( this.array.freeCorner[i] );
-          this.array.block[vec.x][vec.y].setStatus( 0 );
+          this.array.block[vec.x][vec.y].setKind( 0 );
           this.array.freeCorner.splice( i, 1 );
         }
 
@@ -376,6 +374,8 @@ class module {
 
   //find the grid coordinates by index
   convertIndex( index ){
+    if( index == undefined )
+      return null;
     let x = Math.floor( index / this.const.block.x );
     let y = index % this.const.block.y;
     return createVector( x, y );
@@ -400,20 +400,22 @@ class module {
         rand = Math.floor( Math.random() * this.array.freeEdge.length );
         index = this.array.freeEdge[rand];
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setStatus( 1 );
         this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.array.freeEdge.splice( rand, 1 );
         this.cutOffNeighbors( index );
+        this.accountingGateway( index );
         break;
       case 1:
         name = 'anyCorner';
         rand = Math.floor( Math.random() * this.array.freeCorner.length );
         index = this.array.freeCorner[rand];
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setStatus( 1 );
         this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.array.freeCorner.splice( rand, 1 );
         this.cutOffNeighbors( index );
+        this.accountingGateway( index );
         break;
       case 2:
         if( this.const.type < 3 )
@@ -430,33 +432,23 @@ class module {
             if ( testIndex != -1 )
               blockType = type;
           }
-
           counter++;
         }
 
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setStatus( 1 );
         this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.array.freeEdge.splice( rand, 1 );
-
-        let arr2 = [];
-        for( let i = 0; i < this.array.freeEdge.length; i++ )
-          arr2.push(  this.array.freeEdge[i] )
-        this.cutOffNeighbors( index );
+        this.accountingGateway( index );
 
         id = this.getCouple( blockType );
         vec = this.convertIndex( id );
-        let arr3 = [];
-        for( let i = 0; i < this.array.freeEdge.length; i++ )
-          arr3.push(  this.array.freeEdge[i] )
+        this.cutOffNeighbors( index );
 
-        this.array.block[vec.x][vec.y].setStatus( 1 );
         this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.x][vec.y].setPartition( 1 );
+        this.accountingGateway( id );
         this.cutOffNeighbors( id );
-
-        let arr = [];
-        for( let i = 0; i < this.array.freeEdge.length; i++ )
-          arr.push(  this.array.freeEdge[i] )
         break;
       case 3:
       case 4:
@@ -481,13 +473,15 @@ class module {
 
         index = this.array.freeCorner[firstID];
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setStatus( 1 );
         this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.x][vec.y].setPartition( 1 );
+        this.accountingGateway( index );
 
         index = this.array.freeCorner[secondID];
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setStatus( 1 );
         this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.x][vec.y].setPartition( 1 );
+        this.accountingGateway( index );
 
         if( rand != 3 )
           this.array.freeCorner.splice( rand, 2 );
@@ -503,7 +497,6 @@ class module {
 
   //find out a pair for a specific type of block
   getCouple( blockType ){
-    let name = 'unilateralEdge';
     let couples = [
       [ 8, 9 ],
       [ 10, 11 ],
@@ -574,9 +567,10 @@ class module {
         break;
     }
 
-    this.array.block[vec.x][vec.y].setStatus( 1 );
     this.array.block[vec.x][vec.y].setKind( name );
+    this.array.block[vec.x][vec.y].setPartition( 1 );
     this.array.freeEdge.splice( rand, 1 );
+    this.accountingGateway( index );
 
     this.tryAdject( index, adjacents );
 
@@ -665,37 +659,80 @@ class module {
       this.tryAdject( adjIndex, adjacents );
 
       vec = this.convertIndex( adjIndex );
-      this.array.block[vec.x][vec.y].setStatus( 1 );
       this.array.block[vec.x][vec.y].setKind( name );
+      this.array.block[vec.x][vec.y].setPartition( 1 );
       this.array.freeEdge.splice( index, 1 );
-      //console.log( adjacents, adjIndex, vec.x, vec.y );
+      this.accountingGateway( adjIndex );
       count--;
     }
 
     return ids;
   }
 
-  //set unselected blocks to the default value
-  updateVerge(){
-    for( let i = 0; i < this.array.freeEdge.length; i++ ){
-      let vec = this.convertIndex( this.array.freeEdge[i] );
-      this.array.block[vec.x][vec.y].setStatus( 2 );
-    }
+  //determine the type of partition by column and row
+  calculatePartition( x, y ){
+    let partition = null;
 
-    for( let i = 0; i < this.array.freeCorner.length; i++ ){
-      let vec = this.convertIndex( this.array.freeCorner[i] );
-      this.array.block[vec.x][vec.y].setStatus( 2 );
-    }
+    if( x == 0 && y == 0 )
+      partition = 6;
+    if( x == 0 && y == this.const.block.y - 1 )
+      partition = 7;
+    if( x == this.const.block.x - 1 && y == this.const.block.y - 1 )
+      partition = 8;
+    if( x == this.const.block.x - 1 && y == 0 )
+      partition = 9;
+
+    if( partition == null ){
+      if( x == 0 )
+        partition = 2;
+      if( y == this.const.block.y - 1 )
+        partition = 3;
+      if( x == this.const.block.x - 1 )
+        partition = 4;
+      if( y == 0 )
+        partition = 5;
+      }
+    return partition;
   }
 
-  //
-  cutIndexEdge( value ){
-    let index = this.array.freeEdge.indexOf( value );
-    this.array.freeEdge.splice( index, 1 );
-    /*for( let i = 0; i < this.array.freeEdge.length; i++ )
-      if( this.array.freeEdge[i] == index ){
-        break;
-      }*/
+  //add to gateway array taken index
+  accountingGateway( index ){
+    let way = null;
+    let anotherWay = null;
+    let vec = this.convertIndex( index );
+
+
+    if( vec.x == 0 && vec.y == 0 ){
+      way = 0;
+      anotherWay = 3;
+    }
+    if( vec.x == 0 && vec.y == this.const.block.y - 1 ){
+      way = 1;
+      anotherWay = 0;
+    }
+    if( vec.x == this.const.block.x - 1 && vec.y == this.const.block.y - 1 ){
+      way = 2;
+      anotherWay = 1;
+    }
+    if( vec.x == this.const.block.x - 1 && vec.y == 0 ){
+      way = 3;
+      anotherWay = 2;
+    }
+
+    if( way == null ){
+      if( vec.x == 0 )
+        way = 0;
+      if( vec.y == this.const.block.y - 1 )
+        way = 1;
+      if( vec.x == this.const.block.x - 1 )
+        way = 2;
+      if( vec.y == 0 )
+        way = 3;
+      }
+
+    this.array.gateway[way].push( index );
+    if( anotherWay != null )
+      this.array.gateway[anotherWay].push( index );
   }
 
   setStatus( status ){
@@ -743,8 +780,8 @@ class module {
     rand = this.array.freeEdge.indexOf( index );
     vec = this.convertIndex( index );
     console.log( index, vec.x, vec.y, rand );
-    this.array.block[vec.x][vec.y].setStatus( 1 );
-    this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.x][vec.y].setKind( name );
+    this.array.block[vec.x][vec.y].setPartition( 1 );
     this.array.freeEdge.splice( rand, 1 );
     this.cutOffNeighbors( index );
   }
