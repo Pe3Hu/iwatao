@@ -80,7 +80,7 @@ class pika {
     }
   }
 
-  setVars( pika ){
+  clone( pika ){
     this.aspect.num = pika.aspect.num;
     this.setType( pika.aspect.num );
     this.status = pika.status;

@@ -157,7 +157,6 @@ class button {
       //draw module mode change buttons
       if ( this.type > 19 && this.type < 24 ){
         fill( colorMax * 0.75 );
-
         rect(
           this.center.x - this.const.a / 2,
           this.center.y - this.const.a / 2,
@@ -205,6 +204,46 @@ class button {
 
         fill('yellow');
         ellipse( this.center.x, this.center.y, cellSize / 6, cellSize / 6 );
+      }
+
+      //draw module rotate buttons
+      if ( this.type > 26 && this.type < 29 ){
+        noStroke();
+        fill( this.color );
+        ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
+
+        d = 2 + ( this.type - 27.5 ) * 2;
+
+        fill( 'blue' );
+        triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
+          this.array.vertex[d][1].x, this.array.vertex[d][1].y,
+          this.array.vertex[d][2].x, this.array.vertex[d][2].y );
+        triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
+          this.array.vertex[d][3].x, this.array.vertex[d][3].y,
+          this.array.vertex[d][2].x, this.array.vertex[d][2].y );
+        triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
+          this.array.vertex[d][3].x, this.array.vertex[d][3].y,
+          this.array.vertex[d][4].x, this.array.vertex[d][4].y );
+      }
+
+      //draw joint shift buttons
+      if ( this.type > 28 && this.type < 31 ){
+        noStroke();
+        fill( this.color );
+        ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
+
+        d = 4 + ( this.type - 29.5 ) * 2;
+
+        fill( 'purple' );
+        triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
+          this.array.vertex[d][1].x, this.array.vertex[d][1].y,
+          this.array.vertex[d][2].x, this.array.vertex[d][2].y );
+        triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
+          this.array.vertex[d][3].x, this.array.vertex[d][3].y,
+          this.array.vertex[d][2].x, this.array.vertex[d][2].y );
+        triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
+          this.array.vertex[d][3].x, this.array.vertex[d][3].y,
+          this.array.vertex[d][4].x, this.array.vertex[d][4].y );
       }
     }
   }

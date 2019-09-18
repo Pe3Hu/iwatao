@@ -1,6 +1,6 @@
 //module growth process display
 class shipYard{
-  constructor (){
+  constructor(){
     this.const = {
       a: cellSize,
       n: 4,
@@ -12,26 +12,20 @@ class shipYard{
       shift: [ null, null, null, null ],
       distribution: [],
       option: [],
+      choice: [],
       hull: [],
       view: [],
-      edit: []
+      edit: [],
+      way: [ 'up', 'right', 'down', 'left' ]
     };
     this.var = {
-      mode: 0,
-      border: null
+      border: null,
+      joint: 0,
+      mode: 0
     };
 
     this.init();
 
-    let m = this.array.shift[this.var.mode];
-    let mod = this.array.module[this.var.mode][m];
-    console.log( mod )
-    let pIndex = 545;
-    let cIndex = null;
-    for( let i = 0; i < 4; i ++ )
-      cIndex = mod.array.gateway[i][0];
-
-    this.attachToHull( mod, pIndex, cIndex );
   }
 
   initDots(){
@@ -103,6 +97,9 @@ class shipYard{
     this.initDots();
     this.initModules();
     this.addHull();
+
+    this.tryAttach();
+
   }
 
   //
@@ -183,30 +180,54 @@ class shipYard{
 
   }
 
-  attachToHull( module, parentIndex, childIndex ){
-    let childVec = module.convertIndex( childIndex );
-    let parentVec = this.array.hull[0].convertIndex( parentIndex );
-    let originVec = parentVec.copy();
-    originVec.sub( childVec );
-    console.log( childVec.x, childVec.y, childIndex );
-    console.log( parentVec.x, parentVec.y, parentIndex );
-    console.log( originVec.x, originVec.y );
+  tryAttach(){
+    let index = 0;
+    let m = this.array.shift[this.var.mode];
+    let mod = this.array.module[this.var.mode][m];
+    let parent = null;
+    let child = null;
+    this.array.joint = [];
 
-    for(  let i = 0; i < module.array.block.length; i++ )
-      for(  let j = 0; j < module.array.block[i].length; j++ ){
-        let x = i + originVec.x;
-        let y = j + originVec.y;
-        let partition = module.array.block[i][j].partition;
-        console.log(x, y)
-        console.log(this.array.hull[0].array.grid[x][y])
-        this.array.hull[0].array.grid[x][y].setPartition( partition );
+    console.log( this.array.hull[0].array.gateway );
+
+    for( let i = 0; i < this.array.way.length; i++ )
+      for( let j = 0; j < this.array.hull[0].array.gateway[i].length; j++ ){
+          parent = this.array.hull[0].array.gateway[i][j];
+          let way = ( i + 2 ) % this.array.way.length;
+          for( let l = 0; l < mod.array.gateway[way].length; l++ ){
+              child = mod.array.gateway[way][l];
+              this.array.joint.push( new joint( index, parent, child ) );
+              index++;
+          }
       }
-
-
+    this.attachToHull( mod, this.array.joint[this.var.joint] );
 
   }
 
-  //drawing ship creating
+  attachToHull( module, joint ){
+    this.array.hull[0].cleanGrid();
+
+    let childVec = module.convertIndex( joint.child );
+    let parentVec = this.array.hull[0].convertIndex( joint.parent );
+
+    for(  let i = 0; i < module.array.block.length; i++ )
+      for(  let j = 0; j < module.array.block[i].length; j++ ){
+        let y = j + parentVec.y - childVec.y;
+        let x = i + parentVec.x - childVec.x;
+        let block = module.array.block[i][j];
+        this.array.hull[0].array.grid[y][x].copy( block );
+      }
+  }
+
+  shiftJoint( shift ){
+    this.var.joint = ( this.var.joint + shift + this.array.joint.length ) % this.array.joint.length;
+    console.log( this.var.joint, this.array.joint )
+
+    let m = this.array.shift[this.var.mode];
+    let mod = this.array.module[this.var.mode][m];
+    this.attachToHull( mod, this.array.joint[this.var.joint] );
+  }
+
   draw(){
     if( this.array.module.length == 0 )
       return;

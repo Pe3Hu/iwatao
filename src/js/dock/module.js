@@ -1,6 +1,6 @@
 //universal component of the ship
 class module {
-  constructor ( index, type, grade ){
+  constructor( index, type, grade ){
     this.index = index;
     this.const = {
       a: cellSize / 2,
@@ -47,7 +47,8 @@ class module {
         let center = createVector( this.const.a * ( j + 0.5 ), this.const.a * ( i + 0.5 ));
         let scale = 0.5;
         let partition = this.calculatePartition( i, j );
-        this.array.block[i].push( new block( index, center, scale, partition ) );
+        this.array.block[i].push( new block( index, center, scale, true ) );
+        this.array.block[i][j].setPartition( partition );
         }
       }
   }
@@ -357,7 +358,7 @@ class module {
       for( let j = edge.length - 1; j >= 0; j-- )
         if( edge[j] == this.array.freeEdge[i] ){
           let vec = this.convertIndex( this.array.freeEdge[i] );
-          this.array.block[vec.x][vec.y].setKind( 0 );
+          //this.array.block[vec.x][vec.y].setKind( 'noGate' );
           this.array.freeEdge.splice( i, 1 );
         }
 
@@ -366,7 +367,7 @@ class module {
       for( let j = corner.length - 1; j >= 0; j-- )
         if( corner[j] == this.array.freeCorner[i] ){
           let vec = this.convertIndex( this.array.freeCorner[i] );
-          this.array.block[vec.x][vec.y].setKind( 0 );
+          //this.array.block[vec.x][vec.y].setKind( 'noGate' );
           this.array.freeCorner.splice( i, 1 );
         }
 
@@ -376,6 +377,7 @@ class module {
   convertIndex( index ){
     if( index == undefined )
       return null;
+
     let x = Math.floor( index / this.const.block.x );
     let y = index % this.const.block.y;
     return createVector( x, y );
@@ -401,7 +403,6 @@ class module {
         index = this.array.freeEdge[rand];
         vec = this.convertIndex( index );
         this.array.block[vec.x][vec.y].setKind( name );
-        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.array.freeEdge.splice( rand, 1 );
         this.cutOffNeighbors( index );
         this.accountingGateway( index );
@@ -412,7 +413,6 @@ class module {
         index = this.array.freeCorner[rand];
         vec = this.convertIndex( index );
         this.array.block[vec.x][vec.y].setKind( name );
-        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.array.freeCorner.splice( rand, 1 );
         this.cutOffNeighbors( index );
         this.accountingGateway( index );
@@ -437,7 +437,6 @@ class module {
 
         vec = this.convertIndex( index );
         this.array.block[vec.x][vec.y].setKind( name );
-        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.array.freeEdge.splice( rand, 1 );
         this.accountingGateway( index );
 
@@ -446,7 +445,6 @@ class module {
         this.cutOffNeighbors( index );
 
         this.array.block[vec.x][vec.y].setKind( name );
-        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.accountingGateway( id );
         this.cutOffNeighbors( id );
         break;
@@ -474,13 +472,11 @@ class module {
         index = this.array.freeCorner[firstID];
         vec = this.convertIndex( index );
         this.array.block[vec.x][vec.y].setKind( name );
-        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.accountingGateway( index );
 
         index = this.array.freeCorner[secondID];
         vec = this.convertIndex( index );
         this.array.block[vec.x][vec.y].setKind( name );
-        this.array.block[vec.x][vec.y].setPartition( 1 );
         this.accountingGateway( index );
 
         if( rand != 3 )
@@ -568,7 +564,6 @@ class module {
     }
 
     this.array.block[vec.x][vec.y].setKind( name );
-    this.array.block[vec.x][vec.y].setPartition( 1 );
     this.array.freeEdge.splice( rand, 1 );
     this.accountingGateway( index );
 
@@ -660,7 +655,6 @@ class module {
 
       vec = this.convertIndex( adjIndex );
       this.array.block[vec.x][vec.y].setKind( name );
-      this.array.block[vec.x][vec.y].setPartition( 1 );
       this.array.freeEdge.splice( index, 1 );
       this.accountingGateway( adjIndex );
       count--;
@@ -766,23 +760,5 @@ class module {
         for (let j = 0; j < this.array.block[i].length; j++)
           this.array.block[i][j].draw( vec );
           //let index = i *  this.const.block.x + j;
-  }
-
-  addIndexedBlock( index ){
-    let rand;
-    let id;
-    let ids;
-    let vec;
-    let name;
-    let blockType = null;
-    let counter = 0;
-
-    rand = this.array.freeEdge.indexOf( index );
-    vec = this.convertIndex( index );
-    console.log( index, vec.x, vec.y, rand );
-        this.array.block[vec.x][vec.y].setKind( name );
-    this.array.block[vec.x][vec.y].setPartition( 1 );
-    this.array.freeEdge.splice( rand, 1 );
-    this.cutOffNeighbors( index );
   }
 }

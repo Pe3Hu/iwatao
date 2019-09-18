@@ -1,15 +1,13 @@
 //the basic element of which consists module
 class hull {
-  constructor ( index, core ){
+  constructor( index, core ){
     this.index  = index;
     this.array = {
       gateway: [ [], [], [], [] ],
       module: [],
-      choice: [],
       block: [],
       focus: [],
-      grid: [],
-      way: [ 'up', 'right', 'down', 'left' ]
+      grid: []
     }
 
     this.const = {
@@ -47,9 +45,20 @@ class hull {
     let i = Math.floor( this.const.n / 2 );
     let j = Math.floor( this.const.n / 2 );
     let index = j * this.const.n + i;
-    this.array.grid[i][j].setPartition( 10 );
+    this.array.grid[i][j].setContent( 1 );
+    this.array.grid[i][j].setStatus( 2 );
 
-    //console.log( i, j, this.array.grid[i][j] );
+    this.array.gateway[0].push( index - this.const.n );
+    this.array.gateway[1].push( index + 1 );
+    this.array.gateway[2].push( index + this.const.n );
+    this.array.gateway[3].push( index - 1 );
+  }
+
+  cleanGrid(){
+    for( let i = 0; i < this.array.grid.length; i++ )
+      for( let j = 0; j < this.array.grid[i].length; j++ )
+        if( this.array.grid[i][j].status != 'selected' )
+          this.array.grid[i][j].setStatus( 0 );
   }
 
   //find the grid coordinates by index
@@ -73,7 +82,7 @@ class hull {
         noFill();
         rect( x, y, this.const.a, this.const.a );*/
 
-        if( this.array.grid[i][j].partition != null )
+        if( this.array.grid[i][j].status != 'forgotten' )
          this.array.grid[i][j].draw( vec )
       }
   }

@@ -391,6 +391,26 @@ class board {
     vec = createVector( cellSize * ( canvasGrid.x - 6 ), cellSize * 4.5 );
     this.addButton( layer, name, type, vec.copy() );
 
+    name = 'moduleRotateClockwise';
+    type++;
+    vec = createVector( cellSize * 1.5, cellSize * 1.5 );
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'moduleRotateCounterclockwise';
+    type++;
+    vec = createVector( cellSize * 1.5, cellSize * 4.5 );
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'jointScrollForward';
+    type++;
+    vec = createVector( cellSize * ( 0.5 + ( canvasGrid.x - 4 ) / 2 + 9 ), cellSize * 7 );
+    this.addButton( layer, name, type, vec.copy() );
+
+    name = 'jointScrollBack';
+    type++;
+    vec = createVector( cellSize * ( 0.5 + ( canvasGrid.x - 4 ) / 2 - 9 ), cellSize * 7 );
+    this.addButton( layer, name, type, vec.copy() );
+
 
     for ( let i = 0; i < this.array.button.length; i++ )
       if( this.array.button[i].layer == 99 )
@@ -469,6 +489,10 @@ class board {
         this.array.button[offsetID + 4].onScreen = true;
         this.array.button[offsetID + 5].onScreen = true;
         this.array.button[offsetID + 6].onScreen = true;
+        this.array.button[offsetID + 7].onScreen = true;
+        this.array.button[offsetID + 8].onScreen = true;
+        this.array.button[offsetID + 9].onScreen = true;
+        this.array.button[offsetID + 10].onScreen = true;
         break;
       }
   }
@@ -503,7 +527,7 @@ class board {
 
     //rotate tptpts
     if( buttonID >= 34 && buttonID < 38 )
-      this.rotate( buttonID );
+      this.rotateTptpt( buttonID );
 
     //scroll tptpts
     if( buttonID >= 38 && buttonID < 44 )
@@ -528,6 +552,14 @@ class board {
     //generate new module
     if( buttonID == 53 )
       this.array.layer[this.var.layer].addModule();
+
+    //rotate edited module
+    if( buttonID >= 54 && buttonID < 56 )
+      this.rotateModule( buttonID );
+
+    //scroll joint
+    if( buttonID >= 56 && buttonID < 58 )
+      this.array.layer[this.var.layer].shiftJoint( ( buttonID - 56.5 ) * 2 );
 
     this.update();
     //console.log(mouseX, mouseY, minDist, buttonID, this.array.button)
@@ -642,12 +674,23 @@ class board {
     this.updateButtons();
   }
 
-  rotate( buttonID ){
+  rotateTptpt( buttonID ){
     let clockwise;
-    let editedID = this.array.layer[this.var.layer].var.firstShift;
-    if ( buttonID > 35 )
-      editedID = this.array.layer[this.var.layer].var.secondShift;
-    let editedTptpt = this.array.layer[this.var.layer].array.tptpt[editedID];
+    let index = null;
+    let x;
+    let y;
+    switch ( buttonID ) {
+      case 34:
+      case 35:
+        index = this.array.layer[this.var.layer].var.firstShift;
+        break;
+      case 36:
+      case 37:
+        index = this.array.layer[this.var.layer].var.secondShift;
+        break;
+    }
+
+    let editedTptpt = this.array.layer[this.var.layer].array.tptpt[index];
     if ( ( buttonID % 2 ) == 1 )
       clockwise = true;
     else
@@ -655,43 +698,47 @@ class board {
 
     if ( !clockwise ){
       for (let i = 0; i < editedTptpt.const.pika.y / 2; i++)
-        for (let j = i; j < editedTptpt.const.pika.x - i; j++){
+        for (let j = i; j < editedTptpt.const.pika.x - i - 1; j++){
           let temp = new pika();
-          temp.setVars( editedTptpt.array.pika[i][j] );
+          temp.clone( editedTptpt.array.pika[i][j] );
           let current = createVector( i, j );
           let next = createVector( j, 7 - i  );
-          editedTptpt.array.pika[current.x][current.y].setVars( editedTptpt.array.pika[next.x][next.y] );
+          editedTptpt.array.pika[current.x][current.y].clone( editedTptpt.array.pika[next.x][next.y] );
           current = next.copy();
           next.set( 7 - i, 7 - j );
-          editedTptpt.array.pika[current.x][current.y].setVars( editedTptpt.array.pika[next.x][next.y] );
+          editedTptpt.array.pika[current.x][current.y].clone( editedTptpt.array.pika[next.x][next.y] );
           current = next.copy();
           next.set( 7 - j, i );
-          editedTptpt.array.pika[current.x][current.y].setVars( editedTptpt.array.pika[next.x][next.y] );
+          editedTptpt.array.pika[current.x][current.y].clone( editedTptpt.array.pika[next.x][next.y] );
           current = next.copy();
-          editedTptpt.array.pika[current.x][current.y].setVars( temp );
+          editedTptpt.array.pika[current.x][current.y].clone( temp );
           }
     }
     else {
       for (let i = 0; i < editedTptpt.const.pika.y / 2; i++)
-        for (let j = i; j < editedTptpt.const.pika.x - 1 - i; j++){
+        for (let j = i; j < editedTptpt.const.pika.x - i - 1; j++){
           let temp = new pika();
-          temp.setVars( editedTptpt.array.pika[i][j] );
+          temp.clone( editedTptpt.array.pika[i][j] );
           let current = createVector( i, j );
           let next = createVector( 7 - j, i );
-          editedTptpt.array.pika[current.x][current.y].setVars( editedTptpt.array.pika[next.x][next.y] );
+          editedTptpt.array.pika[current.x][current.y].clone( editedTptpt.array.pika[next.x][next.y] );
           current = next.copy();
           next.set( 7 - i, 7 - j );
-          editedTptpt.array.pika[current.x][current.y].setVars( editedTptpt.array.pika[next.x][next.y] );
+          editedTptpt.array.pika[current.x][current.y].clone( editedTptpt.array.pika[next.x][next.y] );
           current = next.copy();
           next.set( j, 7 - i  );
-          editedTptpt.array.pika[current.x][current.y].setVars( editedTptpt.array.pika[next.x][next.y] );
+          editedTptpt.array.pika[current.x][current.y].clone( editedTptpt.array.pika[next.x][next.y] );
           current = next.copy();
-          editedTptpt.array.pika[current.x][current.y].setVars( temp );
+          editedTptpt.array.pika[current.x][current.y].clone( temp );
           }
         }
 
       this.updateButtons();
     }
+
+  rotateModule( buttonID ){
+
+  }
 
   scroll( buttonID, type ){
     let step = null;
