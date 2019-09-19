@@ -56,13 +56,15 @@ class block {
     this.visible = visible;
   }
 
-  copy( block ){
+  copy( block, type ){
     this.visible = block.visible;
     this.content = block.content;
-    this.partition = block.partition;
     this.interior = block.interior;
     this.gateKind = block.gateKind;
     this.setStatus( 1 );
+
+    if( type == 0 )
+      this.partition = block.partition;
   }
 
   //drawing block

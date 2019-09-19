@@ -555,7 +555,7 @@ class board {
 
     //rotate edited module
     if( buttonID >= 54 && buttonID < 56 )
-      this.rotateModule( buttonID );
+      this.array.layer[this.var.layer].rotate( buttonID );
 
     //scroll joint
     if( buttonID >= 56 && buttonID < 58 )

@@ -99,7 +99,6 @@ class shipYard{
     this.addHull();
 
     this.tryAttach();
-
   }
 
   //
@@ -215,7 +214,7 @@ class shipYard{
         let y = j + parentVec.y - childVec.y;
         let x = i + parentVec.x - childVec.x;
         let block = module.array.block[i][j];
-        this.array.hull[0].array.grid[y][x].copy( block );
+        this.array.hull[0].array.grid[y][x].copy( block, 0 );
       }
   }
 
@@ -226,6 +225,66 @@ class shipYard{
     let m = this.array.shift[this.var.mode];
     let mod = this.array.module[this.var.mode][m];
     this.attachToHull( mod, this.array.joint[this.var.joint] );
+  }
+
+  rotate( buttonID ){
+    let index = null;
+    let clockwise;
+    let obj;
+    let x;
+    let y;
+
+    index = this.array.shift[this.var.mode];
+    obj = this.array.module[this.var.mode][index];
+    x = obj.const.block.x - 1;
+    y = obj.const.block.y / 2;
+
+    if ( buttonID % 2 == 1 )
+      clockwise = true;
+    else
+      clockwise = false;
+
+    for (let i = 0; i < y; i++)
+      for (let j = i; j < x - i; j++){
+        let temp;
+        let value;
+        let target;
+        let nexts = [
+          createVector( x - j, i ),
+          createVector( x - i, x - j  ),
+          createVector( j, x - i ) ];
+        let currents = [
+          createVector( i, j ),
+          createVector( x - j, i ),
+          createVector( x - i, x - j  ),
+          createVector( j, x - i ) ];
+        if( clockwise ){
+          nexts = [
+            createVector( j, x - i ),
+            createVector( x - i, x - j ),
+            createVector( x - j, i ) ];
+          currents = [
+            createVector( i, j ),
+            createVector( j, x - i ),
+            createVector( x - i, x - j ),
+            createVector( x - j, i ) ];
+        }
+
+        temp = new block();
+        temp.copy( obj.array.block[i][j], 1 );
+
+        for( let l = 0; l < nexts.length; l++ ){
+          value = obj.array.block[nexts[l].x][nexts[l].y];
+          target = obj.array.block[currents[l].x][currents[l].y];
+          target.copy( value, 1 );
+        }
+
+        target = obj.array.block[currents[3].x][currents[3].y];
+        target.copy( temp, 1 );
+      }
+      obj.updateGateway();
+
+      this.tryAttach();
   }
 
   draw(){

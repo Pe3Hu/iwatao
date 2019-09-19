@@ -43,7 +43,7 @@ rotate( buttonID ){
           let value;
           let target;
           let current = createVector( i, j );
-          let next = createVector( j, x - 1 - i  );
+          let next = createVector( j, x - i  );
           temp = new pika();
           temp.clone( obj.array.pika[i][j] );
           value = obj.array.pika[next.x][next.y];
@@ -51,10 +51,10 @@ rotate( buttonID ){
 
           target.clone( value );
           current = next.copy();
-          next.set( x - 1 - i, x - 1 - j );
+          next.set( x - i, x - j );
           target.clone( value );
           current = next.copy();
-          next.set( x - 1 - j, i );
+          next.set( x - j, i );
           target.clone( value );
           current = next.copy();
           target.clone( temp );
@@ -67,18 +67,30 @@ rotate( buttonID ){
           let value;
           let target;
           let current = createVector( i, j );
-          let next = createVector( x - 1 - j, i );
+          let next = createVector( x - j, i );
           temp = new pika();
           temp.clone( obj.array.pika[i][j] );
           value = obj.array.pika[next.x][next.y];
           target = obj.array.pika[current.x][current.y];
 
+          for( let l = 0; l < currents.length; l++ )
+            if( l != currents.length - 1 ){
+            value = obj.array.pika[nexts[l].x][nexts[l].y];
+            target = obj.array.pika[currents[l].x][currents[l].y];
+            target.clone( value );
+          }
+            else{
+            target = obj.array.pika[currents[l].x][currents[l].y];
+            target.clone( temp );
+          }
+
+
           target.clone( value );
           current = next.copy();
-          next.set( x - 1 - i, x - 1 - j );
+          next.set( x - i, x - j );
           target.clone( value );
           current = next.copy();
-          next.set( j, x - 1 - i  );
+          next.set( j, x - i  );
           target.clone( value );
           current = next.copy();
           target.clone( temp );
@@ -87,4 +99,24 @@ rotate( buttonID ){
 
     this.updateButtons();
   }
+    let nexts = [
+      createVector( x - j, i ),
+      createVector( x - i, x - j  ),
+      createVector( j, x - i ) ];
+    let currents = [
+      createVector( i, j ),
+      createVector( x - j, i ),
+      createVector( x - i, x - j  ),
+      createVector( j, x - i ) ];
+
+
+let nexts = [
+  createVector( j, x - i ),
+  createVector( x - i, x - j ),
+  createVector( x - j, i ) ];
+let currents = [
+  createVector( i, j ),
+  createVector( j, x - i ),
+  createVector( x - i, x - j ),
+  createVector( x - j, i ) ];
   */

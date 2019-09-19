@@ -750,6 +750,10 @@ class module {
     this.offset = offset;
   }
 
+  updateGateway(){
+    this.array.gateway =  [ [], [], [], [] ];
+  }
+
   draw(){
     let vec = this.offset.copy();
     vec.x -= this.const.a * this.const.block.x /2;

@@ -7,7 +7,8 @@ class hull {
       module: [],
       block: [],
       focus: [],
-      grid: []
+      grid: [],
+      id: []
     }
 
     this.const = {
