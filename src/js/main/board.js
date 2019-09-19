@@ -412,6 +412,11 @@ class board {
     this.addButton( layer, name, type, vec.copy() );
 
 
+    name = 'lockModule';
+    type++;
+    vec = createVector( cellSize * ( canvasGrid.x - 6 ), cellSize * 7 );
+    this.addButton( layer, name, type, vec.copy() );
+
     for ( let i = 0; i < this.array.button.length; i++ )
       if( this.array.button[i].layer == 99 )
         this.array.button[i].onScreen = true;
@@ -433,40 +438,41 @@ class board {
     this.cleanButtons();
 
     let offsetID = null;
+    let count = null;
+
     switch ( this.var.layer ) {
       case 0:
         //edit mode button
         offsetID = 44;
         this.array.button[offsetID].onScreen = true;
 
-        offsetID = 10;
-
         switch ( this.array.layer[this.var.layer].var.mode ) {
           case 'solo':
+            offsetID = 10;
+            count = 24;
             //change visiable status for shift buttons
-            for( let i = offsetID; i < offsetID + 24; i++ )
+            for( let i = offsetID; i < offsetID + count; i++ )
               this.detectShift( i );
 
             offsetID = 38;
+            count = 2;
             //change visiable status for scroll buttons
-            this.array.button[offsetID].onScreen = true;
-            this.array.button[offsetID + 1].onScreen = true;
+            for( let i = offsetID; i < offsetID + count; i++ )
+              this.array.button[i].onScreen = true;
 
             break;
           case 'duo':
             offsetID = 34;
+            count = 4;
             //change visiable status for rotate buttons
-            this.array.button[offsetID].onScreen = true;
-            this.array.button[offsetID + 1].onScreen = true;
-            this.array.button[offsetID + 2].onScreen = true;
-            this.array.button[offsetID + 3].onScreen = true;
+            for( let i = offsetID; i < offsetID + count; i++ )
+              this.array.button[i].onScreen = true;
 
             offsetID = 40;
+            count = 4;
             //change visiable status for scroll buttons
-            this.array.button[offsetID].onScreen = true;
-            this.array.button[offsetID + 1].onScreen = true;
-            this.array.button[offsetID + 2].onScreen = true;
-            this.array.button[offsetID + 3].onScreen = true;
+            for( let i = offsetID; i < offsetID + count; i++ )
+              this.array.button[i].onScreen = true;
           }
           break;
       case 1:
@@ -482,17 +488,9 @@ class board {
       case 5:
         //module edit buttons
         offsetID = 47;
-        this.array.button[offsetID].onScreen = true;
-        this.array.button[offsetID + 1].onScreen = true;
-        this.array.button[offsetID + 2].onScreen = true;
-        this.array.button[offsetID + 3].onScreen = true;
-        this.array.button[offsetID + 4].onScreen = true;
-        this.array.button[offsetID + 5].onScreen = true;
-        this.array.button[offsetID + 6].onScreen = true;
-        this.array.button[offsetID + 7].onScreen = true;
-        this.array.button[offsetID + 8].onScreen = true;
-        this.array.button[offsetID + 9].onScreen = true;
-        this.array.button[offsetID + 10].onScreen = true;
+        count = 12;
+       for( let i = offsetID; i < offsetID + count; i++ )
+         this.array.button[i].onScreen = true;
         break;
       }
   }
@@ -561,8 +559,11 @@ class board {
     if( buttonID >= 56 && buttonID < 58 )
       this.array.layer[this.var.layer].shiftJoint( ( buttonID - 56.5 ) * 2 );
 
+    //lock selected module
+    if( buttonID == 58 )
+      this.array.layer[this.var.layer].lockModule();
+
     this.update();
-    //console.log(mouseX, mouseY, minDist, buttonID, this.array.button)
   }
 
   plantClickCheck(){
@@ -778,7 +779,7 @@ class board {
       this.array.button[i].draw( this.var.layer );
 
     //draw grid
-    if( this.var.layer != 6 ){
+    if( this.var.layer != 5 ){
       for( let i = 0; i < this.const.grid.x; i++ )
         for( let j = 0; j < this.const.grid.x; j++ ){
           let x = i * cellSize;

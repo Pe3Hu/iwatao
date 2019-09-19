@@ -4,11 +4,12 @@ class hull {
     this.index  = index;
     this.array = {
       gateway: [ [], [], [], [] ],
+      kind: [ [], [], [], [] ], //gateway kind
       module: [],
       block: [],
       focus: [],
       grid: [],
-      id: []
+      id: [] //module ids
     }
 
     this.const = {
@@ -49,10 +50,20 @@ class hull {
     this.array.grid[i][j].setContent( 1 );
     this.array.grid[i][j].setStatus( 2 );
 
-    this.array.gateway[0].push( index - this.const.n );
-    this.array.gateway[1].push( index + 1 );
-    this.array.gateway[2].push( index + this.const.n );
-    this.array.gateway[3].push( index - 1 );
+    this.addGateway( 0, index - this.const.n, 'solo' );
+    this.addGateway( 1, index + 1, 'solo' );
+    this.addGateway( 2, index + this.const.n, 'solo' );
+    this.addGateway( 3, index - 1, 'solo' );
+  }
+
+  addGateway( way, index, kind ){
+    if( way == undefined )
+      return;
+
+    let vec = this.convertIndex( index );
+    this.array.grid[vec.x][vec.y].setKind( kind );
+    this.array.gateway[way].push( index );
+    this.array.kind[way].push( kind );
   }
 
   cleanGrid(){
@@ -66,6 +77,7 @@ class hull {
   convertIndex( index ){
     if( index == undefined )
       return null;
+
     let x = Math.floor( index / this.const.n );
     let y = index % this.const.n;
     return createVector( x, y );

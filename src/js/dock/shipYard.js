@@ -12,7 +12,6 @@ class shipYard{
       shift: [ null, null, null, null ],
       distribution: [],
       option: [],
-      choice: [],
       hull: [],
       view: [],
       edit: [],
@@ -21,6 +20,7 @@ class shipYard{
     this.var = {
       border: null,
       joint: 0,
+      hull: 0,
       mode: 0
     };
 
@@ -74,7 +74,9 @@ class shipYard{
         this.addModule();
       this.var.mode++;
     }
+
     this.var.mode = 2;
+    this.tryAttach();
   }
 
   initDistribution(){
@@ -93,10 +95,16 @@ class shipYard{
   }
 
   init(){
+    this.addHull();
     this.initDistribution();
     this.initDots();
     this.initModules();
-    this.addHull();
+  }
+
+  //change the type of displayed modules
+  switchMode( buttonID ){
+    let buttonOffset = 47;
+    this.var.mode = buttonID - buttonOffset;
 
     this.tryAttach();
   }
@@ -104,12 +112,6 @@ class shipYard{
   //
   addHull(){
     this.array.hull.push( new hull( this.array.hull.length, 0 ) );
-  }
-
-  //change the type of displayed modules
-  switchMode( buttonID ){
-    let buttonOffset = 47;
-    this.var.mode = buttonID - buttonOffset;
   }
 
   //
@@ -162,6 +164,8 @@ class shipYard{
     let i = this.var.mode;
     let j = this.array.shift[i];
 
+    if( this.array.hull[this.var.hull].array.module.length > 0 )
+      console.log( i, j, this.array.shift[i] )
     //set position and status for editable module
     this.array.module[i][j].setStatus( 2 );
     this.array.module[i][j].setOffset( this.array.edit[0] );
@@ -176,10 +180,16 @@ class shipYard{
       this.array.module[i][index].setOffset( this.array.view[i][l] );
     }
 
-
+    this.tryAttach();
   }
 
+  //formation of an array of possible joints
   tryAttach(){
+    if( this.array.module[this.var.mode].length == 0 )
+      return;
+
+    this.array.hull[this.var.hull].cleanGrid();
+
     let index = 0;
     let m = this.array.shift[this.var.mode];
     let mod = this.array.module[this.var.mode][m];
@@ -187,44 +197,82 @@ class shipYard{
     let child = null;
     this.array.joint = [];
 
-    console.log( this.array.hull[0].array.gateway );
-
     for( let i = 0; i < this.array.way.length; i++ )
-      for( let j = 0; j < this.array.hull[0].array.gateway[i].length; j++ ){
-          parent = this.array.hull[0].array.gateway[i][j];
+      for( let j = 0; j < this.array.hull[this.var.hull].array.gateway[i].length; j++ ){
+          parent = this.array.hull[this.var.hull].array.gateway[i][j];
           let way = ( i + 2 ) % this.array.way.length;
           for( let l = 0; l < mod.array.gateway[way].length; l++ ){
               child = mod.array.gateway[way][l];
-              this.array.joint.push( new joint( index, parent, child ) );
+              this.checkFreeSpace( index, parent, child );
               index++;
           }
       }
-    this.attachToHull( mod, this.array.joint[this.var.joint] );
 
+    if( this.array.joint.length > 0 && this.var.joint != undefined )
+      this.attachToHull( mod, this.array.joint[this.var.joint] );
   }
 
+  //gate kind match check and free space existing
+  checkFreeSpace( index, parent, child ){
+    let m = this.array.shift[this.var.mode];
+    let mod = this.array.module[this.var.mode][m];
+    let hull = this.array.hull[this.var.hull];
+    let cVec = mod.convertIndex( child );
+    let pVec = hull.convertIndex( parent );
+    let cBlock = mod.array.block[cVec.x][cVec.y];
+    let pBlock = hull.array.grid[pVec.x][pVec.y];
+    let join;
+
+    if( pBlock.gateKind == cBlock.gateKind )
+      join = new joint( index, parent, child );
+    else
+      return;
+
+    let childVec = mod.convertIndex( join.child );
+    let parentVec = this.array.hull[this.var.hull].convertIndex( join.parent );
+
+    for( let i = 0; i < mod.array.block.length; i++ )
+      for( let j = 0; j < mod.array.block[i].length; j++ ){
+        let x = i + parentVec.x - childVec.x;
+        let y = j + parentVec.y - childVec.y;
+        let block = mod.array.block[i][j];
+
+        if( this.array.hull[this.var.hull].array.grid[y][x].status != 'forgotten' )
+          return;
+      }
+
+    this.array.joint.push( join );
+  }
+
+  //connect the module to the hull if it is possible
   attachToHull( module, joint ){
-    this.array.hull[0].cleanGrid();
+    this.array.hull[this.var.hull].cleanGrid();
+
+    console.log( joint )
 
     let childVec = module.convertIndex( joint.child );
-    let parentVec = this.array.hull[0].convertIndex( joint.parent );
+    let parentVec = this.array.hull[this.var.hull].convertIndex( joint.parent );
 
-    for(  let i = 0; i < module.array.block.length; i++ )
-      for(  let j = 0; j < module.array.block[i].length; j++ ){
-        let y = j + parentVec.y - childVec.y;
+    for( let i = 0; i < module.array.block.length; i++ )
+      for( let j = 0; j < module.array.block[i].length; j++ ){
         let x = i + parentVec.x - childVec.x;
+        let y = j + parentVec.y - childVec.y;
         let block = module.array.block[i][j];
-        this.array.hull[0].array.grid[y][x].copy( block, 0 );
+        this.array.hull[this.var.hull].array.grid[y][x].copy( block, 0 );
       }
   }
 
   shiftJoint( shift ){
+    if( this.array.joint.length < 2 )
+      return;
+
     this.var.joint = ( this.var.joint + shift + this.array.joint.length ) % this.array.joint.length;
-    console.log( this.var.joint, this.array.joint )
+    //console.log( this.var.joint, this.array.joint )
 
     let m = this.array.shift[this.var.mode];
     let mod = this.array.module[this.var.mode][m];
-    this.attachToHull( mod, this.array.joint[this.var.joint] );
+    let joint = this.array.joint[this.var.joint];
+    this.attachToHull( mod, joint );
   }
 
   rotate( buttonID ){
@@ -287,6 +335,45 @@ class shipYard{
       this.tryAttach();
   }
 
+  lockModule(){
+    if( this.array.module[this.var.mode].length == 0 )
+      return;
+
+    let m = this.array.shift[this.var.mode];
+    let mod = this.array.module[this.var.mode][m];
+    let hull = this.array.hull[this.var.hull];
+    let joint = this.array.joint[this.var.joint];
+
+    for( let i = 0; i < hull.array.grid.length; i++ )
+      for( let j = 0; j < hull.array.grid[i].length; j++ )
+        if( hull.array.grid[i][j].status == 'proposed' )
+          hull.array.grid[i][j].setStatus( 2 );
+
+    mod.setJoint( joint );
+
+    /*if( hull.array.module.length == 0 ){
+
+        hull.addGateway( 0, index - this.const.n, 'solo' );
+    }*/
+
+    hull.array.module.push( mod );
+    this.array.module[this.var.mode].splice( m, 1 );
+
+    this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
+    for( let i = 0; i < this.array.id[this.var.mode].length; i++ )
+      if( this.array.id[this.var.mode][i] > this.array.shift[this.var.mode] )
+      this.array.id[this.var.mode][i]--;
+
+    this.updateModules();
+    this.tryAttach();
+    /*this.array.module[this.var.mode].splice( m, 1 );
+    this.array.shift[this.var.mode] = ( this.array.shift[this.var.mode] - 1 + )
+
+    this.array.id[this.var.mode].push( this.array.shift[this.var.mode] );
+    this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();*/
+    console.log( hull.array.module, this.array.shift[this.var.mode], this.array.id[this.var.mode] )
+  }
+
   draw(){
     if( this.array.module.length == 0 )
       return;
@@ -297,6 +384,6 @@ class shipYard{
       element.draw();
     });
 
-    this.array.hull[0].draw( this.array.edit[1] );
+    this.array.hull[this.var.hull].draw( this.array.edit[1] );
   }
 }

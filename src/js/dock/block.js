@@ -151,9 +151,9 @@ class block {
     }
 
     //draw text
-    textSize( fontSize * this.scale  );
+    textSize( fontSize * this.scale * 0.8 );
     fill( 0 );
-    if( this.interior != 'floor' )
+    if( this.interior == 'door' )
       text( this.index, offset.x + this.center.x, offset.y + this.center.y + fontSize / 6 );
     textSize( fontSize );
   }

@@ -200,7 +200,7 @@ class button {
         arc( this.center.x, this.center.y, cellSize, cellSize, Math.PI * 4 / 3, Math.PI * 5 / 3 );
 
         fill( this.color );
-        ellipse( this.center.x, this.center.y, cellSize / 4, cellSize / 4 );
+        ellipse( this.center.x, this.center.y, cellSize / 3, cellSize / 3 );
 
         fill('yellow');
         ellipse( this.center.x, this.center.y, cellSize / 6, cellSize / 6 );
@@ -244,6 +244,63 @@ class button {
         triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
           this.array.vertex[d][3].x, this.array.vertex[d][3].y,
           this.array.vertex[d][4].x, this.array.vertex[d][4].y );
+      }
+
+      if ( this.type > 30 && this.type < 33 ){
+        let a = 0.3;
+        let b = 0.4;
+        let c = 0.09;
+        let d = 0.18;
+        let offsetY = -0.19 * cellSize;
+        let shackle = 0.125 * cellSize;
+        let radius = 0.45;
+        let gap = radius - 0.2;
+        let keyhole = 0.15;
+        noStroke();
+        fill( this.color );
+        ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
+
+        //draw shackle
+        fill( 'yellow' );
+        arc( this.center.x, this.center.y + offsetY, cellSize * radius, cellSize * radius, Math.PI, Math.PI * 2 );
+        //ellipse( this.center.x, this.center.y + offsetY, cellSize * radius, cellSize * radius );
+
+        fill( this.color );
+        ellipse( this.center.x, this.center.y + offsetY, cellSize * gap , cellSize * gap );
+
+        fill( 'yellow' );
+        triangle( this.center.x + cellSize * gap / 2, this.center.y + offsetY,
+          this.center.x + cellSize * radius / 2, this.center.y + offsetY,
+          this.center.x + cellSize * radius / 2, this.center.y + shackle + offsetY );
+        triangle( this.center.x + cellSize * gap / 2, this.center.y + offsetY,
+          this.center.x + cellSize * gap / 2, this.center.y + shackle + offsetY,
+          this.center.x + cellSize * radius / 2, this.center.y + shackle + offsetY );
+
+        if( this.type == 31 ){
+          triangle( this.center.x - cellSize * gap / 2, this.center.y + offsetY,
+            this.center.x - cellSize * radius / 2, this.center.y + offsetY,
+            this.center.x - cellSize * radius / 2, this.center.y + shackle + offsetY );
+          triangle( this.center.x - cellSize * gap / 2, this.center.y + offsetY,
+            this.center.x - cellSize * gap / 2, this.center.y + shackle + offsetY,
+            this.center.x - cellSize * radius / 2, this.center.y + shackle + offsetY );
+        }
+
+        ////draw case
+        offsetY += shackle;
+        triangle( this.center.x + cellSize * a, this.center.y + offsetY,
+          this.center.x - cellSize * a, this.center.y + offsetY,
+          this.center.x + cellSize * a, this.center.y + cellSize * b + offsetY );
+        triangle( this.center.x - cellSize * a, this.center.y + cellSize * b + offsetY,
+          this.center.x - cellSize * a, this.center.y + offsetY,
+          this.center.x + cellSize * a, this.center.y + cellSize * b + offsetY );
+
+        //draw keyhole
+        offsetY += cellSize * keyhole;
+        fill( this.color );
+        ellipse( this.center.x, this.center.y + offsetY, cellSize * keyhole , cellSize * keyhole );
+        triangle( this.center.x, this.center.y - cellSize * keyhole / 2 + offsetY,
+          this.center.x - cellSize * c, this.center.y + cellSize * d + offsetY,
+          this.center.x + cellSize * c, this.center.y + cellSize * d + offsetY );
       }
     }
   }

@@ -25,6 +25,7 @@ class module {
     };
     this.status = 'wait';
     this.offset = createVector();
+    this.joint = null;
 
     this.init();
 
@@ -383,6 +384,14 @@ class module {
     return createVector( x, y );
   }
 
+  //find the index coordinates by grid coordinates
+  convertGrid( vec ){
+    if( vec == undefined )
+      return null;
+
+    return vec.x * this.const.block.x + vec.y;
+  }
+
   //activate a certain type of gateway
   addGateway( kind ){
     let rand;
@@ -398,7 +407,7 @@ class module {
 
     switch ( kind ) {
       case 0:
-        name = 'anyEdge';
+        name = 'solo';//'anyEdge';
         rand = Math.floor( Math.random() * this.array.freeEdge.length );
         index = this.array.freeEdge[rand];
         vec = this.convertIndex( index );
@@ -408,7 +417,7 @@ class module {
         this.accountingGateway( index );
         break;
       case 1:
-        name = 'anyCorner';
+        name = 'solo';//'anyCorner';
         rand = Math.floor( Math.random() * this.array.freeCorner.length );
         index = this.array.freeCorner[rand];
         vec = this.convertIndex( index );
@@ -421,7 +430,7 @@ class module {
         if( this.const.type < 3 )
           return;
 
-        name = 'unilateralEdge';
+        name = 'solo';//'unilateralEdge';
         while( blockType == null && counter < 1000 ){
           rand = Math.floor( Math.random() * this.array.freeEdge.length );
           index = this.array.freeEdge[rand];
@@ -457,7 +466,7 @@ class module {
           this.cutOffNeighbors( ids[i] );
         break;
       case 6:
-        name = 'duoCorner';
+        name = 'duo';//'duoCorner';
         let direction = [ 'up', 'right', 'down', 'left' ];
         let firstID;
         let secondID;
@@ -544,7 +553,7 @@ class module {
 
   //create a gateway of a given width
   getAdjacent( count ){
-    let name;
+    let name = null;
     let ids;
     let adjacents = [];
     let rand = Math.floor( Math.random() * this.array.freeEdge.length );
@@ -552,14 +561,14 @@ class module {
     let vec = this.convertIndex( index );
 
     switch ( count ) {
-      case 1:
-        name = 'duoEdge';
-        break;
       case 2:
-        name = 'trioEdge';
+        name = 'duo';//'duoEdge';
         break;
       case 3:
-        name = 'quarterEdge';
+        name = 'trio';//'trioEdge';
+        break;
+      case 4:
+        name = 'quartet';//'quartetEdge';
         break;
     }
 
@@ -634,13 +643,13 @@ class module {
 
     switch ( count ) {
       case 1:
-      name = 'duoEdge';
+      name = 'duo';//'duoEdge';
       break;
     case 2:
-      name = 'trioEdge';
+      name = 'trio';//'trioEdge';
       break;
     case 3:
-      name = 'quartetEdge';
+      name = 'quartet';//'quartetEdge';
       break;
     }
 
@@ -750,8 +759,18 @@ class module {
     this.offset = offset;
   }
 
+  setJoint( joint ){
+    this.joint = joint;
+  }
+
   updateGateway(){
     this.array.gateway =  [ [], [], [], [] ];
+
+    for( let i = 0; i < this.array.block.length; i++)
+      for( let j = 0; j < this.array.block[i].length; j++ ){
+          if( this.array.block[i][j].gateKind != null )
+            this.accountingGateway( this.array.block[i][j].index );
+      }
   }
 
   draw(){
