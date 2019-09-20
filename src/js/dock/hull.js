@@ -2,16 +2,6 @@
 class hull {
   constructor( index, core ){
     this.index  = index;
-    this.array = {
-      gateway: [ [], [], [], [] ],
-      kind: [ [], [], [], [] ], //gateway kind
-      module: [],
-      block: [],
-      focus: [],
-      grid: [],
-      id: [] //module ids
-    }
-
     this.const = {
       n: 33,
       m: 16,
@@ -19,6 +9,16 @@ class hull {
       a: cellSize * 0.25
     }
     this.var = {
+    }
+    this.array = {
+      gateway: [ [], [], [], [] ],
+      kind: [ [], [], [], [] ],
+      module: [],
+      block: [],
+      focus: [],
+      grid: [],
+      id: [],
+      way: [ -this.const.n, 1, this.const.n, -1 ]//'up', 'right', 'down', 'left'
     }
 
     this.init();
@@ -50,10 +50,9 @@ class hull {
     this.array.grid[i][j].setContent( 1 );
     this.array.grid[i][j].setStatus( 2 );
 
-    this.addGateway( 0, index - this.const.n, 'solo' );
-    this.addGateway( 1, index + 1, 'solo' );
-    this.addGateway( 2, index + this.const.n, 'solo' );
-    this.addGateway( 3, index - 1, 'solo' );
+
+    for ( let i = 0; i < this.array.way.length; i++ )
+      this.addGateway( i, index + this.array.way[i], 'solo' );
   }
 
   addGateway( way, index, kind ){
@@ -62,6 +61,7 @@ class hull {
 
     let vec = this.convertIndex( index );
     this.array.grid[vec.x][vec.y].setKind( kind );
+    this.array.grid[vec.x][vec.y].setStatus( 3 );
     this.array.gateway[way].push( index );
     this.array.kind[way].push( kind );
   }
@@ -69,8 +69,11 @@ class hull {
   cleanGrid(){
     for( let i = 0; i < this.array.grid.length; i++ )
       for( let j = 0; j < this.array.grid[i].length; j++ )
-        if( this.array.grid[i][j].status != 'selected' )
+        if( this.array.grid[i][j].status == 'selected' ||
+            this.array.grid[i][j].status == 'expectant' ){
+          this.array.grid[i][j].setKind( null );
           this.array.grid[i][j].setStatus( 0 );
+        }
   }
 
   //find the grid coordinates by index
@@ -81,6 +84,14 @@ class hull {
     let x = Math.floor( index / this.const.n );
     let y = index % this.const.n;
     return createVector( x, y );
+  }
+
+  //find the index coordinates by grid coordinates
+  convertGrid( vec ){
+    if( vec == undefined )
+      return null;
+
+    return vec.x * this.const.n + vec.y;
   }
 
   draw( offset ){
@@ -95,7 +106,7 @@ class hull {
         noFill();
         rect( x, y, this.const.a, this.const.a );*/
 
-        if( this.array.grid[i][j].status != 'forgotten' )
+        //if( this.array.grid[i][j].status != 'forgotten' )
          this.array.grid[i][j].draw( vec )
       }
   }

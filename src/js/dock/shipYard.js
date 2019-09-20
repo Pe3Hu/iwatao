@@ -114,6 +114,58 @@ class shipYard{
     this.array.hull.push( new hull( this.array.hull.length, 0 ) );
   }
 
+  updateHull(){
+    let m = this.array.shift[this.var.mode];
+    let mod = this.array.module[this.var.mode][m];
+    let hull = this.array.hull[this.var.hull];
+    let joint = this.array.joint[this.var.joint];
+    let parent = hull.convertIndex( joint.parent );
+    let child = mod.convertIndex( joint.child );
+
+    mod.setJoint( joint );
+
+    hull.array.module.push( mod );
+    this.array.module[this.var.mode].splice( m, 1 );
+
+    this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
+    for( let i = 0; i < this.array.id[this.var.mode].length; i++ )
+      if( this.array.id[this.var.mode][i] > this.array.shift[this.var.mode] )
+      this.array.id[this.var.mode][i]--;
+
+    for( let i = 0; i < hull.array.gateway.length; i++ ){
+      let index = hull.array.gateway[i].indexOf( joint.parent )
+      if( index != -1 )
+        hull.array.gateway[i].splice( index, 1 );
+
+      for( let j = 0; j < mod.array.gateway[i].length; j++ )
+        if( mod.array.gateway[i][j] != joint.child ){
+        let grid = mod.convertIndex( mod.array.gateway[i][j] );
+        grid.x += parent.x - child.x;
+        grid.y += parent.y - child.y;
+
+        let kind = hull.array.grid[grid.x][grid.y].gateKind;
+        let index = hull.convertGrid( grid );
+        index += hull.array.way[i];
+        hull.array.gateway[i].push( index );
+
+        let couple = hull.convertIndex( index );
+        hull.array.grid[couple.x][couple.y].setKind( kind );
+
+        if( hull.array.module.length > 0 )
+          console.log( index, kind,
+            grid.x, grid.y, hull.array.grid[grid.x][grid.y].gateKind,
+            couple.x, couple.y, hull.array.grid[couple.x][couple.y].gateKind )
+      }
+    }
+
+
+    for( let i = 0; i < hull.array.grid.length; i++ )
+      for( let j = 0; j < hull.array.grid[i].length; j++ )
+        if( hull.array.grid[i][j].gateKind != null )
+          console.log( 'update', hull.array.grid[i][j].index, hull.array.grid[i][j].gateKind )
+    console.log( joint.parent, hull.array.gateway )
+  }
+
   //
   addModule(){
     let i = this.var.mode;
@@ -134,148 +186,7 @@ class shipYard{
 
   }
 
-  //bring the statuses of all the block to the default value
-  cleanModules(){
-    for( let i = 0; i < this.array.module.length; i++ )
-      for( let j = 0; j < this.array.module[i].length; j++ )
-        this.array.module[i][j].setStatus( 0 );
-  }
-
-  //insert the current shift at the beginning or at the end of the id array
-  updateShift( step ){
-    if( step > 0 ){
-      this.array.id[this.var.mode].push( this.array.shift[this.var.mode] );
-      this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
-    }
-    if( step < 0 ){
-      this.array.id[this.var.mode].unshift( this.array.shift[this.var.mode] );
-      this.array.shift[this.var.mode] = this.array.id[this.var.mode].pop();
-    }
-  }
-
-  //change the status and location of all modules
-  updateModules( step ){
-    if( this.array.module[this.var.mode] == 0 )
-      return;
-
-    this.cleanModules();
-    this.updateShift( step );
-
-    let i = this.var.mode;
-    let j = this.array.shift[i];
-
-    if( this.array.hull[this.var.hull].array.module.length > 0 )
-      console.log( i, j, this.array.shift[i] )
-    //set position and status for editable module
-    this.array.module[i][j].setStatus( 2 );
-    this.array.module[i][j].setOffset( this.array.edit[0] );
-
-    //set position and status for visible modules
-    for( let l = 0; l < this.array.view[i].length; l++ ){
-      if( l >= this.array.module[i].length - 1 )
-        return;
-
-      let index = this.array.id[i][l];
-      this.array.module[i][index].setStatus( 1 );
-      this.array.module[i][index].setOffset( this.array.view[i][l] );
-    }
-
-    this.tryAttach();
-  }
-
-  //formation of an array of possible joints
-  tryAttach(){
-    if( this.array.module[this.var.mode].length == 0 )
-      return;
-
-    this.array.hull[this.var.hull].cleanGrid();
-
-    let index = 0;
-    let m = this.array.shift[this.var.mode];
-    let mod = this.array.module[this.var.mode][m];
-    let parent = null;
-    let child = null;
-    this.array.joint = [];
-
-    for( let i = 0; i < this.array.way.length; i++ )
-      for( let j = 0; j < this.array.hull[this.var.hull].array.gateway[i].length; j++ ){
-          parent = this.array.hull[this.var.hull].array.gateway[i][j];
-          let way = ( i + 2 ) % this.array.way.length;
-          for( let l = 0; l < mod.array.gateway[way].length; l++ ){
-              child = mod.array.gateway[way][l];
-              this.checkFreeSpace( index, parent, child );
-              index++;
-          }
-      }
-
-    if( this.array.joint.length > 0 && this.var.joint != undefined )
-      this.attachToHull( mod, this.array.joint[this.var.joint] );
-  }
-
-  //gate kind match check and free space existing
-  checkFreeSpace( index, parent, child ){
-    let m = this.array.shift[this.var.mode];
-    let mod = this.array.module[this.var.mode][m];
-    let hull = this.array.hull[this.var.hull];
-    let cVec = mod.convertIndex( child );
-    let pVec = hull.convertIndex( parent );
-    let cBlock = mod.array.block[cVec.x][cVec.y];
-    let pBlock = hull.array.grid[pVec.x][pVec.y];
-    let join;
-
-    if( pBlock.gateKind == cBlock.gateKind )
-      join = new joint( index, parent, child );
-    else
-      return;
-
-    let childVec = mod.convertIndex( join.child );
-    let parentVec = this.array.hull[this.var.hull].convertIndex( join.parent );
-
-    for( let i = 0; i < mod.array.block.length; i++ )
-      for( let j = 0; j < mod.array.block[i].length; j++ ){
-        let x = i + parentVec.x - childVec.x;
-        let y = j + parentVec.y - childVec.y;
-        let block = mod.array.block[i][j];
-
-        if( this.array.hull[this.var.hull].array.grid[y][x].status != 'forgotten' )
-          return;
-      }
-
-    this.array.joint.push( join );
-  }
-
-  //connect the module to the hull if it is possible
-  attachToHull( module, joint ){
-    this.array.hull[this.var.hull].cleanGrid();
-
-    console.log( joint )
-
-    let childVec = module.convertIndex( joint.child );
-    let parentVec = this.array.hull[this.var.hull].convertIndex( joint.parent );
-
-    for( let i = 0; i < module.array.block.length; i++ )
-      for( let j = 0; j < module.array.block[i].length; j++ ){
-        let x = i + parentVec.x - childVec.x;
-        let y = j + parentVec.y - childVec.y;
-        let block = module.array.block[i][j];
-        this.array.hull[this.var.hull].array.grid[y][x].copy( block, 0 );
-      }
-  }
-
-  shiftJoint( shift ){
-    if( this.array.joint.length < 2 )
-      return;
-
-    this.var.joint = ( this.var.joint + shift + this.array.joint.length ) % this.array.joint.length;
-    //console.log( this.var.joint, this.array.joint )
-
-    let m = this.array.shift[this.var.mode];
-    let mod = this.array.module[this.var.mode][m];
-    let joint = this.array.joint[this.var.joint];
-    this.attachToHull( mod, joint );
-  }
-
-  rotate( buttonID ){
+  rotateModule( buttonID ){
     let index = null;
     let clockwise;
     let obj;
@@ -339,39 +250,183 @@ class shipYard{
     if( this.array.module[this.var.mode].length == 0 )
       return;
 
+    let hull = this.array.hull[this.var.hull];
+
+    for( let i = 0; i < hull.array.grid.length; i++ )
+      for( let j = 0; j < hull.array.grid[i].length; j++ ){
+        if( hull.array.grid[i][j].status == 'proposed' )
+          hull.array.grid[i][j].setStatus( 2 );
+          if( hull.array.grid[i][j].gateKind != null )
+            console.log( 'lock', hull.array.grid[i][j].index, hull.array.grid[i][j].gateKind )
+
+      }
+
+    this.updateHull();
+    this.updateModules();
+    this.tryAttach();
+
+    /*
+    console.log( this.array.joint[this.var.joint] )
+    console.log( hull.array.module, this.array.shift[this.var.mode], this.array.id[this.var.mode] )
+    */
+  }
+
+  //bring the statuses of all the block to the default value
+  cleanModules(){
+    for( let i = 0; i < this.array.module.length; i++ )
+      for( let j = 0; j < this.array.module[i].length; j++ )
+        this.array.module[i][j].setStatus( 0 );
+  }
+
+  //insert the current shift at the beginning or at the end of the id array
+  updateShift( step ){
+    if( step > 0 ){
+      this.array.id[this.var.mode].push( this.array.shift[this.var.mode] );
+      this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
+    }
+    if( step < 0 ){
+      this.array.id[this.var.mode].unshift( this.array.shift[this.var.mode] );
+      this.array.shift[this.var.mode] = this.array.id[this.var.mode].pop();
+    }
+  }
+
+  //change the status and location of all modules
+  updateModules( step ){
+    if( this.array.module[this.var.mode] == 0 )
+      return;
+
+    this.cleanModules();
+    this.updateShift( step );
+
+    let i = this.var.mode;
+    let j = this.array.shift[i];
+
+    if( this.array.hull[this.var.hull].array.module.length > 0 )
+      console.log( i, j, this.array.shift[i], '+', this.var.joint )
+
+    //set position and status for editable module
+    this.array.module[i][j].setStatus( 2 );
+    this.array.module[i][j].setOffset( this.array.edit[0] );
+
+    //set position and status for visible modules
+    for( let l = 0; l < this.array.view[i].length; l++ ){
+      if( l >= this.array.module[i].length - 1 )
+        return;
+
+      let index = this.array.id[i][l];
+      this.array.module[i][index].setStatus( 1 );
+      this.array.module[i][index].setOffset( this.array.view[i][l] );
+    }
+
+    this.tryAttach();
+  }
+
+  //formation of an array of possible joints
+  tryAttach(){
+    if( this.array.module[this.var.mode].length == 0 )
+      return;
+
+    this.array.hull[this.var.hull].cleanGrid();
+
+    let index = 0;
     let m = this.array.shift[this.var.mode];
     let mod = this.array.module[this.var.mode][m];
     let hull = this.array.hull[this.var.hull];
+    let parent = null;
+    let child = null;
+    this.array.joint = [];
+
+    for( let i = 0; i < this.array.way.length; i++ )
+      for( let j = 0; j < hull.array.gateway[i].length; j++ ){
+          parent = this.array.hull[this.var.hull].array.gateway[i][j];
+          let way = ( i + 2 ) % this.array.way.length;
+          for( let l = 0; l < mod.array.gateway[way].length; l++ ){
+              child = mod.array.gateway[way][l];
+              this.checkFreeSpace( index, parent, child );
+              index++;
+          }
+      }
+
+
+    if( hull.array.module.length > 0 )
+      console.log( hull.array.gateway, this.array.joint )
+    //console.log(  )
+    if( this.array.joint.length > 0 && this.var.joint != undefined )
+      this.attachToHull( mod, this.array.joint[this.var.joint] );
+  }
+
+  //gate kind match check and check for the existence of a free place
+  checkFreeSpace( index, parent, child ){
+    let m = this.array.shift[this.var.mode];
+    let mod = this.array.module[this.var.mode][m];
+    let hull = this.array.hull[this.var.hull];
+    let cVec = mod.convertIndex( child );
+    let pVec = hull.convertIndex( parent );
+    let cBlock = mod.array.block[cVec.x][cVec.y];
+    let pBlock = hull.array.grid[pVec.x][pVec.y];
+    let join;
+
+    if( hull.array.module.length > 0 )
+      console.log( parent, pBlock.gateKind, child, cBlock.gateKind )
+    if( pBlock.gateKind == cBlock.gateKind )
+      join = new joint( index, parent, child );
+    else
+      return;
+
+    let childVec = mod.convertIndex( join.child );
+    let parentVec = hull.convertIndex( join.parent );
+
+    for( let i = 0; i < mod.array.block.length; i++ )
+      for( let j = 0; j < mod.array.block[i].length; j++ ){
+        let x = i + parentVec.x - childVec.x;
+        let y = j + parentVec.y - childVec.y;
+        let block = mod.array.block[i][j];
+
+        if( hull.array.grid[y][x].status == 'selected' )
+          return;
+      }
+
+    this.array.joint.push( join );
+  }
+
+  //connect the module to the hull if it is possible
+  attachToHull( module, joint ){
+    let hull = this.array.hull[this.var.hull];
+    hull.cleanGrid();
+
+    //console.log( joint )
+
+    let childVec = module.convertIndex( joint.child );
+    let parentVec = hull.convertIndex( joint.parent );
+
+    for( let i = 0; i < module.array.block.length; i++ )
+      for( let j = 0; j < module.array.block[i].length; j++ ){
+        let x = i + parentVec.x - childVec.x;
+        let y = j + parentVec.y - childVec.y;
+        let block = module.array.block[i][j];
+        hull.array.grid[y][x].copy( block, 0 );
+      }
+
+      if( module.status == 'edit' && module.const.type == 3 )
+      for( let i = 0; i < hull.array.grid.length; i++ )
+        for( let j = 0; j < hull.array.grid[i].length; j++ ){
+          if( hull.array.grid[i][j].status == 'proposed' )
+            if( hull.array.grid[i][j].gateKind != null )
+              console.log( 'attach', hull.array.grid[i][j].index, hull.array.grid[i][j].gateKind )
+          }
+  }
+
+  shiftJoint( shift ){
+    if( this.array.joint.length < 2 )
+      return;
+
+    this.var.joint = ( this.var.joint + shift + this.array.joint.length ) % this.array.joint.length;
+    //console.log( this.var.joint, this.array.joint )
+
+    let m = this.array.shift[this.var.mode];
+    let mod = this.array.module[this.var.mode][m];
     let joint = this.array.joint[this.var.joint];
-
-    for( let i = 0; i < hull.array.grid.length; i++ )
-      for( let j = 0; j < hull.array.grid[i].length; j++ )
-        if( hull.array.grid[i][j].status == 'proposed' )
-          hull.array.grid[i][j].setStatus( 2 );
-
-    mod.setJoint( joint );
-
-    /*if( hull.array.module.length == 0 ){
-
-        hull.addGateway( 0, index - this.const.n, 'solo' );
-    }*/
-
-    hull.array.module.push( mod );
-    this.array.module[this.var.mode].splice( m, 1 );
-
-    this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
-    for( let i = 0; i < this.array.id[this.var.mode].length; i++ )
-      if( this.array.id[this.var.mode][i] > this.array.shift[this.var.mode] )
-      this.array.id[this.var.mode][i]--;
-
-    this.updateModules();
-    this.tryAttach();
-    /*this.array.module[this.var.mode].splice( m, 1 );
-    this.array.shift[this.var.mode] = ( this.array.shift[this.var.mode] - 1 + )
-
-    this.array.id[this.var.mode].push( this.array.shift[this.var.mode] );
-    this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();*/
-    console.log( hull.array.module, this.array.shift[this.var.mode], this.array.id[this.var.mode] )
+    this.attachToHull( mod, joint );
   }
 
   draw(){

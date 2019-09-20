@@ -32,12 +32,19 @@ class block {
       case 2:
         this.status = 'selected';
         break;
+      //show as place to insert
+      case 3:
+        this.status = 'expectant';
+        break;
+
     }
   }
 
   setKind( kind ){
     this.gateKind = kind;
     this.interior = 'door';
+    if( kind == null )
+      this.interior = 'floor';
   }
 
   setPartition( partition ){
@@ -67,10 +74,14 @@ class block {
       this.partition = block.partition;
   }
 
+  free(){
+    return ( this.status == 'selected' || this.status == 'forgotten' )
+  }
+
   //drawing block
   draw( offset ){
-    if( this.status == 'forgotten' )
-      return;
+    //if( this.status == 'forgotten' )
+    //  return;
 
     fill( this.colorBackground );
     if( this.interior == 'door' )
@@ -151,10 +162,10 @@ class block {
     }
 
     //draw text
-    textSize( fontSize * this.scale * 0.8 );
+    textSize( fontSize * this.scale * 0.7 );
     fill( 0 );
-    if( this.interior == 'door' )
-      text( this.index, offset.x + this.center.x, offset.y + this.center.y + fontSize / 6 );
+    //if( this.interior != 'floor' )
+    text( this.index, offset.x + this.center.x, offset.y + this.center.y + fontSize / 6 );
     textSize( fontSize );
   }
 }
