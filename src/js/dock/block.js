@@ -4,7 +4,7 @@ class block {
     this.index  = index;
     this.center = center;
     this.scale = scale;
-    this.visible = visible ? visible : false;
+    //this.visible = visible ? visible : false;
     this.gateKind = null;
     this.partition = null;
     this.interior = 'floor';
@@ -14,6 +14,7 @@ class block {
     this.colorBackground = color( 0, 0, colorMax * 4 / 5 );
     this.colorPartition =  color( colorMax * 0.5, colorMax * 0.25, colorMax * 0.25 );
     this.colorGateway = color( colorMax * 5 / 6, colorMax, colorMax * 0.5 );
+    this.colorGateway2 = color( colorMax * 2 / 6, colorMax, colorMax * 0.5 );
     this.colorFocus = color( colorMax / 7, colorMax, colorMax * 0.6 );
   }
 
@@ -43,8 +44,11 @@ class block {
   setKind( kind ){
     this.gateKind = kind;
     this.interior = 'door';
-    if( kind == null )
+    if( kind == null ){
       this.interior = 'floor';
+      this.gateKind = null;
+      this.partition = null;
+    }
   }
 
   setPartition( partition ){
@@ -64,7 +68,7 @@ class block {
   }
 
   copy( block, type ){
-    this.visible = block.visible;
+    //this.visible = block.visible;
     this.content = block.content;
     this.interior = block.interior;
     this.gateKind = block.gateKind;
@@ -84,8 +88,11 @@ class block {
     //  return;
 
     fill( this.colorBackground );
-    if( this.interior == 'door' )
+    if( this.interior == 'door' ){
       fill( this.colorGateway );
+      if( this.status == 'expectant' )
+        fill( this.colorGateway2 );
+    }
     if( this.content == 1 )
       fill( this.colorFocus );
     rect(

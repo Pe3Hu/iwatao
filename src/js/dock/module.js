@@ -173,6 +173,7 @@ class module {
     }
   }
 
+  //edited
   //convert block index to type
   determineBlockType( index ){
     let blockType = null;
@@ -181,40 +182,40 @@ class module {
     //corner
     if( vec.x == 0 && vec.y == 0 )
       blockType = 0;
-    if( vec.x == 0 && vec.y == this.const.block.y - 1 )
+    if( vec.x == this.const.block.x - 1 && vec.y == 0 )
       blockType = 1;
     if( vec.x == this.const.block.x - 1 && vec.y == this.const.block.y - 1 )
       blockType = 2;
-    if( vec.x == this.const.block.x - 1 && vec.y == 0 )
+    if( vec.x == 0 && vec.y == this.const.block.y - 1 )
       blockType = 3;
 
     if( blockType == null ){
       //edge
-      if( vec.x == 0 )
-        blockType = 4;
-      if( vec.y == this.const.block.y - 1 )
-        blockType = 5;
-      if( vec.x == this.const.block.x - 1 )
-        blockType = 6;
       if( vec.y == 0 )
+        blockType = 4;
+      if( vec.x == this.const.block.x - 1 )
+        blockType = 5;
+      if( vec.y == this.const.block.y - 1 )
+        blockType = 6;
+      if( vec.x == 0 )
         blockType = 7;
 
       //cornered edge
-      if( vec.x == 0 && vec.y == 1 )
-        blockType = 8;
-      if( vec.x == 0 && vec.y == this.const.block.y - 2 )
-        blockType = 9;
-      if( vec.x == 1 && vec.y == this.const.block.y - 1 )
-        blockType = 10;
-      if( vec.x == this.const.block.x - 2 && vec.y == this.const.block.y - 1 )
-        blockType = 11;
-      if( vec.x == this.const.block.x - 1 && vec.y == this.const.block.y - 2 )
-        blockType = 12;
-      if( vec.x == this.const.block.x - 1 && vec.y == 1 )
-        blockType = 13;
-      if( vec.x == this.const.block.x - 2 && vec.y == 0 )
-        blockType = 14;
       if( vec.x == 1 && vec.y == 0 )
+        blockType = 8;
+      if( vec.x == this.const.block.x - 2 && vec.y == 0 )
+        blockType = 9;
+      if( vec.x == this.const.block.x - 1 && vec.y == 1 )
+        blockType = 10;
+      if( vec.x == this.const.block.x - 1 && vec.y == this.const.block.y - 2 )
+        blockType = 11;
+      if( vec.x == this.const.block.x - 2 && vec.y == this.const.block.y - 1 )
+        blockType = 12;
+      if( vec.x == 1 && vec.y == this.const.block.y - 1 )
+        blockType = 13;
+      if( vec.x == 0 && vec.y == this.const.block.y - 2 )
+        blockType = 14;
+      if( vec.x == 0 && vec.y == 1 )
         blockType = 15;
     }
 
@@ -359,7 +360,7 @@ class module {
       for( let j = edge.length - 1; j >= 0; j-- )
         if( edge[j] == this.array.freeEdge[i] ){
           let vec = this.convertIndex( this.array.freeEdge[i] );
-          //this.array.block[vec.x][vec.y].setKind( 'noGate' );
+          //this.array.block[vec.y][vec.x].setKind( 'noGate' );
           this.array.freeEdge.splice( i, 1 );
         }
 
@@ -368,7 +369,7 @@ class module {
       for( let j = corner.length - 1; j >= 0; j-- )
         if( corner[j] == this.array.freeCorner[i] ){
           let vec = this.convertIndex( this.array.freeCorner[i] );
-          //this.array.block[vec.x][vec.y].setKind( 'noGate' );
+          //this.array.block[vec.y][vec.x].setKind( 'noGate' );
           this.array.freeCorner.splice( i, 1 );
         }
 
@@ -379,8 +380,8 @@ class module {
     if( index == undefined )
       return null;
 
-    let x = Math.floor( index / this.const.block.x );
-    let y = index % this.const.block.y;
+    let y = Math.floor( index / this.const.block.x );
+    let x = index % this.const.block.y;
     return createVector( x, y );
   }
 
@@ -389,7 +390,7 @@ class module {
     if( vec == undefined )
       return null;
 
-    return vec.x * this.const.block.x + vec.y;
+    return vec.y * this.const.block.x + vec.x;
   }
 
   //activate a certain type of gateway
@@ -411,7 +412,7 @@ class module {
         rand = Math.floor( Math.random() * this.array.freeEdge.length );
         index = this.array.freeEdge[rand];
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.y][vec.x].setKind( name );
         this.array.freeEdge.splice( rand, 1 );
         this.cutOffNeighbors( index );
         this.accountingGateway( index );
@@ -420,8 +421,9 @@ class module {
         name = 'solo';//'anyCorner';
         rand = Math.floor( Math.random() * this.array.freeCorner.length );
         index = this.array.freeCorner[rand];
+        console.log( index );
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.y][vec.x].setKind( name );
         this.array.freeCorner.splice( rand, 1 );
         this.cutOffNeighbors( index );
         this.accountingGateway( index );
@@ -445,7 +447,7 @@ class module {
         }
 
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.y][vec.x].setKind( name );
         this.array.freeEdge.splice( rand, 1 );
         this.accountingGateway( index );
 
@@ -453,7 +455,7 @@ class module {
         vec = this.convertIndex( id );
         this.cutOffNeighbors( index );
 
-        this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.y][vec.x].setKind( name );
         this.accountingGateway( id );
         this.cutOffNeighbors( id );
         break;
@@ -480,12 +482,12 @@ class module {
 
         index = this.array.freeCorner[firstID];
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.y][vec.x].setKind( name );
         this.accountingGateway( index );
 
         index = this.array.freeCorner[secondID];
         vec = this.convertIndex( index );
-        this.array.block[vec.x][vec.y].setKind( name );
+        this.array.block[vec.y][vec.x].setKind( name );
         this.accountingGateway( index );
 
         if( rand != 3 )
@@ -572,7 +574,7 @@ class module {
         break;
     }
 
-    this.array.block[vec.x][vec.y].setKind( name );
+    this.array.block[vec.y][vec.x].setKind( name );
     this.array.freeEdge.splice( rand, 1 );
     this.accountingGateway( index );
 
@@ -663,7 +665,7 @@ class module {
       this.tryAdject( adjIndex, adjacents );
 
       vec = this.convertIndex( adjIndex );
-      this.array.block[vec.x][vec.y].setKind( name );
+      this.array.block[vec.y][vec.x].setKind( name );
       this.array.freeEdge.splice( index, 1 );
       this.accountingGateway( adjIndex );
       count--;

@@ -414,7 +414,7 @@ class board {
 
     name = 'lockModule';
     type++;
-    vec = createVector( cellSize * ( canvasGrid.x - 6 ), cellSize * 7 );
+    vec = createVector( cellSize * 3, cellSize * 7 );//( canvasGrid.x - 6 )
     this.addButton( layer, name, type, vec.copy() );
 
     for ( let i = 0; i < this.array.button.length; i++ )
