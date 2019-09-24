@@ -1,10 +1,9 @@
 //the basic element of which consists module
 class block {
-  constructor( index, center, scale, visible ){
+  constructor( index, center, scale ){
     this.index  = index;
     this.center = center;
     this.scale = scale;
-    //this.visible = visible ? visible : false;
     this.gateKind = null;
     this.partition = null;
     this.interior = 'floor';
@@ -44,11 +43,8 @@ class block {
   setKind( kind ){
     this.gateKind = kind;
     this.interior = 'door';
-    if( kind == null ){
+    if( kind == null )
       this.interior = 'floor';
-      this.gateKind = null;
-      this.partition = null;
-    }
   }
 
   setPartition( partition ){
@@ -86,12 +82,13 @@ class block {
   draw( offset ){
     //if( this.status == 'forgotten' )
     //  return;
-
     fill( this.colorBackground );
+
     if( this.interior == 'door' ){
-      fill( this.colorGateway );
       if( this.status == 'expectant' )
-        fill( this.colorGateway2 );
+        fill( this.colorGateway2 );        
+      if( this.status == 'selected' || this.status == 'proposed' )
+        fill( this.colorGateway );
     }
     if( this.content == 1 )
       fill( this.colorFocus );
@@ -101,72 +98,73 @@ class block {
       this.size.x, this.size.y );
 
     fill( this.colorPartition );
-    switch ( this.partition ) {
-      case 2:
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x, this.size.y / 4);
-        break;
-      case 3:
-        rect(
-          offset.x + this.center.x + this.size.x / 4,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x / 4, this.size.y );
-        break;
-      case 4:
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y + this.size.y / 4,
-          this.size.x, this.size.y / 4);
-        break;
-      case 6:
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x / 4, this.size.y );
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x, this.size.y / 4);
-        break;
-      case 5:
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x / 4, this.size.y );
-        break;
-      case 7:
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x, this.size.y / 4);
-        rect(
-          offset.x + this.center.x + this.size.x / 4,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x / 4, this.size.y );
-        break;
-      case 8:
-        rect(
-          offset.x + this.center.x + this.size.x / 4,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x / 4, this.size.y );
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y + this.size.y / 4,
-          this.size.x, this.size.y / 4);
-        break;
-      case 9:
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y + this.size.y / 4,
-          this.size.x, this.size.y / 4);
-        rect(
-          offset.x + this.center.x - this.size.x / 2,
-          offset.y + this.center.y - this.size.y / 2,
-          this.size.x / 4, this.size.y );
-        break;
-    }
+    if( this.interior == 'wall' )
+      switch ( this.partition ) {
+        case 2:
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x, this.size.y / 4);
+          break;
+        case 3:
+          rect(
+            offset.x + this.center.x + this.size.x / 4,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x / 4, this.size.y );
+          break;
+        case 4:
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y + this.size.y / 4,
+            this.size.x, this.size.y / 4);
+          break;
+        case 6:
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x / 4, this.size.y );
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x, this.size.y / 4);
+          break;
+        case 5:
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x / 4, this.size.y );
+          break;
+        case 7:
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x, this.size.y / 4);
+          rect(
+            offset.x + this.center.x + this.size.x / 4,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x / 4, this.size.y );
+          break;
+        case 8:
+          rect(
+            offset.x + this.center.x + this.size.x / 4,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x / 4, this.size.y );
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y + this.size.y / 4,
+            this.size.x, this.size.y / 4);
+          break;
+        case 9:
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y + this.size.y / 4,
+            this.size.x, this.size.y / 4);
+          rect(
+            offset.x + this.center.x - this.size.x / 2,
+            offset.y + this.center.y - this.size.y / 2,
+            this.size.x / 4, this.size.y );
+          break;
+      }
 
     //draw text
     textSize( fontSize * this.scale * 0.7 );

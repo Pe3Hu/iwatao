@@ -11,8 +11,7 @@ class hull {
     this.var = {
     }
     this.array = {
-      gateway: [ [], [], [], [] ],
-      kind: [ [], [], [], [] ],
+      gate:  [ [], [], [], [] ],
       module: [],
       block: [],
       focus: [],
@@ -52,35 +51,32 @@ class hull {
 
 
     for ( let i = 0; i < this.array.way.length; i++ )
-      this.addGateway( i, index + this.array.way[i], 'solo' );
+      this.addGateway( index + this.array.way[i], 'solo', i );
   }
 
-  addGateway( way, index, kind ){
+  addGateway( index, kind, way ){
     if( way == undefined )
       return;
 
     let vec = this.convertIndex( index );
     this.array.grid[vec.y][vec.x].setKind( kind );
     this.array.grid[vec.y][vec.y].setStatus( 3 );
-    this.array.gateway[way].push( index );
-    this.array.kind[way].push( kind );
+    this.array.gate[way].push( new gate( index, kind, way ) );
   }
 
   cleanGrid(){
     for( let i = 0; i < this.array.grid.length; i++ )
       for( let j = 0; j < this.array.grid[i].length; j++ )
-        if( this.array.grid[i][j].status == 'forgotten'
-        || this.array.grid[i][j].status == 'proposed' ){
+        if( this.array.grid[i][j].status != 'selected' ){
           this.array.grid[i][j].setKind( null );
           this.array.grid[i][j].setStatus( 0 );
         }
 
-    for( let i = 0; i < this.array.gateway.length; i++ )
-      for( let j = 0; j < this.array.gateway[i].length; j++ ){
-        let vec = this.convertIndex( this.array.gateway[i] );
-        this.array.grid[vec.x][vec.y].setKind( this.array.kind[i][j] );
-        this.array.grid[vec.x][vec.y].setStatus( 3 );
-        this.array.grid[vec.x][vec.y].partition = null;
+    for( let i = 0; i < this.array.gate.length; i++ )
+      for( let j = 0; j < this.array.gate[i].length; j++ ){
+        let vec = this.convertIndex( this.array.gate[i][j].index );
+      this.array.grid[vec.y][vec.x].setKind( this.array.gate[i][j].kind );
+        this.array.grid[vec.y][vec.x].setStatus( 3 );
       }
   }
 

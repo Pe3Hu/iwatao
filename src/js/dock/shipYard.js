@@ -18,11 +18,6 @@ class shipYard{
       way: [ 'up', 'right', 'down', 'left' ]
     };
     this.var = {
-      gate: {
-        way: null,
-        index: null,
-        kind: null
-      },
       border: null,
       joint: 0,
       hull: 0,
@@ -82,6 +77,7 @@ class shipYard{
 
     this.var.mode = 2;
     let hull = this.array.hull[this.var.hull];
+    let mod = this.array.module[this.var.mode][this.array.shift[this.var.mode]];
     hull.cleanGrid();
     this.tryAttach();
   }
@@ -126,71 +122,62 @@ class shipYard{
     let mod = this.array.module[this.var.mode][m];
     let hull = this.array.hull[this.var.hull];
     let joint = this.array.joint[this.var.joint];
-    let parent = hull.convertIndex( joint.parent );
-    let child = mod.convertIndex( joint.child );
+    let parent = hull.convertIndex( joint.parent.index );
+    let child = mod.convertIndex( joint.child.index );
 
     //update joint in locked module
     mod.setJoint( joint );
 
     hull.array.module.push( mod );
     this.array.module[this.var.mode].splice( m, 1 );
+    console.log( joint );
 
     //update values in shift and id arrays
-    this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
     for( let i = 0; i < this.array.id[this.var.mode].length; i++ )
-      if( this.array.id[this.var.mode][i] > this.array.shift[this.var.mode] )
-      this.array.id[this.var.mode][i]--;
+      if( this.array.id[this.var.mode][i] >= this.array.shift[this.var.mode] )
+        this.array.id[this.var.mode][i]--;
 
-    for( let i = 0; i < hull.array.gateway.length; i++ ){
-      let index = hull.array.gateway[i].indexOf( joint.parent );
+    this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
+
+    console.log( this.array.shift[this.var.mode], this.array.id[this.var.mode] );
+
+    for( let i = 0; i < hull.array.gate.length; i++ ){
+      let index = hull.array.gate[i].indexOf( joint.parent );
+      let way = ( i + 2 ) % hull.array.gate.length;
       //remove used gateway
       if( index != -1 )
-        hull.array.gateway[i].splice( index, 1 );
+        hull.array.gate[i].splice( index, 1 );
 
-      for( let j = 0; j < mod.array.gateway[i].length; j++ )
+
+      for( let j = 0; j < mod.array.gate[i].length; j++ )
         //adding new options in gateway array
-        if( mod.array.gateway[i][j] != joint.child ){
-          let grid = mod.convertIndex( mod.array.gateway[i][j] );
+        if( mod.array.gate[i][j].index != joint.child.index ){
+          let grid = mod.convertIndex( mod.array.gate[i][j].index );
           grid.x += parent.x - child.x;
           grid.y += parent.y - child.y;
 
-          let kind = hull.array.grid[grid.y][grid.x].gateKind;
+          let kind = mod.array.gate[i][j].kind;
           let index = hull.convertGrid( grid );
           index += hull.array.way[i];
-          hull.array.gateway[i].push( index );
+          hull.array.gate[i].push( new gate( index, kind, way ) );
 
-          let couple = hull.convertIndex( index );
+          /*let couple = hull.convertIndex( index );
           hull.array.grid[couple.y][couple.x].setKind( kind );
-          hull.array.grid[couple.y][couple.x].setStatus( 3 );
+          hull.array.grid[couple.y][couple.x].setStatus( 3 );*/
 
-          if( hull.array.module.length > 0 )
-            console.log( index, kind,
-              grid.x, grid.y, hull.array.grid[grid.y][grid.x].gateKind, hull.array.grid[grid.y][grid.x].status,
-              couple.x, couple.y, hull.array.grid[couple.y][couple.x].gateKind, hull.array.grid[couple.y][couple.x].status )
       }
     }
 
-    for( let i = 0; i < hull.array.grid.length; i++ )
-      for( let j = 0; j < hull.array.grid[i].length; j++ )
-        if( hull.array.grid[i][j].status == 'expectant' )
-          console.log( 'expectant', hull.array.grid[i][j].index, hull.array.grid[i][j].gateKind )
-
-
-
-
-    for( let i = 0; i < hull.array.grid.length; i++ )
-      for( let j = 0; j < hull.array.grid[i].length; j++ )
-        if( hull.array.grid[i][j].status == 'selected' )
-          console.log( 'select', hull.array.grid[i][j].index, hull.array.grid[i][j].content, hull.array.grid[i][j].interior )
-
-    console.log( joint.parent, hull.array.gateway )
+    console.log( hull.array.gate );
   }
 
   //connect the module to the hull if it is possible
   attachToHull( module, joint ){
     let hull = this.array.hull[this.var.hull];
-    let childVec = module.convertIndex( joint.child );
-    let parentVec = hull.convertIndex( joint.parent );
+    let childVec = module.convertIndex( joint.child.index );
+    let parentVec = hull.convertIndex( joint.parent.index );
+
+    //console.log( '!', module.const.type, joint.parent, joint.child )
 
     hull.cleanGrid();
 
@@ -201,13 +188,6 @@ class shipYard{
         let block = module.array.block[i][j];
         hull.array.grid[y][x].copy( block, 0 );
       }
-
-      if( module.status == 'edit' && module.const.type == 3 )
-        for( let i = 0; i < hull.array.grid.length; i++ )
-          for( let j = 0; j < hull.array.grid[i].length; j++ )
-            if( hull.array.grid[i][j].status == 'proposed' )
-              if( hull.array.grid[i][j].gateKind != null )
-                console.log( 'attach', hull.array.grid[i][j].index, hull.array.grid[i][j].gateKind )
 
   }
 
@@ -225,45 +205,38 @@ class shipYard{
     this.array.joint = [];
 
     for( let i = 0; i < this.array.way.length; i++ )
-      for( let j = 0; j < hull.array.gateway[i].length; j++ ){
-          parent = this.array.hull[this.var.hull].array.gateway[i][j];
+      for( let j = 0; j < hull.array.gate[i].length; j++ ){
+          parent = this.array.hull[this.var.hull].array.gate[i][j];
           let way = ( i + 2 ) % this.array.way.length;
-          for( let l = 0; l < mod.array.gateway[way].length; l++ ){
-              child = mod.array.gateway[way][l];
-              this.checkFreeSpace( index, parent, child, i );
+          for( let l = 0; l < mod.array.gate[way].length; l++ ){
+              child = mod.array.gate[way][l];
+              this.checkFreeSpace( index, parent, child );
               index++;
           }
       }
-
-    if( hull.array.module.length > 0 )
-      console.log( hull.array.gateway, this.array.joint )
 
     if( this.array.joint.length > 0 && this.var.joint != undefined )
       this.attachToHull( mod, this.array.joint[this.var.joint] );
   }
 
   //gate kind match check and check for the existence of a free place
-  checkFreeSpace( index, parent, child, way ){
+  checkFreeSpace( index, parent, child ){
     let m = this.array.shift[this.var.mode];
     let mod = this.array.module[this.var.mode][m];
     let hull = this.array.hull[this.var.hull];
-    let cVec = mod.convertIndex( child );
-    let pVec = hull.convertIndex( parent );
-    let cBlock = mod.array.block[cVec.x][cVec.y];
-    let pBlock = hull.array.grid[pVec.x][pVec.y];
+    let cVec = mod.convertIndex( child.index );
+    let pVec = hull.convertIndex( parent.index );
+    let cBlock = mod.array.block[cVec.y][cVec.x];
+    let pBlock = hull.array.grid[pVec.y][pVec.x];
     let join;
 
-    if( hull.array.module.length > 0 ){
-        console.log( parent, pVec.x, pVec.y, pBlock.gateKind, hull.array.grid[pVec.x][pVec.y].index )
-        console.log( child, cVec.x, cVec.y, cBlock.gateKind,  mod.array.block[cVec.x][cVec.y].index )
-    }
     if( pBlock.gateKind == cBlock.gateKind )
-      join = new joint( index, parent, child, way );
+      join = new joint( index, parent, child );
     else
       return;
 
-    let childVec = mod.convertIndex( join.child );
-    let parentVec = hull.convertIndex( join.parent );
+    let childVec = mod.convertIndex( join.child.index );
+    let parentVec = hull.convertIndex( join.parent.index );
 
     for( let i = 0; i < mod.array.block.length; i++ )
       for( let j = 0; j < mod.array.block[i].length; j++ ){
@@ -353,12 +326,12 @@ class shipYard{
         target = obj.array.block[currents[3].x][currents[3].y];
         target.copy( temp, 1 );
       }
-      obj.updateGateway();
 
+    obj.updateGateway();
 
-      let hull = this.array.hull[this.var.hull];
-      hull.cleanGrid()
-      this.tryAttach()
+    let hull = this.array.hull[this.var.hull];
+    hull.cleanGrid();
+    this.tryAttach();
   }
 
   lockModule(){
@@ -371,8 +344,6 @@ class shipYard{
       for( let j = 0; j < hull.array.grid[i].length; j++ ){
         if( hull.array.grid[i][j].status == 'proposed' )
           hull.array.grid[i][j].setStatus( 2 );
-          if( hull.array.grid[i][j].gateKind != null )
-            console.log( 'lock', hull.array.grid[i][j].index, hull.array.grid[i][j].gateKind )
       }
 
     this.updateHull();
@@ -380,7 +351,7 @@ class shipYard{
     this.tryAttach();
 
     console.log( this.array.joint[this.var.joint] )
-    console.log( hull.array.module, this.array.shift[this.var.mode], this.array.id[this.var.mode] )
+    //console.log( hull.array.module, this.array.shift[this.var.mode], this.array.id[this.var.mode] )
 
   }
 
@@ -396,14 +367,14 @@ class shipYard{
     if( this.array.module[this.var.mode] == 0 )
       return;
 
-    this.cleanModules();
     this.updateShift( step );
+        this.cleanModules();
 
     let i = this.var.mode;
     let j = this.array.shift[i];
 
     if( this.array.hull[this.var.hull].array.module.length > 0 )
-      console.log( i, j, this.array.shift[i], '+', this.var.joint )
+      console.log( 'mode', i, 'shift', j, '=', this.array.shift[i], '+', this.var.joint )
 
     //set position and status for editable module
     this.array.module[i][j].setStatus( 2 );
@@ -442,14 +413,14 @@ class shipYard{
     if( this.array.joint.length < 2 )
       return;
 
-    this.var.joint = ( this.var.joint + shift + this.array.joint.length ) % this.array.joint.length;
-    //console.log( this.var.joint, this.array.joint )
-
     let m = this.array.shift[this.var.mode];
     let mod = this.array.module[this.var.mode][m];
     let joint = this.array.joint[this.var.joint];
     let hull = this.array.hull[this.var.hull];
-    this.attachToHull( mod, joint );
+    hull.cleanGrid();
+
+    this.var.joint = ( this.var.joint + shift + this.array.joint.length ) % this.array.joint.length;
+    this.tryAttach();
     if( hull.array.module.length > 0 )
       console.log( joint )
   }
