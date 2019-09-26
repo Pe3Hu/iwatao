@@ -4,7 +4,8 @@ class block {
     this.index  = index;
     this.center = center;
     this.scale = scale;
-    this.gateKind = null;
+    this.kind = null;
+    this.sequence = null;
     this.partition = null;
     this.interior = 'floor';
     this.content = 'empty';
@@ -40,11 +41,14 @@ class block {
     }
   }
 
-  setKind( kind ){
-    this.gateKind = kind;
+  setGate( kind, sequence ){
+    this.kind = kind;
+    this.sequence = sequence;
     this.interior = 'door';
     if( kind == null )
       this.interior = 'floor';
+    else if ( sequence == undefined )  
+      console.log( '!' );
   }
 
   setPartition( partition ){
@@ -67,7 +71,8 @@ class block {
     //this.visible = block.visible;
     this.content = block.content;
     this.interior = block.interior;
-    this.gateKind = block.gateKind;
+    this.kind = block.kind;
+    this.kind = block.sequence;
     this.setStatus( 1 );
 
     if( type == 0 )
@@ -86,7 +91,7 @@ class block {
 
     if( this.interior == 'door' ){
       if( this.status == 'expectant' )
-        fill( this.colorGateway2 );        
+        fill( this.colorGateway2 );
       if( this.status == 'selected' || this.status == 'proposed' )
         fill( this.colorGateway );
     }

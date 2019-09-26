@@ -139,8 +139,6 @@ class shipYard{
 
     this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
 
-    console.log( this.array.shift[this.var.mode], this.array.id[this.var.mode] );
-
     for( let i = 0; i < hull.array.gate.length; i++ ){
       let index = hull.array.gate[i].indexOf( joint.parent );
       let way = ( i + 2 ) % hull.array.gate.length;
@@ -157,9 +155,11 @@ class shipYard{
           grid.y += parent.y - child.y;
 
           let kind = mod.array.gate[i][j].kind;
+          let sequence = mod.array.gate[i][j].sequence;
+          console.log( mod.array.gate[i][j].index, kind, sequence  )
           let index = hull.convertGrid( grid );
           index += hull.array.way[i];
-          hull.array.gate[i].push( new gate( index, kind, way ) );
+          hull.array.gate[i].push( new gate( index, kind, sequence, way ) );
 
           /*let couple = hull.convertIndex( index );
           hull.array.grid[couple.y][couple.x].setKind( kind );
@@ -167,8 +167,6 @@ class shipYard{
 
       }
     }
-
-    console.log( hull.array.gate );
   }
 
   //connect the module to the hull if it is possible
@@ -230,7 +228,9 @@ class shipYard{
     let pBlock = hull.array.grid[pVec.y][pVec.x];
     let join;
 
-    if( pBlock.gateKind == cBlock.gateKind )
+    console.log( parent.index, pBlock.kind, pBlock.sequence, child.index, cBlock.kind, cBlock.sequence )
+
+    if( pBlock.sequence == cBlock.sequence )
       join = new joint( index, parent, child );
     else
       return;
@@ -258,6 +258,8 @@ class shipYard{
     let l = this.array.option[i].length;
     let rand = Math.floor( Math.random() * l );
     let grade = this.array.option[i][rand];
+    if( this.var.mode == 2 )
+      grade = 10;
     this.array.module[i].push( new module( index, i + 1, grade ) );
 
     if( this.array.shift[i] == null ){
@@ -351,7 +353,6 @@ class shipYard{
     this.tryAttach();
 
     console.log( this.array.joint[this.var.joint] )
-    //console.log( hull.array.module, this.array.shift[this.var.mode], this.array.id[this.var.mode] )
 
   }
 
@@ -368,7 +369,7 @@ class shipYard{
       return;
 
     this.updateShift( step );
-        this.cleanModules();
+    this.cleanModules();
 
     let i = this.var.mode;
     let j = this.array.shift[i];

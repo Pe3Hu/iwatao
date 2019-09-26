@@ -359,7 +359,7 @@ class module {
       for( let j = edge.length - 1; j >= 0; j-- )
         if( edge[j] == this.array.freeEdge[i] ){
           let vec = this.convertIndex( this.array.freeEdge[i] );
-          //this.array.block[vec.y][vec.x].setKind( 'noGate' );
+          //this.array.block[vec.y][vec.x].setGate( 'noGate' );
           this.array.freeEdge.splice( i, 1 );
         }
 
@@ -368,7 +368,7 @@ class module {
       for( let j = corner.length - 1; j >= 0; j-- )
         if( corner[j] == this.array.freeCorner[i] ){
           let vec = this.convertIndex( this.array.freeCorner[i] );
-          //this.array.block[vec.y][vec.x].setKind( 'noGate' );
+          //this.array.block[vec.y][vec.x].setGate( 'noGate' );
           this.array.freeCorner.splice( i, 1 );
         }
 
@@ -393,44 +393,48 @@ class module {
   }
 
   //activate a certain type of gateway
-  addGateway( gateKind ){
+  addGateway( kind ){
     let rand;
     let index;
     let id;
     let ids;
     let vec;
     let name;
+    let sequence;
     let testValue;
     let testIndex;
     let blockType = null;
     let counter = 0;
 
-    switch ( gateKind ) {
+    switch ( kind ) {
       case 0:
-        name = 'solo';//'anyEdge';
+        sequence = 'solo';
+        name = 'edge';
         rand = Math.floor( Math.random() * this.array.freeEdge.length );
         index = this.array.freeEdge[rand];
         vec = this.convertIndex( index );
-        this.array.block[vec.y][vec.x].setKind( name );
+        this.array.block[vec.y][vec.x].setGate( name, sequence );
         this.array.freeEdge.splice( rand, 1 );
         this.cutOffNeighbors( index );
-        this.accountingGateway( index, name );
+        this.accountingGateway( index, name, sequence );
         break;
       case 1:
-        name = 'solo';//'anyCorner';
+        sequence = 'solo';
+        name = 'corner';
         rand = Math.floor( Math.random() * this.array.freeCorner.length );
         index = this.array.freeCorner[rand];
         vec = this.convertIndex( index );
-        this.array.block[vec.y][vec.x].setKind( name );
+        this.array.block[vec.y][vec.x].setGate( name, sequence );
         this.array.freeCorner.splice( rand, 1 );
         this.cutOffNeighbors( index );
-        this.accountingGateway( index, name );
+        this.accountingGateway( index, name, sequence );
         break;
       case 2:
         if( this.const.type < 3 )
           return;
 
-        name = 'solo';//'unilateralEdge';
+        sequence = 'solo';//'unilateralEdge';
+        name = 'edge';
         while( blockType == null && counter < 1000 ){
           rand = Math.floor( Math.random() * this.array.freeEdge.length );
           index = this.array.freeEdge[rand];
@@ -445,28 +449,29 @@ class module {
         }
 
         vec = this.convertIndex( index );
-        this.array.block[vec.y][vec.x].setKind( name );
+        this.array.block[vec.y][vec.x].setGate( name, sequence );
         this.array.freeEdge.splice( rand, 1 );
-        this.accountingGateway( index, name );
+        this.accountingGateway( index, name, sequence  );
 
         id = this.getCouple( blockType );
         vec = this.convertIndex( id );
         this.cutOffNeighbors( index );
 
-        this.array.block[vec.y][vec.x].setKind( name );
-        this.accountingGateway( id, name );
+        this.array.block[vec.y][vec.x].setGate( name, sequence );
+        this.accountingGateway( id, name, sequence );
         this.cutOffNeighbors( id );
         break;
       case 3:
       case 4:
       case 5:
-        ids = this.getAdjacent( gateKind - 1 );
+        ids = this.getAdjacent( kind - 1 );
 
         for( let i = 0; i < ids.length; i++ )
           this.cutOffNeighbors( ids[i] );
         break;
       case 6:
-        name = 'duo';//'duoCorner';
+        sequence = 'duo';
+        name = 'corner';
         let direction = [ 'up', 'right', 'down', 'left' ];
         let firstID;
         let secondID;
@@ -480,13 +485,13 @@ class module {
 
         index = this.array.freeCorner[firstID];
         vec = this.convertIndex( index );
-        this.array.block[vec.y][vec.x].setKind( name );
-        this.accountingGateway( index, name );
+        this.array.block[vec.y][vec.x].setGate( name, sequence );
+        this.accountingGateway( index, name, sequence );
 
         index = this.array.freeCorner[secondID];
         vec = this.convertIndex( index );
-        this.array.block[vec.y][vec.x].setKind( name );
-        this.accountingGateway( index, name );
+        this.array.block[vec.y][vec.x].setGate( name, sequence );
+        this.accountingGateway( index, name, sequence );
 
         if( rand != 3 )
           this.array.freeCorner.splice( rand, 2 );
@@ -553,7 +558,8 @@ class module {
 
   //create a gateway of a given width
   getAdjacent( count ){
-    let name = null;
+    let name = 'edge';
+    let sequence = null;
     let ids;
     let adjacents = [];
     let rand = Math.floor( Math.random() * this.array.freeEdge.length );
@@ -562,19 +568,19 @@ class module {
 
     switch ( count ) {
       case 2:
-        name = 'duo';//'duoEdge';
+        sequence = 'duo';//'duoEdge';
         break;
       case 3:
-        name = 'trio';//'trioEdge';
+        sequence = 'trio';//'trioEdge';
         break;
       case 4:
-        name = 'quartet';//'quartetEdge';
+        sequence = 'quartet';//'quartetEdge';
         break;
     }
 
-    this.array.block[vec.y][vec.x].setKind( name );
+    this.array.block[vec.y][vec.x].setGate( name, sequence );
     this.array.freeEdge.splice( rand, 1 );
-    this.accountingGateway( index, name );
+    this.accountingGateway( index, name, sequence );
 
     this.tryAdject( index, adjacents );
 
@@ -635,7 +641,8 @@ class module {
 
   //choose from an array of adjacent blocks
   applyAdject( adjacents, count ){
-    let name;
+    let name = 'edge';
+    let sequence;
     let vec;
     let rand;
     let adjIndex;
@@ -643,13 +650,13 @@ class module {
 
     switch ( count ) {
       case 1:
-      name = 'duo';//'duoEdge';
+      sequence = 'duo';//'duoEdge';
       break;
     case 2:
-      name = 'trio';//'trioEdge';
+      sequence = 'trio';//'trioEdge';
       break;
     case 3:
-      name = 'quartet';//'quartetEdge';
+      sequence = 'quartet';//'quartetEdge';
       break;
     }
 
@@ -663,9 +670,9 @@ class module {
       this.tryAdject( adjIndex, adjacents );
 
       vec = this.convertIndex( adjIndex );
-      this.array.block[vec.y][vec.x].setKind( name );
+      this.array.block[vec.y][vec.x].setGate( name, sequence );
       this.array.freeEdge.splice( index, 1 );
-      this.accountingGateway( adjIndex, name );
+      this.accountingGateway( adjIndex, name, sequence );
       count--;
     }
 
@@ -699,7 +706,7 @@ class module {
   }
 
   //add to gateway array taken index
-  accountingGateway( index, kind ){
+  accountingGateway( index, kind, sequence ){
     let way = null;
     let anotherWay = null;
     let vec = this.convertIndex( index );
@@ -733,9 +740,9 @@ class module {
         way = 3;
       }
 
-    this.array.gate[way].push( new gate( index, kind, way ) );
+    this.array.gate[way].push( new gate( index, kind, sequence, way ) );
     if( anotherWay != null )
-      this.array.gate[anotherWay].push( new gate( index, kind, way ) );
+      this.array.gate[anotherWay].push( new gate( index, kind, sequence, way ) );
   }
 
   setStatus( status ){
@@ -768,8 +775,8 @@ class module {
 
     for( let i = 0; i < this.array.block.length; i++)
       for( let j = 0; j < this.array.block[i].length; j++ ){
-          if( this.array.block[i][j].gateKind != null )
-            this.accountingGateway( this.array.block[i][j].index, this.array.block[i][j].gateKind );
+          if( this.array.block[i][j].kind != null && this.array.block[i][j].sequence != null )
+            this.accountingGateway( this.array.block[i][j].index, this.array.block[i][j].kind, this.array.block[i][j].sequence );
       }
   }
 

@@ -51,31 +51,33 @@ class hull {
 
 
     for ( let i = 0; i < this.array.way.length; i++ )
-      this.addGateway( index + this.array.way[i], 'solo', i );
+      this.addGateway( index + this.array.way[i], 'focus', 'solo', i );
   }
 
-  addGateway( index, kind, way ){
+  addGateway( index, kind, sequence, way ){
     if( way == undefined )
       return;
 
     let vec = this.convertIndex( index );
-    this.array.grid[vec.y][vec.x].setKind( kind );
+    this.array.grid[vec.y][vec.x].setGate( kind, sequence );
     this.array.grid[vec.y][vec.y].setStatus( 3 );
-    this.array.gate[way].push( new gate( index, kind, way ) );
+    this.array.gate[way].push( new gate( index, kind, sequence, way ) );
   }
 
   cleanGrid(){
     for( let i = 0; i < this.array.grid.length; i++ )
       for( let j = 0; j < this.array.grid[i].length; j++ )
         if( this.array.grid[i][j].status != 'selected' ){
-          this.array.grid[i][j].setKind( null );
+          this.array.grid[i][j].setGate( null, null );
           this.array.grid[i][j].setStatus( 0 );
         }
 
     for( let i = 0; i < this.array.gate.length; i++ )
       for( let j = 0; j < this.array.gate[i].length; j++ ){
         let vec = this.convertIndex( this.array.gate[i][j].index );
-      this.array.grid[vec.y][vec.x].setKind( this.array.gate[i][j].kind );
+        let kind = this.array.gate[i][j].kind;
+        let sequence = this.array.gate[i][j].sequence;
+        this.array.grid[vec.y][vec.x].setGate( kind, sequence );
         this.array.grid[vec.y][vec.x].setStatus( 3 );
       }
   }
