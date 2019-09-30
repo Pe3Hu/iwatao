@@ -680,27 +680,27 @@ class module {
   }
 
   //determine the type of partition by column and row
-  calculatePartition( x, y ){
+  calculatePartition( y, x ){
     let partition = null;
 
     if( x == 0 && y == 0 )
-      partition = 6;
-    if( x == 0 && y == this.const.block.y - 1 )
       partition = 7;
+    if( x == 0 && y == this.const.block.y - 1 )
+      partition = 6;
     if( x == this.const.block.x - 1 && y == this.const.block.y - 1 )
-      partition = 8;
+      partition = 5;
     if( x == this.const.block.x - 1 && y == 0 )
-      partition = 9;
+      partition = 4;
 
     if( partition == null ){
       if( x == 0 )
-        partition = 2;
-      if( y == this.const.block.y - 1 )
         partition = 3;
+      if( y == this.const.block.y - 1 )
+        partition = 2;
       if( x == this.const.block.x - 1 )
-        partition = 4;
+        partition = 1;
       if( y == 0 )
-        partition = 5;
+        partition = 0;
       }
     return partition;
   }
@@ -775,8 +775,11 @@ class module {
 
     for( let i = 0; i < this.array.block.length; i++)
       for( let j = 0; j < this.array.block[i].length; j++ ){
+        let index = this.array.block[i][j].index;
+        let kind = this.array.block[i][j].kind;
+        let sequence = this.array.block[i][j].sequence;
           if( this.array.block[i][j].kind != null && this.array.block[i][j].sequence != null )
-            this.accountingGateway( this.array.block[i][j].index, this.array.block[i][j].kind, this.array.block[i][j].sequence );
+            this.accountingGateway( index, kind, sequence );
       }
   }
 
@@ -792,3 +795,30 @@ class module {
           //let index = i *  this.const.block.x + j;
   }
 }
+
+/*
+calculatePartition( x, y ){
+  let partition = null;
+
+  if( x == 0 && y == 0 )
+    partition = 6;
+  if( x == 0 && y == this.const.block.y - 1 )
+    partition = 7;
+  if( x == this.const.block.x - 1 && y == this.const.block.y - 1 )
+    partition = 8;
+  if( x == this.const.block.x - 1 && y == 0 )
+    partition = 9;
+
+  if( partition == null ){
+    if( x == 0 )
+      partition = 2;
+    if( y == this.const.block.y - 1 )
+      partition = 3;
+    if( x == this.const.block.x - 1 )
+      partition = 4;
+    if( y == 0 )
+      partition = 5;
+    }
+  return partition;
+}
+*/

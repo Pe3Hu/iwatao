@@ -14,8 +14,7 @@ class shipYard{
       option: [],
       hull: [],
       view: [],
-      edit: [],
-      way: [ 'up', 'right', 'down', 'left' ]
+      edit: []
     };
     this.var = {
       border: null,
@@ -75,7 +74,7 @@ class shipYard{
       this.var.mode++;
     }
 
-    this.var.mode = 2;
+    this.var.mode = 0;
     let hull = this.array.hull[this.var.hull];
     let mod = this.array.module[this.var.mode][this.array.shift[this.var.mode]];
     hull.cleanGrid();
@@ -202,10 +201,10 @@ class shipYard{
     let child = null;
     this.array.joint = [];
 
-    for( let i = 0; i < this.array.way.length; i++ )
+    for( let i = 0; i < hull.array.way.length; i++ )
       for( let j = 0; j < hull.array.gate[i].length; j++ ){
           parent = this.array.hull[this.var.hull].array.gate[i][j];
-          let way = ( i + 2 ) % this.array.way.length;
+          let way = ( i + 2 ) % hull.array.way.length;
           for( let l = 0; l < mod.array.gate[way].length; l++ ){
               child = mod.array.gate[way][l];
               this.checkFreeSpace( index, parent, child );
@@ -215,6 +214,9 @@ class shipYard{
 
     if( this.array.joint.length > 0 && this.var.joint != undefined )
       this.attachToHull( mod, this.array.joint[this.var.joint] );
+
+    if( hull.array.module.length > 0 )
+      console.log( this.array.joint[this.var.joint] )
   }
 
   //gate kind match check and check for the existence of a free place
@@ -228,8 +230,7 @@ class shipYard{
     let pBlock = hull.array.grid[pVec.y][pVec.x];
     let join;
 
-    console.log( parent.index, pBlock.kind, pBlock.sequence, child.index, cBlock.kind, cBlock.sequence )
-
+    //merger opportunity
     if( pBlock.sequence == cBlock.sequence )
       join = new joint( index, parent, child );
     else
@@ -243,10 +244,30 @@ class shipYard{
         let x = j + parentVec.x - childVec.x;
         let y = i + parentVec.y - childVec.y;
         let block = mod.array.block[i][j];
+        let index = hull.array.grid[y][x].index;
+        let partition = mod.array.block[i][j].partition;
 
+        //place to merge
         if( hull.array.grid[y][x].status == 'selected' )
           return;
       }
+
+      for( let i = 0; i < hull.array.gate.length; i++ )
+        for( let j = 0; j < hull.array.gate[i].length; j++ ){
+          let index = hull.array.gate[i][j].index;
+          let vec = hull.convertIndex( index );
+
+          let x = vec.x - parentVec.x + childVec.x;
+          let y = vec.y - parentVec.y + childVec.y;
+          if( x >= 0 && x < mod.const.block.x &&
+              y >= 0 && y < mod.const.block.y ){
+                let block = mod.array.block[y][x];
+
+                //ban on connecting wall and door
+                if( block.interior != 'door' )
+                  return;
+              }
+        }
 
     this.array.joint.push( join );
   }
@@ -340,6 +361,9 @@ class shipYard{
     if( this.array.module[this.var.mode].length == 0 )
       return;
 
+    if( this.array.joint[this.var.joint] == undefined )
+      return;
+
     let hull = this.array.hull[this.var.hull];
 
     for( let i = 0; i < hull.array.grid.length; i++ )
@@ -352,8 +376,7 @@ class shipYard{
     this.updateModules();
     this.tryAttach();
 
-    console.log( this.array.joint[this.var.joint] )
-
+    console.log( hull.array.gate )
   }
 
   //bring the statuses of all the block to the default value
@@ -406,8 +429,8 @@ class shipYard{
     }
 
     let hull = this.array.hull[this.var.hull];
-    hull.cleanGrid()
-    this.tryAttach()
+    hull.cleanGrid();
+    this.tryAttach();
   }
 
   shiftJoint( shift ){
@@ -418,12 +441,10 @@ class shipYard{
     let mod = this.array.module[this.var.mode][m];
     let joint = this.array.joint[this.var.joint];
     let hull = this.array.hull[this.var.hull];
-    hull.cleanGrid();
 
+    hull.cleanGrid();
     this.var.joint = ( this.var.joint + shift + this.array.joint.length ) % this.array.joint.length;
     this.tryAttach();
-    if( hull.array.module.length > 0 )
-      console.log( joint )
   }
 
   draw(){
