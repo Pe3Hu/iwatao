@@ -44,7 +44,7 @@ class button {
       let d = null;
 
       //draw layer change buttons
-      if ( this.type > -1 && this.type < 6 ){
+      if ( this.type > -1 && this.type < 8 ){
         noStroke();
         switch ( this.type ) {
           case 0:
@@ -64,6 +64,12 @@ class button {
             break;
           case 5:
             fill( 300, colorMax * 1, colorMax * 0.5 );
+            break;
+          case 6:
+            fill( 270, colorMax * 1, colorMax * 0.5 );
+            break;
+          case 7:
+            fill( 130, colorMax * 1, colorMax * 0.5 );
             break;
         }
         rect(

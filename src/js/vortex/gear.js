@@ -2,7 +2,7 @@
 class gear {
   constructor ( index, orientation, center, teeths ){
     this.index =  index;
-    this.orientation = orientation
+    this.orientation = orientation;
     this.center = center;
     this.const = {
       teeths: teeths,
