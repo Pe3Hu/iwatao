@@ -4,6 +4,7 @@ let colorMax = 360;
 let colorBG = colorMax * 2 / 3;
 let colorButton = colorMax / 2;
 let infinity = 999999999;
+let fr = 60;
 let font;
 let fontSize = 18;
 let canvasSize;
@@ -26,6 +27,7 @@ function setup() {
   textAlign( CENTER );
 
   colorMode( HSL, colorMax );
+  frameRate( fr );
 
   offset = createVector( cellSize * 3, cellSize * 3 );
 

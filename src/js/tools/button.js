@@ -48,28 +48,28 @@ class button {
         noStroke();
         switch ( this.type ) {
           case 0:
-            fill( 340, colorMax * 1, colorMax * 0.5 );
+            fill( 340, colorMax, colorMax * 0.5 );
             break;
           case 1:
-            fill( 150, colorMax * 1, colorMax * 0.5 );
+            fill( 150, colorMax, colorMax * 0.5 );
             break;
           case 2:
-            fill( 50, colorMax * 1, colorMax * 0.5 );
+            fill( 50, colorMax, colorMax * 0.5 );
             break;
           case 3:
-            fill( 220, colorMax * 1, colorMax * 0.5 );
+            fill( 220, colorMax, colorMax * 0.5 );
             break;
           case 4:
-            fill( 140, colorMax * 1, colorMax * 0.3 );
+            fill( 140, colorMax, colorMax * 0.3 );
             break;
           case 5:
-            fill( 300, colorMax * 1, colorMax * 0.5 );
+            fill( 300, colorMax, colorMax * 0.5 );
             break;
           case 6:
-            fill( 270, colorMax * 1, colorMax * 0.5 );
+            fill( 270, colorMax, colorMax * 0.5 );
             break;
           case 7:
-            fill( 130, colorMax * 1, colorMax * 0.5 );
+            fill( 130, colorMax, colorMax * 0.5 );
             break;
         }
         rect(

@@ -90,7 +90,6 @@ class hull {
     let y = Math.floor( index / this.const.n );
     let x = index % this.const.n;
     return createVector( x, y );
-
   }
 
   //find the index coordinates by grid coordinates
