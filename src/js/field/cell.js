@@ -13,6 +13,7 @@ class cell {
       vertex: []
     };
     this.var = {
+      meeple: null,
       txt: null
     }
 
@@ -48,6 +49,10 @@ class cell {
         this.status = 'moving';
         break;
     }
+  }
+
+  setMeeple( meeple ){
+    this.var.meeple = meeple;
   }
 
   draw(){

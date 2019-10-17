@@ -1,11 +1,8 @@
 //
 class meeple {
-  constructor ( index, current, center ){
+  constructor ( index, center, cell ){
     this.index =  index;
-    this.current = current;
     this.center = center.copy();
-    this.next = null;
-    this.previous = this.center.copy();
     this.const = {
       n: 6,
       a: cellSize / 2,
@@ -15,20 +12,25 @@ class meeple {
     this.const.r = this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
     this.array = {
       vertex: [],
+      dot: [],
       way: []
     };
     this.var = {
-      orientation: 2,
+      orientation: 1,
       clockwise: true,
       status: 'wait',
+      stage: null,
+      timer: null,
+      stop: null,
+      cell: cell,
       speed: {
         move: 1,
         rotate: 1
       },
-      stop: null,
-      timer: null,
+      angle: 0,
       beat: 1 //tact
     }
+    this.priority = 'sleep';//sleep spend fill convergence//'automaticAttack' specialAttack
 
     this.init();
   }
@@ -36,8 +38,8 @@ class meeple {
   initVertexs(){
     for( let i = 0; i < this.const.n; i++ ){
       let vec = createVector(
-        Math.sin( Math.PI * 2 / this.const.n * ( - i + this.const.n / 2 ) ) * this.const.r,
-        Math.cos( Math.PI * 2 / this.const.n * ( - i + this.const.n / 2 ) ) * this.const.r );
+        Math.sin( Math.PI * 2 / this.const.n * ( - i + this.const.n / 2 ) ) * this.const.a,
+        Math.cos( Math.PI * 2 / this.const.n * ( - i + this.const.n / 2 ) ) * this.const.a );
       this.array.vertex.push( vec );
     }
   }
@@ -56,22 +58,36 @@ class meeple {
     this.initWays();
   }
 
-  setStatus( stat, current, clockwise ){
+  setCell( cell ){
+    this.var.cell = cell;
+    this.array.dot = [];
+  }
+
+  setStatus( stat, clockwise ){
     let vec;
+    let origin;
     switch ( stat ) {
       case 0:
         this.status = 'wait';
         break;
       case 1:
         this.status = 'move';
-        this.next = this.center.copy();
-        if( current != null )
-          this.current = current;
         vec = this.array.way[this.var.orientation].copy();
-        this.next.add( vec );
+        origin = this.array.way[this.var.orientation].copy();
+        origin.normalize();
+        origin.mult( this.const.r );
+        vec.div( 2 );
+        vec.add( this.center.copy() );
+        vec.sub( origin );
+        this.array.dot.push( vec.copy() );
+        vec.add( origin );
+        vec.add( origin );
+        this.array.dot.push( vec.copy() );
+        vec.add( origin );
+        this.array.dot.push( vec.copy() );
         break;
       case 2:
-        this.status = 'rotate';        
+        this.status = 'rotate';
         if( clockwise != null )
           this.var.clockwise = clockwise;
         this.var.timer = 0;
@@ -87,49 +103,13 @@ class meeple {
     }
   }
 
-  move(){
-    let step = this.array.way[this.var.orientation].copy();
-    step.div( this.var.speed.move * fr );
-    let d = this.center.dist( this.next );
-    if( d > cellSize / fr )
-      this.center.add( step );
-    else{
-      this.status = 'wait';
-    }
-  }
-
-  attack(){
-
-  }
-
-  rotate(){
-    let angle = Math.PI / 3 / fr / this.var.speed.rotate;
-    if( !this.var.clockwise )
-      angle *= -1;
-    if( this.var.timer < this.var.stop ){
-      for( let i = 0; i < this.array.vertex.length; i++ ){
-        this.array.vertex[i].rotate( angle )
-      }
-    }
-    else {
-      this.setStatus( 0 );
-    }
-
-    this.var.timer++;
-
-    console.log( this.var.timer, this.var.stop, frameCount );
-  }
-
-  update(){
-    switch ( this.status ) {
-      case 'move':
-        this.move();
+  setPriority( prior, target ){
+    switch ( prior ) {
+      case 0:
+        this.priority = 'sleep';
         break;
-      case 'rotate':
-        this.rotate();
-        break;
-      case 'attack':
-        this.attack();
+      case 1:
+        this.priority = 'convergence';
         break;
     }
   }
