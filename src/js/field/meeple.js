@@ -24,7 +24,7 @@ class meeple {
       stop: null,
       cell: cell,
       speed: {
-        move: 1,
+        move: 2,
         rotate: 1
       },
       angle: 0,
@@ -69,6 +69,7 @@ class meeple {
     switch ( stat ) {
       case 0:
         this.status = 'wait';
+        this.array.dot = [];
         break;
       case 1:
         this.status = 'move';

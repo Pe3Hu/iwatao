@@ -2,8 +2,8 @@
 class battleGround{
   constructor(){
     this.const = {
-      n: 4,
-      m: 5,
+      n: 9,
+      m: 7,
       a: cellSize
     };
     this.var = {
@@ -32,12 +32,13 @@ class battleGround{
       for( let j = 0; j < this.const.m; j++ ){
           let index = i * this.const.m + j;
           let vec = createVector( this.offset.x, this.offset.y );
+          let grid = createVector( j, i );
             vec.x += this.const.r * 2 * j;
             vec.y += this.const.a * 1.5 * i;
           if( i % 2 == 1 )
             vec.x += this.const.r;
 
-          this.array.cell[i].push( new cell( index, vec ) )
+          this.array.cell[i].push( new cell( index, vec, grid ) );
       }
     }
   }
@@ -45,12 +46,14 @@ class battleGround{
   initMeeples(){
     let grid = createVector( 0, 0 ) ;
     this.addMeeple( grid );
-    grid = createVector( 3, 3 ) ;
+    grid = createVector( 1, 2 ) ;
     this.addMeeple( grid );
 
-    this.array.meeple[0].setStatus( 1, true );
+    this.array.meeple[0].setStatus( 1 );
     this.array.meeple[0].setPriority( 1 );
-
+    let end = this.const.n * this.const.m - 1;
+    let begin = 0;
+    this.paveWay( begin, end );
     this.updateMeeples();
   }
 
@@ -77,8 +80,8 @@ class battleGround{
 
   init(){
     this.initCells();
-    this.initMeeples();
     this.initNeighbors();
+    this.initMeeples();
   }
 
   cleanCells(){
@@ -138,6 +141,7 @@ class battleGround{
       case 1:
         meeple.var.stage = 'afterMid';
         meeple.center.add( step );
+        previousCell.setStatus( 0 );
         break;
       case 2:
         meeple.var.stage = 'atEnd';
@@ -147,7 +151,6 @@ class battleGround{
           meeple.setCell( nextCell.index );
           meeple.status = 'wait';
           meeple.var.stage = 'atBegin';
-          previousCell.setStatus( 0 );
           previousCell.setMeeple( null );
         }
         break;
@@ -196,7 +199,7 @@ class battleGround{
     if( index == undefined )
       return null;
 
-    let y = Math.floor( index / this.const.n );
+    let y = Math.floor( index / this.const.m );
     let x = index % this.const.m;
     return createVector( x, y );
   }
@@ -244,8 +247,40 @@ class battleGround{
     }
   }
 
-  paveWay( meeple, end ){
+  markNeighbors( cell, d ){
+    let vec = this.convertIndex( cell );
+    let parity = ( vec.y % 2 );
 
+    for( let i = 0; i < this.array.neighbor[parity].length; i++ ){
+      let grid = createVector( vec.x, vec.y );
+      grid.add( this.array.neighbor[parity][i] );
+
+      if( this.checkCell( grid ) )
+        if( this.array.cell[grid.y][grid.x].var.meeple == null &&
+            this.array.cell[grid.y][grid.x].var.wave == null )
+              this.array.cell[grid.y][grid.x].var.wave = d + 1;
+    }
+  }
+
+  paveWay( begin, end ){
+    let gridB = this.convertIndex( begin );
+    let d = 0;
+    let flag = false;
+    this.array.cell[gridB.y][gridB.x].var.wave = 0;
+    this.markNeighbors( this.array.cell[gridB.y][gridB.x].index, d );
+    d++;
+
+    while( !flag && d < 100 ){
+      for( let i = 0; i < this.array.cell.length; i++ )
+        for( let j = 0; j < this.array.cell[i].length; j++ )
+          if( this.array.cell[i][j].var.meeple == null &&
+              this.array.cell[i][j].var.wave == d ){
+            this.markNeighbors( this.array.cell[i][j].index, d );
+            if( this.array.cell[i][j].index == end )
+              flag = true;
+          }
+      d++;
+    }
   }
 
   draw(){

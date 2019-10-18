@@ -1,12 +1,14 @@
 //the basic element of field
 class cell {
-  constructor ( index, center ){
+  constructor ( index, center, grid ){
     this.index =  index;
     this.center = center;
     this.status = 'empty';
     this.const = {
       n: 6,
-      a: cellSize
+      a: cellSize,
+      i: grid.y,
+      j: grid.x
     };
     this.const.r =  this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
     this.array = {
@@ -14,6 +16,7 @@ class cell {
     };
     this.var = {
       meeple: null,
+      wave: null,
       txt: null
     }
 
@@ -39,6 +42,7 @@ class cell {
       //show free cell
       case 0:
         this.status = 'empty';
+        this.var.wave = null;
         break;
       //show occupied cell
       case 1:
@@ -74,6 +78,11 @@ class cell {
                 this.array.vertex[i].x, this.array.vertex[i].y,
                 this.array.vertex[ii].x, this.array.vertex[ii].y );
      }
-     text( this.index, this.center.x, this.center.y );
+
+     stroke( 0 );
+     fill( 0 );
+     this.var.txt = this.var.wave;
+     if( this.var.wave != null  )
+      text( this.var.txt, this.center.x, this.center.y + fontSize / 3 );
   }
 }
