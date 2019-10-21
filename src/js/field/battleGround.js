@@ -11,6 +11,7 @@ class battleGround{
     }
     this.array = {
       windRose: [ 'NNE', 'E', 'SSE', 'SSW', 'W', 'NNW' ],
+      adjacency: [],
       action: {
         'past': [],
         'now': [],
@@ -41,19 +42,26 @@ class battleGround{
           this.array.cell[i].push( new cell( index, vec, grid ) );
       }
     }
+
+
+    for( let i = 0; i < this.array.cell.length; i++ )
+      for( let j = 0; j < this.array.cell[i].length; j++ ){
+        let index = this.array.cell[i].index;
+        for( let l = 0; l < this.array.neighbor[i % 2].length; l++ ){
+          this.array.adjacency.push();
+        }
+      }
+
   }
 
   initMeeples(){
-    let grid = createVector( 0, 0 ) ;
+    let grid = createVector( 1, 1 ) ;
     this.addMeeple( grid );
-    grid = createVector( 1, 2 ) ;
+    grid = createVector( 3, 3 ) ;
     this.addMeeple( grid );
 
-    this.array.meeple[0].setStatus( 1 );
     this.array.meeple[0].setPriority( 1 );
-    let end = this.const.n * this.const.m - 1;
-    let begin = 0;
-    this.paveWay( begin, end );
+    this.array.meeple[0].var.target = this.const.n * this.const.m - 1;
     this.updateMeeples();
   }
 
@@ -79,8 +87,8 @@ class battleGround{
   }
 
   init(){
-    this.initCells();
     this.initNeighbors();
+    this.initCells();
     this.initMeeples();
   }
 
@@ -161,9 +169,11 @@ class battleGround{
     let meeple = this.array.meeple[index];
     let angle = Math.PI / 3 / fr / meeple.var.speed.rotate;
     let shift = 1;
+
     if( !meeple.var.clockwise )
       shift = -1;
     angle *= shift;
+
     if( meeple.var.timer < meeple.var.stop )
       //smooth rotation
       for( let i = 0; i < meeple.array.vertex.length; i++ )
@@ -219,30 +229,51 @@ class battleGround{
     return flag;
   }
 
+  chooseNearest(){
+
+  }
+
+  takeTrack( meeple ){
+    let end = meeple.var.target;
+    let begin = meeple.var.cell;
+    this.markGrid( begin, end );
+    let nearests = [];
+    this.paveWay( begin, end );
+    let turns = [];
+
+    //for( let i = 0; i < nearests.length; i++ )
+    let orientation = meeple.var.orientation;
+    let grid = this.convertIndex( meeple.var.cell );
+    let capity = grid.y % 2;
+    let neighbor = this.array.neighbor[capity][orientation].copy();
+    neighbor.add( grid );
+    //console.log( grid, neighbor );
+
+    for( let i = 0; i < nearests.length; i++ ){
+      //console.log( nearests[i] );
+    }
+  }
+
   doStuff( m ){
     let meeple = this.array.meeple[m];
-
-    /*switch ( meeple.status ) {
-      case 'wait':
-        break;
-      case 'move':
-        this.moveMeeple( index );
-        break;
-      case 'rotate':
-        this.rotateMeeple( index );
-        break;
-      case 'attack':
-        this.attackMeeple( index );
-        break;
-    }*/
 
     switch ( meeple.priority ) {
       case 'sleep':
         break;
       case 'convergence':
-        this.moveMeeple( m );
-        if( meeple.status == 'wait' )
-          meeple.setStatus( 1 );
+        let action = this.takeTrack( meeple );
+
+        switch ( action ) {
+          case 'rotateClockwise':
+            this.rotateMeeple( meeple, 1 );
+            break;
+          case 'rotateCounterclockwise':
+            this.rotateMeeple( meeple, -1 );
+            break;
+          case 'move':
+            this.moveMeeple( meeple );
+            break;
+        }
         break;
     }
   }
@@ -262,10 +293,11 @@ class battleGround{
     }
   }
 
-  paveWay( begin, end ){
+  markGrid( begin, end ){
     let gridB = this.convertIndex( begin );
-    let d = 0;
     let flag = false;
+    let d = 0;
+
     this.array.cell[gridB.y][gridB.x].var.wave = 0;
     this.markNeighbors( this.array.cell[gridB.y][gridB.x].index, d );
     d++;
@@ -281,6 +313,10 @@ class battleGround{
           }
       d++;
     }
+  }
+
+  paveWay( begin, end ){
+
   }
 
   draw(){

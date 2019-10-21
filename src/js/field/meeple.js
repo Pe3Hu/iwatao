@@ -11,6 +11,7 @@ class meeple {
     };
     this.const.r = this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
     this.array = {
+      aggression: [],
       vertex: [],
       dot: [],
       way: []

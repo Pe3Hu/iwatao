@@ -15,6 +15,7 @@ class cell {
       vertex: []
     };
     this.var = {
+      target: null,
       meeple: null,
       wave: null,
       txt: null
