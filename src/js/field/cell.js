@@ -82,7 +82,7 @@ class cell {
 
      stroke( 0 );
      fill( 0 );
-     this.var.txt = this.var.wave;
+     this.var.txt = this.index + '_' + this.var.wave;
      if( this.var.wave != null  )
       text( this.var.txt, this.center.x, this.center.y + fontSize / 3 );
   }

@@ -19,7 +19,8 @@ class meeple {
     this.var = {
       orientation: 1,
       clockwise: true,
-      status: 'wait',
+      action: null,
+      status: 'waiting',
       stage: null,
       timer: null,
       stop: null,
@@ -69,11 +70,11 @@ class meeple {
     let origin;
     switch ( stat ) {
       case 0:
-        this.status = 'wait';
+        this.status = 'waiting';
         this.array.dot = [];
         break;
       case 1:
-        this.status = 'move';
+        this.status = 'moving';
         vec = this.array.way[this.var.orientation].copy();
         origin = this.array.way[this.var.orientation].copy();
         origin.normalize();
@@ -89,14 +90,14 @@ class meeple {
         this.array.dot.push( vec.copy() );
         break;
       case 2:
-        this.status = 'rotate';
+        this.status = 'rotating';
         if( clockwise != null )
           this.var.clockwise = clockwise;
         this.var.timer = 0;
         this.var.stop = fr * this.var.speed.rotate;
         break;
       case 3:
-        this.status = 'attack';
+        this.status = 'attacking';
         this.next = this.center.copy();
         vec = this.array.way[this.var.orientation].copy();
         vec.div( 2 );

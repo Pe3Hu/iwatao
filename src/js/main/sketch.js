@@ -6,7 +6,7 @@ let colorButton = colorMax / 2;
 let infinity = 999999999;
 let fr = 60;
 let font;
-let fontSize = 18;
+let fontSize = 12;//18
 let canvasSize;
 let canvasGrid;
 let interfaceBoundaries;
