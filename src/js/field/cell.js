@@ -3,7 +3,6 @@ class cell {
   constructor ( index, center, grid ){
     this.index =  index;
     this.center = center;
-    this.status = 'empty';
     this.const = {
       n: 6,
       a: cellSize,
@@ -15,8 +14,10 @@ class cell {
       vertex: []
     };
     this.var = {
+      status: 'empty',
       target: null,
       meeple: null,
+      free: true,
       wave: null,
       txt: null
     }
@@ -42,37 +43,57 @@ class cell {
     switch ( status ) {
       //show free cell
       case 0:
-        this.status = 'empty';
+        this.var.status = 'empty';
+        this.var.free = true;
         this.var.wave = null;
         break;
       //show occupied cell
       case 1:
-        this.status = 'taken';
+        this.var.status = 'taken';
+        this.var.free = false;
         break;
       //show temporarily cell
       case 2:
-        this.status = 'moving';
+        this.var.status = 'move';
+        this.var.free = false;
+        break;
+      //show rotation cell
+      case 3:
+        this.var.status = 'rotate';
+        this.var.free = false;
+        break;
+      //show attacking cell
+      case 4:
+        this.var.status = 'attack';
+        this.var.free = false;
         break;
     }
   }
 
   setMeeple( meeple ){
     this.var.meeple = meeple;
+    this.var.free = false;
+    if( meeple = null )
+      this.setStatus( 0 );
   }
 
   draw(){
     noStroke();
-    switch ( this.status ) {
+    switch ( this.var.status ) {
       case 'empty':
         fill( 120, colorMax, colorMax * 0.5 );
         break;
       case 'taken':
         fill( 0, colorMax, colorMax * 0.5 );
         break;
-      case 'moving':
+      case 'move':
         fill( 60, colorMax, colorMax * 0.5 );
         break;
+      case 'rotate':
+        fill( 200, colorMax, colorMax * 0.5 );
+        break;
     }
+
     for( let i = 0; i < this.array.vertex.length; i++ ){
       let ii = ( i + 1 ) % this.array.vertex.length;
       triangle( this.center.x, this.center.y,
@@ -80,10 +101,16 @@ class cell {
                 this.array.vertex[ii].x, this.array.vertex[ii].y );
      }
 
+
      stroke( 0 );
      fill( 0 );
      this.var.txt = this.index + '_' + this.var.wave;
-     if( this.var.wave != null  )
-      text( this.var.txt, this.center.x, this.center.y + fontSize / 3 );
+     text( this.var.txt, this.center.x, this.center.y + fontSize / 3 );
+
+     fill( colorMax );
+     stroke( colorMax );
+     if( this.var.free )
+       ellipse( this.center.x + 3, this.center.y, 5, 5 );
+
   }
 }

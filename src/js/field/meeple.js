@@ -19,20 +19,20 @@ class meeple {
     this.var = {
       orientation: 1,
       clockwise: true,
-      action: null,
-      status: 'waiting',
+      priority: 'sleep',//sleep spend fill convergence//'automaticAttack' specialAttack
+      action: 'waiting',
+      status: 'free',//busy
       stage: null,
       timer: null,
       stop: null,
       cell: cell,
       speed: {
-        move: 2,
-        rotate: 1
+        move: 0.5,
+        rotate: 0.25
       },
       angle: 0,
       beat: 1 //tact
     }
-    this.priority = 'sleep';//sleep spend fill convergence//'automaticAttack' specialAttack
 
     this.init();
   }
@@ -65,16 +65,16 @@ class meeple {
     this.array.dot = [];
   }
 
-  setStatus( stat, clockwise ){
+  setAction( action ){
     let vec;
     let origin;
-    switch ( stat ) {
+    switch ( action ) {
       case 0:
-        this.status = 'waiting';
+        this.var.action = 'waiting';
         this.array.dot = [];
         break;
       case 1:
-        this.status = 'moving';
+        this.var.action = 'moving';
         vec = this.array.way[this.var.orientation].copy();
         origin = this.array.way[this.var.orientation].copy();
         origin.normalize();
@@ -90,14 +90,18 @@ class meeple {
         this.array.dot.push( vec.copy() );
         break;
       case 2:
-        this.status = 'rotating';
-        if( clockwise != null )
-          this.var.clockwise = clockwise;
+      case 3:
+        this.var.action = 'clockwiseRotating';
+        this.var.clockwise = true;
+        if( action == 3 ){
+          this.var.action = 'counterClockwiseRotating';
+          this.var.clockwise = false;
+        }
         this.var.timer = 0;
         this.var.stop = fr * this.var.speed.rotate;
         break;
-      case 3:
-        this.status = 'attacking';
+      case 4:
+        this.var.action = 'attacking';
         this.next = this.center.copy();
         vec = this.array.way[this.var.orientation].copy();
         vec.div( 2 );
@@ -109,10 +113,15 @@ class meeple {
   setPriority( prior, target ){
     switch ( prior ) {
       case 0:
-        this.priority = 'sleep';
+        this.var.priority = 'sleep';
         break;
       case 1:
-        this.priority = 'convergence';
+        this.var.priority = 'convergence';
+        this.var.target = target;
+        break;
+      case 2:
+        this.var.priority = 'attack';
+        this.var.target = target;
         break;
     }
   }
