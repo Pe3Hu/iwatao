@@ -33,6 +33,7 @@ class meeple {
       angle: 0,
       beat: 1 //tact
     }
+    this.var.stop = fr * this.var.speed.rotate;
 
     this.init();
   }
@@ -68,6 +69,7 @@ class meeple {
   setAction( action ){
     let vec;
     let origin;
+    
     switch ( action ) {
       case 0:
         this.var.action = 'waiting';
@@ -90,15 +92,14 @@ class meeple {
         this.array.dot.push( vec.copy() );
         break;
       case 2:
-      case 3:
         this.var.action = 'clockwiseRotating';
         this.var.clockwise = true;
-        if( action == 3 ){
-          this.var.action = 'counterClockwiseRotating';
-          this.var.clockwise = false;
-        }
         this.var.timer = 0;
-        this.var.stop = fr * this.var.speed.rotate;
+        break;
+      case 3:
+        this.var.action = 'counterClockwiseRotating';
+        this.var.clockwise = false;
+        this.var.timer = 0;
         break;
       case 4:
         this.var.action = 'attacking';

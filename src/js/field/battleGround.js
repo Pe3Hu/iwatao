@@ -45,13 +45,26 @@ class battleGround{
   }
 
   initMeeples(){
-    let grid = createVector( 1, 0 ) ;
+    let target = this.array.cell[Math.floor(this.const.n / 2)][Math.floor(this.const.m / 2)].index;
+    let grid = createVector( 0, 0 ) ;
     this.addMeeple( grid );
-    grid = createVector( 5, 3 ) ;
+    grid = createVector( this.const.m - 1, 0 ) ;
+    this.addMeeple( grid );
+    grid = createVector( 0, this.const.n - 1 ) ;
+    this.addMeeple( grid );
+    grid = createVector( this.const.m - 1, this.const.n - 1 ) ;
+    this.addMeeple( grid );
+    grid = createVector( 0, 3 ) ;
+    this.addMeeple( grid );
+    grid = createVector( 4, 5 ) ;
     this.addMeeple( grid );
 
-    this.array.meeple[0].setPriority( 1, this.const.n * this.const.m - 1 );
-    //this.array.meeple[1].setPriority( 1, this.const.n * ( this.const.m - 1 ) );
+    this.array.meeple[0].setPriority( 1, target );
+    this.array.meeple[1].setPriority( 1, target );
+    this.array.meeple[2].setPriority( 1, target );
+    this.array.meeple[3].setPriority( 1, target );
+    this.array.meeple[4].setPriority( 1, target );
+    this.array.meeple[5].setPriority( 1, target );
   }
 
   initNeighbors(){
@@ -112,7 +125,8 @@ class battleGround{
     let nextCell = this.array.cell[next.y][next.x];
     let min = meeple.const.a * 4;
     let stage = 0;
-    let step = meeple.array.way[meeple.var.orientation].copy();
+    let orientation = ( meeple.var.orientation + meeple.array.way.length ) % meeple.array.way.length;
+    let step = meeple.array.way[orientation].copy();
     step.div( meeple.var.speed.move * fr );
 
     for( let i = 0; i < meeple.array.dot.length; i++ ){
@@ -124,7 +138,6 @@ class battleGround{
       }
     }
 
-    console.log( meeple.index, ':', previousCell.index, '_', nextCell.index, '|', meeple.var.target );
     switch ( stage ) {
       case 0:
         meeple.var.stage = 'beforeMid';
@@ -136,7 +149,6 @@ class battleGround{
       case 1:
         meeple.var.stage = 'afterMid';
         meeple.center.add( step );
-        previousCell.setStatus( 0 );
         break;
       case 2:
         meeple.var.stage = 'atEnd';
@@ -147,9 +159,11 @@ class battleGround{
           meeple.setAction( 0 );
           meeple.var.stage = 'atBegin';
           previousCell.setMeeple( null );
+          previousCell.setStatus( 0 );
         }
         break;
     }
+    //console.log( meeple.index, ':', previousCell.index, '_', nextCell.index, '|', meeple.var.stage );
   }
 
   rotateMeeple( index ){
@@ -163,16 +177,15 @@ class battleGround{
     angle *= shift;
     this.array.cell[cell.y][cell.x].setStatus( 3 );
 
-
     if( meeple.var.timer < meeple.var.stop )
       //smooth rotation
       for( let i = 0; i < meeple.array.vertex.length; i++ )
         meeple.array.vertex[i].rotate( angle )
     else{
       meeple.setAction( 0 );
-      this.array.cell[cell.y][cell.x].setStatus( 0 );
+      this.array.cell[cell.y][cell.x].setStatus( null );
       //fixing a new position
-      meeple.var.orientation = ( meeple.var.orientation + shift ) % meeple.array.way.length;
+      meeple.var.orientation = ( meeple.var.orientation + shift + meeple.array.way.length ) % meeple.array.way.length;
       for( let i = 0; i < meeple.array.vertex.length; i++ )
         meeple.array.vertex[i].rotate( -angle * meeple.var.stop )
     }
@@ -244,7 +257,10 @@ class battleGround{
   takeTrack( meeple ){
     let end = meeple.var.target;
     let begin = meeple.var.cell;
-    this.markGrid( begin, end );
+    let marked = this.markGrid( begin, end );
+    /*if( !marked ){
+      meeple.setAction( 0 );
+    }*/
     let nearests = this.paveWay( begin, end );
     let orientation = meeple.var.orientation;
     let grid = this.convertIndex( meeple.var.cell );
@@ -256,9 +272,10 @@ class battleGround{
         neighbor.add( this.array.neighbor[parity][i] );
         if( this.checkCell( neighbor ) ){
           let index = this.array.cell[neighbor.y][neighbor.x].index;
-          let rotates = ( i - orientation ) % this.array.neighbor[parity].length;
-          if( i > this.array.neighbor[parity].length / 2 )
-            rotates -= this.array.neighbor[parity].length;
+          let l = this.array.neighbor[parity].length;
+          let rotates = ( i - orientation + l ) % l;
+          if( rotates > l / 2 )
+            rotates -= l;
           turns[index] = rotates;
         }
     }
@@ -268,16 +285,16 @@ class battleGround{
 
     for( let i = 0; i < nearests.length; i++ ){
       let rotates = Math.abs( turns[nearests[i]] );
-      if( min > rotates ){
-        min = rotates;
+      if( min >= rotates ){
+        min = turns[nearests[i]];
         result = nearests[i];
       }
     }
 
-    console.log( turns, min, result, nearests, turns )
-
-    if( min == 3 )
-      min = Math.floor( Math.random() * 2 - 1 );
+    if( min == 3 ){
+      min = Math.floor( Math.random() * 2 ) * 2 - 1;
+      console.log( '_______', min )
+    }
 
     switch ( min ) {
       case 0:
@@ -285,12 +302,8 @@ class battleGround{
         break;
       case 1:
       case 2:
-      case -4:
-      case -5:
         meeple.setAction( 2 );
         break;
-      case 4:
-      case 5:
       case -1:
       case -2:
         meeple.setAction( 3 );
@@ -300,6 +313,8 @@ class battleGround{
 
   doStuff( index ){
     let meeple = this.array.meeple[index];
+    let c = this.convertIndex( meeple.var.cell );
+    let status = this.array.cell[c.y][c.x].var.status;
 
     switch ( meeple.var.priority ) {
       case 'sleep':
@@ -309,7 +324,7 @@ class battleGround{
 
         if( action == 'waiting' )
           this.takeTrack( meeple );
-        console.log( index, action )
+        console.log( index, action, status )
         switch ( action ) {
           case 'clockwiseRotating':
             this.rotateMeeple( index, 1 );
@@ -354,6 +369,7 @@ class battleGround{
     let gridB = this.convertIndex( begin );
     let flag = false;
     let wave = 0;
+    let max = this.const.n + this.const.m;
 
     for( let i = 0; i < this.array.cell.length; i++ )
       for( let j = 0; j < this.array.cell[i].length; j++ )
@@ -363,7 +379,7 @@ class battleGround{
     this.markNeighbors( this.array.cell[gridB.y][gridB.x].index, wave );
     wave++;
 
-    while( !flag && wave < 100 ){
+    while( !flag && wave < max ){
       for( let i = 0; i < this.array.cell.length; i++ )
         for( let j = 0; j < this.array.cell[i].length; j++ )
           if( this.array.cell[i][j].var.free &&
@@ -373,8 +389,9 @@ class battleGround{
               flag = true;
           }
       wave++;
-      console.log( 'wave number:', wave, flag, end )
+      //console.log( 'wave number:', wave, flag, end )
     }
+    return flag;
   }
 
   paveWay( begin, end ){
@@ -420,7 +437,7 @@ class battleGround{
         let grid = this.convertIndex( cell );
         wave = this.array.cell[grid.y][grid.x].var.wave;
 
-        while( wave > 0  ){
+        while( wave > 1 ){
           let vec = this.convertIndex( cell );
           let parity = ( vec.y % 2 );
           wave--;
@@ -440,23 +457,34 @@ class battleGround{
         }
       }
 
-    //reverse the path from beginning to end
-    for( let i = 0; i < paths.length; i++ ){
-      paths[i].reverse();
-      paths[i].push( end );
-      let flag = true;
+      let min = paths[0].length;
 
-      //formation of an array of options in the first step
-      for( let j = 0; j < nearests.length; j++ )
-        if( paths[i][0] == nearests[j] )
-          flag = false;
+      for( let i = 0; i < paths.length; i++ )
+        if( paths[i].length < min )
+          min = paths[i].length;
 
-      if( flag )
-        nearests.push( paths[i][0] );
-    }
-    console.log( paths, nearests );
+      for( let i = paths.length - 1; i >= 0; i-- )
+        if( paths[i].length > min )
+          paths.splice( i, 1 );
 
-    return nearests;
+
+      for( let i = 0; i < paths.length; i++ ){
+          //reverse the path from beginning to end
+          paths[i].reverse();
+          //add meeple target cell
+          paths[i].push( end );
+          let flag = true;
+
+          //formation of an array of options in the first step
+          for( let j = 0; j < nearests.length; j++ )
+            if( paths[i][0] == nearests[j] )
+              flag = false;
+
+          if( flag )
+            nearests.push( paths[i][0] );
+        }
+
+      return nearests;
   }
 
   draw(){

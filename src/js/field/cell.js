@@ -104,7 +104,9 @@ class cell {
 
      stroke( 0 );
      fill( 0 );
-     this.var.txt = this.index + '_' + this.var.wave;
+     this.var.txt = this.index;
+     if( this.var.wave != null )
+      this.var.txt += '_' + this.var.wave;
      text( this.var.txt, this.center.x, this.center.y + fontSize / 3 );
 
      fill( colorMax );
