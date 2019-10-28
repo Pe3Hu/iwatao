@@ -12,6 +12,7 @@ class meeple {
     this.const.r = this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
     this.array = {
       aggression: [],
+      pointer: [],
       vertex: [],
       dot: [],
       way: []
@@ -20,6 +21,7 @@ class meeple {
       orientation: 1,
       clockwise: true,
       priority: 'sleep',//sleep spend fill convergence//'automaticAttack' specialAttack
+      forward: true,
       action: 'waiting',
       status: 'free',//busy
       stage: null,
@@ -27,7 +29,7 @@ class meeple {
       stop: null,
       cell: cell,
       speed: {
-        move: 0.5,
+        move: 2,
         rotate: 0.25
       },
       angle: 0,
@@ -47,6 +49,15 @@ class meeple {
     }
   }
 
+  initPointers(){
+    for( let i = 0; i < this.const.n; i++ ){
+      let vec = createVector(
+        Math.sin( Math.PI * 2 / this.const.n * ( 0.5 - i + this.const.n / 2 ) ) * this.const.a * 1.2,
+        Math.cos( Math.PI * 2 / this.const.n * ( 0.5 - i + this.const.n / 2 ) ) * this.const.a * 1.2 );
+      this.array.pointer.push( vec );
+    }
+  }
+
   initWays(){
     for( let i = 0; i < this.const.n; i++ ){
       let vec = createVector(
@@ -58,6 +69,7 @@ class meeple {
 
   init(){
     this.initVertexs();
+    this.initPointers();
     this.initWays();
   }
 
@@ -69,7 +81,7 @@ class meeple {
   setAction( action ){
     let vec;
     let origin;
-    
+
     switch ( action ) {
       case 0:
         this.var.action = 'waiting';
@@ -103,10 +115,15 @@ class meeple {
         break;
       case 4:
         this.var.action = 'attacking';
-        this.next = this.center.copy();
+        this.array.dot.push( this.center.copy() );
         vec = this.array.way[this.var.orientation].copy();
+        origin = this.array.way[this.var.orientation].copy();
+        origin.normalize();
+        origin.mult( this.const.r );
         vec.div( 2 );
-        this.next.add( vec );
+        vec.add( this.center.copy() );
+        vec.sub( origin );
+        this.array.dot.push( vec.copy() );
         break;
     }
   }
@@ -122,7 +139,7 @@ class meeple {
         break;
       case 2:
         this.var.priority = 'attack';
-        this.var.target = target;
+        this.setAction( 4 );
         break;
     }
   }
@@ -130,13 +147,17 @@ class meeple {
   draw(){
     noStroke();
     for( let i = 0; i < this.array.vertex.length; i++ ){
-      fill( 270, colorMax, colorMax * 0.5 );
-      if( i == this.var.orientation )
-        fill( 270, colorMax, colorMax * 0.25 );
       let ii = ( i + 1 ) % this.array.vertex.length;
+      fill( 270, colorMax, colorMax * 0.5 );
       triangle( this.center.x, this.center.y,
                 this.array.vertex[i].x  + this.center.x, this.array.vertex[i].y + this.center.y,
                 this.array.vertex[ii].x + this.center.x, this.array.vertex[ii].y + this.center.y );
+      if( i == this.var.orientation ){
+        fill( 270, colorMax, colorMax * 0.25 );
+        triangle( this.array.pointer[ii].x  + this.center.x, this.array.pointer[ii].y + this.center.y,
+                  this.array.vertex[i].x  + this.center.x, this.array.vertex[i].y + this.center.y,
+                  this.array.vertex[ii].x + this.center.x, this.array.vertex[ii].y + this.center.y );
+      }
      }
      noFill();
   }

@@ -84,13 +84,16 @@ class cell {
         fill( 120, colorMax, colorMax * 0.5 );
         break;
       case 'taken':
-        fill( 0, colorMax, colorMax * 0.5 );
+        fill( colorMax * 0.5 );
         break;
       case 'move':
         fill( 60, colorMax, colorMax * 0.5 );
         break;
       case 'rotate':
         fill( 200, colorMax, colorMax * 0.5 );
+        break;
+      case 'attack':
+        fill( 0, colorMax, colorMax * 0.5 );
         break;
     }
 
@@ -100,7 +103,6 @@ class cell {
                 this.array.vertex[i].x, this.array.vertex[i].y,
                 this.array.vertex[ii].x, this.array.vertex[ii].y );
      }
-
 
      stroke( 0 );
      fill( 0 );
