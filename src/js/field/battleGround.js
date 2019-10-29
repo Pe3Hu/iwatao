@@ -48,7 +48,7 @@ class battleGround{
     let target = 1;//this.array.cell[Math.floor(this.const.n / 2)][Math.floor(this.const.m / 2)].index;
     let grid = createVector( 0, 0 ) ;
     this.addMeeple( grid );
-    grid = createVector( this.const.m - 1, 0 ) ;
+    grid = createVector( this.const.m - 1, 2 ) ;
     this.addMeeple( grid );
     /*grid = createVector( 0, this.const.n - 1 ) ;
     this.addMeeple( grid );
@@ -60,7 +60,7 @@ class battleGround{
     this.addMeeple( grid );*/
 
     this.array.meeple[0].setPriority( 2, target );
-    /*this.array.meeple[1].setPriority( 1, target );
+  /*  this.array.meeple[1].setPriority( 1, target );
     this.array.meeple[2].setPriority( 1, target );
     this.array.meeple[3].setPriority( 1, target );
     this.array.meeple[4].setPriority( 1, target );

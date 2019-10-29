@@ -72,16 +72,28 @@ class bar{
           this.data.arrow = 'linear';
           this.const.a = cellSize * 4;
           break;
-        case 5:
+        case 6:
           this.data.type.name = 'decagon';
           this.data.arrow = 'circular';
           this.const.a = cellSize * 6;
           break;
+        case 7:
+          this.data.type.name = 'leftTrapeze';
+          this.data.arrow = 'linear';
+          this.const.a = cellSize / 2;
+          break;
+        case 8:
+          this.data.type.name = 'rightTrapeze';
+          this.data.arrow = 'linear';
+          this.const.a = cellSize / 2;
+          break;
+
       }
     }
 
     initVertexs(){
       let vec = null;
+      let offset = null;
 
       switch ( this.data.type.num ){
         case 0:
@@ -136,6 +148,44 @@ class bar{
             this.array.vertex.push( vec );
           }
           break;
+        case 7:
+          offset = createVector( Math.sin( Math.PI * 5 / 3 ) * this.const.a / 2,
+                                 Math.cos( Math.PI * 5 / 3 ) * this.const.a / 2  );
+          vec = createVector( 0, -this.const.a );
+          vec.add( this.center );
+          this.array.vertex.push( vec.copy() );
+          vec.add( offset );
+          this.array.vertex.push( vec.copy() );
+
+          offset = createVector( Math.sin( Math.PI * 4 / 3 ) * this.const.a / 2,
+                                 Math.cos( Math.PI * 4 / 3 ) * this.const.a / 2  );
+          vec = createVector( 0, this.const.a );
+          vec.add( this.center );
+          vec.add( offset );
+          this.array.vertex.push( vec.copy() );
+          vec = createVector( 0, this.const.a );
+          vec.add( this.center );
+          this.array.vertex.push( vec.copy() );
+          break;
+        case 8:
+          offset = createVector( Math.sin( Math.PI / 3 ) * this.const.a / 2,
+                                 Math.cos( Math.PI / 3 ) * this.const.a / 2  );
+          vec = createVector( 0, -this.const.a );
+          vec.add( this.center );
+          this.array.vertex.push( vec.copy() );
+          vec.add( offset );
+          this.array.vertex.push( vec.copy() );
+
+          offset = createVector( Math.sin( Math.PI * 2 / 3 ) * this.const.a / 2,
+                                 Math.cos( Math.PI * 2 / 3 ) * this.const.a / 2  );
+          vec = createVector( 0, this.const.a );
+          vec.add( this.center );
+          vec.add( offset );
+          this.array.vertex.push( vec.copy() );
+          vec = createVector( 0, this.const.a );
+          vec.add( this.center );
+          this.array.vertex.push( vec.copy() );
+          break;
       }
     }
 
@@ -169,6 +219,11 @@ class bar{
       }
     }
 
+    setPoints( data ){
+      this.points.current = data.current;
+      this.points.max = data.max;
+      this.updatePoints( data.current );
+    }
     //after change current points value
     updatePoints( points ){
       this.points.current = points;
@@ -177,6 +232,7 @@ class bar{
       let k = 1 + Math.sqrt( 2 );
       let t = this.const.a * Math.sqrt( ( k - 1 ) / k ) * 2;
       let vec = null;
+      let addVec = null;
 
       switch (this.data.type.num ) {
         case 0:
@@ -202,7 +258,7 @@ class bar{
             vec.add( this.center );
             this.array.filled.push( vec );
             vec = this.array.filled[0].copy();
-            let addVec = createVector( this.const.a, -this.const.a );
+            addVec = createVector( this.const.a, -this.const.a );
             addVec.mult( this.var.ratio * 2 );
             vec.add( addVec );
             this.array.filled.push( vec );
@@ -214,7 +270,7 @@ class bar{
             vec = this.center.copy();
             this.array.filled.push( vec );
             vec = this.array.filled[1].copy();
-            let addVec = createVector( this.const.a, this.const.a );
+            addVec = createVector( this.const.a, this.const.a );
             addVec.mult( ( this.var.ratio - 0.5 ) * 2 );
             vec.add( addVec );
             this.array.filled.push( vec );
@@ -232,7 +288,7 @@ class bar{
             vec.add( this.center );
             this.array.filled.push( vec );
             vec = this.array.filled[0].copy();
-            let addVec = createVector( this.const.a, this.const.a );
+            addVec = createVector( this.const.a, this.const.a );
             addVec.mult( this.var.ratio * 2 );
             vec.add( addVec );
             this.array.filled.push( vec );
@@ -244,7 +300,7 @@ class bar{
             vec = this.center.copy();
             this.array.filled.push( vec );
             vec = this.array.filled[1].copy();
-            let addVec = createVector( this.const.a, -this.const.a );
+            addVec = createVector( this.const.a, -this.const.a );
             addVec.mult( ( this.var.ratio - 0.5 ) * 2 );
             vec.add( addVec );
             this.array.filled.push( vec );
@@ -260,7 +316,7 @@ class bar{
             vec = this.array.vertex[1].copy();
             let angle = Math.PI * 3 * 5 / 8 ;
 
-            let addVec = createVector(
+            addVec = createVector(
                 Math.sin( angle ) * t * ( this.var.ratio - 0.5 ),
                 Math.cos( angle ) * t * ( this.var.ratio - 0.5 ) );
             vec.add( addVec );
@@ -269,7 +325,7 @@ class bar{
           else{
             vec = this.array.vertex[0].copy();
             let angle = Math.PI * 3 * 7 / 8 ;
-            let addVec = createVector(
+            addVec = createVector(
                 Math.sin( angle ) * t * ( -this.var.ratio ),
                 Math.cos( angle ) * t * ( -this.var.ratio ) );
             vec.add( addVec );
@@ -284,7 +340,7 @@ class bar{
             vec = this.array.vertex[1].copy();
             let angle = -Math.PI * 3 * 5 / 8 ;
 
-            let addVec = createVector(
+            addVec = createVector(
                 Math.sin( angle ) * t * ( this.var.ratio - 0.5 ),
                 Math.cos( angle ) * t * ( this.var.ratio - 0.5 ) );
             vec.add( addVec );
@@ -293,13 +349,65 @@ class bar{
           else{
             vec = this.array.vertex[0].copy();
             let angle = -Math.PI * 3 * 7 / 8 ;
-            let addVec = createVector(
+            addVec = createVector(
                 Math.sin( angle ) * t * ( -this.var.ratio ),
                 Math.cos( angle ) * t * ( -this.var.ratio ) );
             vec.add( addVec );
             this.array.filled.push( vec );
             this.array.filled.push( this.array.vertex[0].copy() );
           }
+          break;
+        case 7:
+        case 8:
+          if( this.var.ratio < 0.125 ){
+            this.array.filled.push( this.array.vertex[3].copy() );
+            this.array.filled.push( this.array.vertex[3].copy() );
+            this.array.filled.push( this.array.vertex[3].copy() );
+
+            let scale = this.var.ratio * this.const.a * 2;
+            addVec = createVector( 0, -scale );
+            this.array.filled[1].add( addVec );
+
+            scale = this.var.ratio / 0.125 * this.const.a / 2;
+            let angel = Math.PI * 4 / 3;
+            if( this.data.type.num == 8 )
+              angel = Math.PI * 2 / 3;
+            addVec = createVector( Math.sin( angel ) * scale, Math.cos( angel ) * scale );
+            this.array.filled[2].add( addVec );
+          }
+          else
+            if( this.var.ratio < 0.875 ){
+              this.array.filled.push( this.array.vertex[2].copy() );
+              this.array.filled.push( this.array.vertex[3].copy() );
+              this.array.filled.push( this.array.vertex[2].copy() );
+              this.array.filled.push( this.array.vertex[3].copy() );
+
+              let scale = this.var.ratio * this.const.a * 2;
+              addVec = createVector( 0, -scale );
+              this.array.filled[1].add( addVec );
+
+              scale = ( this.var.ratio -  0.125 ) / 0.75 * this.const.a * 1.5;
+              addVec = createVector( 0, -scale );
+              this.array.filled[2].add( addVec );
+            }
+            else{
+              this.array.filled.push( this.array.vertex[1].copy() );
+              this.array.filled.push( this.array.vertex[3].copy() );
+              this.array.filled.push( this.array.vertex[2].copy() );
+              this.array.filled.push( this.array.vertex[3].copy() );
+              this.array.filled.push( this.array.vertex[0].copy() );
+
+              let scale = this.var.ratio * this.const.a * 2;
+              addVec = createVector( 0, -scale );
+              this.array.filled[3].add( addVec );
+
+              scale = ( 1 - ( this.var.ratio -  0.875 ) / 0.125 ) * this.const.a / 2;
+              let angel = Math.PI * 5 / 3;
+              if( this.data.type.num == 8 )
+                angel = Math.PI / 3;
+              addVec = createVector( Math.sin( angel ) * scale, Math.cos( angel ) * scale );
+              this.array.filled[4].add( addVec );
+            }
           break;
       }
     }
@@ -310,6 +418,9 @@ class bar{
     }
 
     draw( offset ){
+      if( offset == undefined )
+        offset = createVector();
+
       this.drawEmtpy( offset );
       this.drawFilled( offset );
     }
@@ -330,6 +441,8 @@ class bar{
         case 3:
         case 4:
         case 5:
+        case 7:
+        case 8:
           noStroke();
           for ( let i = 0; i < this.array.vertex.length - 1; i++ )
             triangle( this.center.x + offset.x, this.center.y + offset.y,
@@ -340,6 +453,7 @@ class bar{
     }
 
     drawFilled( offset ){
+
       noStroke();
       fill( this.filled );
       switch ( this.data.type.num ) {
@@ -370,10 +484,24 @@ class bar{
           triangle( this.center.x + offset.x, this.center.y + offset.y,
                     this.array.filled[0].x + offset.x, this.array.filled[0].y + offset.y,
                     this.array.filled[1].x + offset.x, this.array.filled[1].y + offset.y );
-          if( this.var.ratio > 0.5 )
-            triangle( this.center.x + offset.x, this.center.y + offset.y,
+          if( this.var.ratio > 0.8 )
+          triangle( this.center.x + offset.x, this.center.y + offset.y,
+                    this.array.filled[1].x + offset.x, this.array.filled[1].y + offset.y,
+                    this.array.filled[2].x + offset.x, this.array.filled[2].y + offset.y );
+          break;
+        case 7:
+        case 8:
+          triangle( this.array.filled[2].x + offset.x, this.array.filled[2].y + offset.y,
+                    this.array.filled[1].x + offset.x, this.array.filled[1].y + offset.y,
+                    this.array.filled[0].x + offset.x, this.array.filled[0].y + offset.y );
+          if( this.var.ratio > 0.125 )
+            triangle( this.array.filled[3].x + offset.x, this.array.filled[3].y + offset.y,
                       this.array.filled[1].x + offset.x, this.array.filled[1].y + offset.y,
-                      this.array.filled[2].x + offset.x, this.array.filled[2].y + offset.y );
+                      this.array.filled[0].x + offset.x, this.array.filled[0].y + offset.y );
+          if( this.var.ratio > 0.875 )
+            triangle( this.array.filled[4].x + offset.x, this.array.filled[4].y + offset.y,
+                      this.array.filled[3].x + offset.x, this.array.filled[3].y + offset.y,
+                      this.array.filled[0].x + offset.x, this.array.filled[0].y + offset.y );
           break;
       }
     }

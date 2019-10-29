@@ -81,19 +81,19 @@ class cell {
     noStroke();
     switch ( this.var.status ) {
       case 'empty':
-        fill( 120, colorMax, colorMax * 0.5 );
+        fill( 120, colorMax * 0.8, colorMax * 0.5 );
         break;
       case 'taken':
-        fill( colorMax * 0.5 );
+        fill( colorMax * 0.8 );
         break;
       case 'move':
-        fill( 60, colorMax, colorMax * 0.5 );
+        fill( 60, colorMax * 0.8, colorMax * 0.5 );
         break;
       case 'rotate':
-        fill( 200, colorMax, colorMax * 0.5 );
+        fill( 200, colorMax * 0.8, colorMax * 0.5 );
         break;
       case 'attack':
-        fill( 0, colorMax, colorMax * 0.5 );
+        fill( 0, colorMax * 0.8, colorMax * 0.5 );
         break;
     }
 
@@ -111,10 +111,10 @@ class cell {
       this.var.txt += '_' + this.var.wave;
      text( this.var.txt, this.center.x, this.center.y + fontSize / 3 );
 
-     fill( colorMax );
+     /*fill( colorMax );
      stroke( colorMax );
      if( this.var.free )
-       ellipse( this.center.x + 3, this.center.y, 5, 5 );
+       ellipse( this.center.x + 3, this.center.y, 5, 5 );*/
 
   }
 }

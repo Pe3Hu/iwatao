@@ -15,7 +15,8 @@ class meeple {
       pointer: [],
       vertex: [],
       dot: [],
-      way: []
+      way: [],
+      bar: []
     };
     this.var = {
       orientation: 1,
@@ -34,6 +35,16 @@ class meeple {
       },
       angle: 0,
       beat: 1 //tact
+    }
+    this.data = {
+      'health': {
+        current: 100,
+        max : 100
+      },
+      'mana': {
+        current: 0,
+        max : 100
+      }
     }
     this.var.stop = fr * this.var.speed.rotate;
 
@@ -67,10 +78,18 @@ class meeple {
     }
   }
 
+  initBars(){
+    this.array.bar.push( new  bar( createVector(), 7, 'health' ) );
+    this.array.bar.push( new  bar( createVector(), 8, 'mana' ) );
+    this.array.bar[0].setPoints( this.data['health'] );
+    this.array.bar[1].setPoints( this.data['mana'] );
+  }
+
   init(){
     this.initVertexs();
     this.initPointers();
     this.initWays();
+    this.initBars();
   }
 
   setCell( cell ){
@@ -159,6 +178,10 @@ class meeple {
                   this.array.vertex[ii].x + this.center.x, this.array.vertex[ii].y + this.center.y );
       }
      }
+
+     for( let i = 0; i < this.array.bar.length; i++ )
+        this.array.bar[i].draw( this.center );
+
      noFill();
   }
 }
