@@ -1,18 +1,19 @@
 //
 class meeple {
-  constructor ( index, center, cell ){
-    this.index =  index;
+  constructor ( index, center, cell, team ){
+    this.index = index;
     this.center = center.copy();
     this.const = {
-      n: 6,
-      a: cellSize / 2,
       period: 12,
-      frame: 2
+      frame: 2,
+      team: team,
+      a: cellSize / 2,
+      n: 6
     };
     this.const.r = this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
     this.array = {
-      aggression: [],
       pointer: [],
+      danger: [],
       vertex: [],
       dot: [],
       way: [],
@@ -29,9 +30,14 @@ class meeple {
       timer: null,
       stop: null,
       cell: cell,
+      color:{
+        h: null,
+        s: null,
+        l: null
+      },
       speed: {
-        move: 2,
-        rotate: 0.25
+        move: 0.5,
+        rotate: 0.5
       },
       angle: 0,
       beat: 1 //tact
@@ -85,11 +91,27 @@ class meeple {
     this.array.bar[1].setPoints( this.data['mana'] );
   }
 
+  initColor(){
+    switch ( this.const.team ) {
+      case 0:
+        this.var.color.h = 120;
+        this.var.color.s = colorMax;
+        this.var.color.l = colorMax;
+        break;
+      case 1:
+        this.var.color.h = 0;
+        this.var.color.s = colorMax;
+        this.var.color.l = 0;
+        break;
+    }
+  }
+
   init(){
     this.initVertexs();
     this.initPointers();
     this.initWays();
     this.initBars();
+    this.initColor();
   }
 
   setCell( cell ){
@@ -147,14 +169,14 @@ class meeple {
     }
   }
 
-  setPriority( prior, target ){
+  setPriority( prior, meeples ){
     switch ( prior ) {
       case 0:
         this.var.priority = 'sleep';
         break;
       case 1:
         this.var.priority = 'convergence';
-        this.var.target = target;
+        this.selectTarget( meeples );
         break;
       case 2:
         this.var.priority = 'attack';
@@ -163,16 +185,48 @@ class meeple {
     }
   }
 
+  addThreat( meeple ){
+    this.array.danger.push( {
+      target: meeple,
+      value: 0,
+    } );
+
+  }
+
+  sortThreats(){
+    for( let i = 0; i < this.array.danger.length - 1; i++ ){
+      let finish = true;
+      for( let j = 0; i < this.array.danger.length - 1 - i; j++ )
+        if ( this.array.danger[j].value > this.array.danger[j + 1].value ) {
+            let temp = this.array.danger[j];
+            this.array.danger[j] = this.array.danger[j + 1];
+            this.array.danger[j + 1] = temp;
+            finish = false;
+        }
+
+      if ( finish )
+        break;
+    }
+  }
+
+  selectTarget( meeples ){
+    this.sortThreats();
+    let index = this.array.danger[0].target;
+    let cell = meeples[index].var.cell;
+    this.var.target = cell;
+    //return this.var.target;
+  }
+
   draw(){
     noStroke();
     for( let i = 0; i < this.array.vertex.length; i++ ){
       let ii = ( i + 1 ) % this.array.vertex.length;
-      fill( 270, colorMax, colorMax * 0.5 );
+      fill( this.var.color.h, this.var.color.s, this.var.color.l );
       triangle( this.center.x, this.center.y,
                 this.array.vertex[i].x  + this.center.x, this.array.vertex[i].y + this.center.y,
                 this.array.vertex[ii].x + this.center.x, this.array.vertex[ii].y + this.center.y );
       if( i == this.var.orientation ){
-        fill( 270, colorMax, colorMax * 0.25 );
+        fill( this.var.color.h, this.var.color.s, this.var.color.l );
         triangle( this.array.pointer[ii].x  + this.center.x, this.array.pointer[ii].y + this.center.y,
                   this.array.vertex[i].x  + this.center.x, this.array.vertex[i].y + this.center.y,
                   this.array.vertex[ii].x + this.center.x, this.array.vertex[ii].y + this.center.y );

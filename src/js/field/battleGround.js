@@ -2,6 +2,7 @@
 class battleGround{
   constructor(){
     this.const = {
+      parties: 2,
       n: 9,
       m: 7,
       a: cellSize
@@ -19,6 +20,7 @@ class battleGround{
       },
       neighbor: [],
       meeple: [],
+      team: [],
       cell: []
     }
     this.offset = createVector( cellSize * 2, cellSize * 2 )
@@ -44,12 +46,17 @@ class battleGround{
     }
   }
 
+  initTeams(){
+    for( let i = 0; i < this.const.parties; i++ )
+      this.array.team.push( [] );
+  }
+
   initMeeples(){
     let target = 1;//this.array.cell[Math.floor(this.const.n / 2)][Math.floor(this.const.m / 2)].index;
     let grid = createVector( 0, 0 ) ;
-    this.addMeeple( grid );
+    this.addMeeple( grid, 0 );
     grid = createVector( this.const.m - 1, 2 ) ;
-    this.addMeeple( grid );
+    this.addMeeple( grid, 1 );
     /*grid = createVector( 0, this.const.n - 1 ) ;
     this.addMeeple( grid );
     grid = createVector( this.const.m - 1, this.const.n - 1 ) ;
@@ -59,7 +66,8 @@ class battleGround{
     grid = createVector( 4, 5 ) ;
     this.addMeeple( grid );*/
 
-    this.array.meeple[0].setPriority( 2, target );
+    this.array.meeple[0].setPriority( 1, this.array.meeple );
+    console.log(   this.array.meeple[0] )
   /*  this.array.meeple[1].setPriority( 1, target );
     this.array.meeple[2].setPriority( 1, target );
     this.array.meeple[3].setPriority( 1, target );
@@ -91,6 +99,7 @@ class battleGround{
   init(){
     this.initNeighbors();
     this.initCells();
+    this.initTeams();
     this.initMeeples();
   }
 
@@ -101,12 +110,22 @@ class battleGround{
           this.array.cell[i][j].setStatus( 0 );
   }
 
-  addMeeple( grid ){
+  addMeeple( grid, team ){
     let center = this.array.cell[grid.y][grid.x].center;
     let cell = grid.y * this.const.m + grid.x;
-    this.array.meeple.push( new meeple( this.var.meeple, center, cell ) );
+    this.array.meeple.push( new meeple( this.var.meeple, center, cell, team ) );
     this.array.cell[grid.y][grid.x].setStatus( 1 );
     this.array.cell[grid.y][grid.x].var.meeple = this.var.meeple;
+    this.array.team[team].push( this.var.meeple );
+
+    for( let i = 0; i < this.array.team.length; i++ )
+      if( i != team )
+        for( let j = 0; j < this.array.team[i].length; j++ ){
+          let index = this.array.team[i][j];
+          let meeple = this.array.meeple[index];
+          meeple.addThreat( this.var.meeple );
+        }
+
     this.var.meeple++;
   }
 
@@ -386,15 +405,14 @@ class battleGround{
     let t = this.convertIndex( meeple.var.target );
     let status = this.array.cell[c.y][c.x].var.status;
     let target;
+    let action = meeple.var.action;
 
     switch ( meeple.var.priority ) {
       case 'sleep':
         break;
       case 'convergence':
-        let action = meeple.var.action;
         if( action == 'waiting' )
           this.takeTrack( meeple );
-        console.log( index, action, status )
         switch ( action ) {
           case 'clockwiseRotating':
             this.rotateMeeple( index, 1 );
@@ -408,7 +426,7 @@ class battleGround{
             target = this.array.cell[t.y][t.x];
             if( this.checkGoalAchievement( meeple ) ){
               this.array.cell[c.y][c.x].setStatus( 1 );
-              meeple.setPriority( 0 );
+              meeple.setPriority( 2 );
             }
             else
               this.moveMeeple( index );
@@ -417,6 +435,7 @@ class battleGround{
         break;
       case 'attack':
         if( !this.checkTargetLife( meeple ) ){
+          console.log('life');
           this.array.cell[c.y][c.x].setStatus( 1 );
           meeple.setPriority( 0 );
         }
@@ -425,12 +444,12 @@ class battleGround{
             meeple.setAction( 4 );
           else
             this.attackMeeple( index );
-
         break;
     }
+      console.log( index, action, status )
   }
 
-  markNeighbors( cell, wave ){
+  markNeighbors( cell, wave, end ){
     let vec = this.convertIndex( cell );
     let parity = ( vec.y % 2 );
 
@@ -439,7 +458,7 @@ class battleGround{
       grid.add( this.array.neighbor[parity][i] );
 
       if( this.checkCell( grid ) )
-        if( this.array.cell[grid.y][grid.x].var.free &&
+        if( ( this.array.cell[grid.y][grid.x].var.free || this.array.cell[grid.y][grid.x].index == end ) &&
             this.array.cell[grid.y][grid.x].var.wave == null )
           this.array.cell[grid.y][grid.x].var.wave = wave + 1;
     }
@@ -456,7 +475,7 @@ class battleGround{
         this.array.cell[i][j].var.wave = null;
 
     this.array.cell[gridB.y][gridB.x].var.wave = 0;
-    this.markNeighbors( this.array.cell[gridB.y][gridB.x].index, wave );
+    this.markNeighbors( this.array.cell[gridB.y][gridB.x].index, wave, end );
     wave++;
 
     while( !flag && wave < max ){
@@ -464,10 +483,11 @@ class battleGround{
         for( let j = 0; j < this.array.cell[i].length; j++ )
           if( this.array.cell[i][j].var.free &&
               this.array.cell[i][j].var.wave == wave ){
-            this.markNeighbors( this.array.cell[i][j].index, wave );
-            if( this.array.cell[i][j].index == end )
+            this.markNeighbors( this.array.cell[i][j].index, wave,end );
+             if( this.array.cell[i][j].index == end )
               flag = true;
           }
+
       wave++;
       //console.log( 'wave number:', wave, flag, end )
     }
