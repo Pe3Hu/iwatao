@@ -39,6 +39,11 @@ class meeple {
         move: 0.5,
         rotate: 0.5
       },
+      target: {
+        cell: null,
+        meeple: null
+      },
+      damage: 21,
       angle: 0,
       beat: 1 //tact
     }
@@ -126,10 +131,10 @@ class meeple {
     switch ( action ) {
       case 0:
         this.var.action = 'waiting';
-        this.array.dot = [];
         break;
       case 1:
         this.var.action = 'moving';
+        this.array.dot = [];
         vec = this.array.way[this.var.orientation].copy();
         origin = this.array.way[this.var.orientation].copy();
         origin.normalize();
@@ -156,6 +161,7 @@ class meeple {
         break;
       case 4:
         this.var.action = 'attacking';
+        this.array.dot = [];
         this.array.dot.push( this.center.copy() );
         vec = this.array.way[this.var.orientation].copy();
         origin = this.array.way[this.var.orientation].copy();
@@ -213,8 +219,22 @@ class meeple {
     this.sortThreats();
     let index = this.array.danger[0].target;
     let cell = meeples[index].var.cell;
-    this.var.target = cell;
+    this.var.target = {
+      cell: cell,
+      meeple: index
+    };
     //return this.var.target;
+  }
+
+  takeDamge( dmg ){
+    let points = this.data['health'].current -= dmg;
+    this.array.bar[0].updatePoints( points )
+  }
+
+  makeDamage( meeples ){
+    let dmg = this.var.damage;
+    let victim = meeples[this.var.target.meeple];
+    victim.takeDamge( dmg );
   }
 
   draw(){

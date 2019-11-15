@@ -55,7 +55,7 @@ class battleGround{
     let target = 1;//this.array.cell[Math.floor(this.const.n / 2)][Math.floor(this.const.m / 2)].index;
     let grid = createVector( 0, 0 ) ;
     this.addMeeple( grid, 0 );
-    grid = createVector( this.const.m - 1, 2 ) ;
+    grid = createVector( 1, 1 ) ;
     this.addMeeple( grid, 1 );
     /*grid = createVector( 0, this.const.n - 1 ) ;
     this.addMeeple( grid );
@@ -218,7 +218,7 @@ class battleGround{
     //console.log( meeple.var.timer, meeple.var.stop, frameCount );
   }
 
-  attackMeeple( index ){
+  attackMeeple( index, last ){
     let meeple = this.array.meeple[index];
     let previous = this.convertIndex( meeple.var.cell );
     let previousCell = this.array.cell[previous.y][previous.x];
@@ -256,12 +256,14 @@ class battleGround{
           if( min > step.mag() )
             meeple.center.sub( step );
           else{
-            meeple.center =  meeple.array.dot[stage].copy();
-            meeple.setAction( 0 );
-            //previousCell.setStatus( 0 );
-            meeple.var.stage = 'attack';
-            meeple.var.forward  = true;
-          }
+              if( last )
+                meeple.setPriority( 0 );
+              meeple.center =  meeple.array.dot[stage].copy();
+              meeple.setAction( 0 );
+              //previousCell.setStatus( 0 );
+              meeple.var.stage = 'attack';
+              meeple.var.forward = true;
+            }
         }
         break;
       case 1:
@@ -269,8 +271,9 @@ class battleGround{
           if( min > step.mag() )
             meeple.center.add( step );
           else{
-             meeple.var.forward  = false;
-             meeple.var.stage = 'retrun';
+            meeple.makeDamage( this.array.meeple );
+            meeple.var.forward  = false;
+            meeple.var.stage = 'retrun';
           }
         else
           meeple.center.sub( step );
@@ -318,7 +321,7 @@ class battleGround{
   }
 
   checkGoalAchievement( meeple ){
-    let target = meeple.var.target;
+    let target = meeple.var.target.cell;
     let cell = meeple.var.cell;
     let orientation = meeple.var.orientation;
     let vecT = this.convertIndex( target );
@@ -335,7 +338,11 @@ class battleGround{
   }
 
   checkTargetLife( meeple ){
-    return true;
+    let victim = this.array.meeple[meeple.var.target.meeple];
+    let flag = false;
+    if( victim.array.bar[0].points.current == 0 )
+      flag = true;
+    return flag;
   }
 
   chooseNearest(){
@@ -343,7 +350,7 @@ class battleGround{
   }
 
   takeTrack( meeple ){
-    let end = meeple.var.target;
+    let end = meeple.var.target.cell;
     let begin = meeple.var.cell;
     let marked = this.markGrid( begin, end );
     /*if( !marked ){
@@ -402,9 +409,10 @@ class battleGround{
   doStuff( index ){
     let meeple = this.array.meeple[index];
     let c = this.convertIndex( meeple.var.cell );
-    let t = this.convertIndex( meeple.var.target );
+    let t = this.convertIndex( meeple.var.target.cell );
     let status = this.array.cell[c.y][c.x].var.status;
     let target;
+    let last;
     let action = meeple.var.action;
 
     switch ( meeple.var.priority ) {
@@ -434,10 +442,9 @@ class battleGround{
         }
         break;
       case 'attack':
-        if( !this.checkTargetLife( meeple ) ){
-          console.log('life');
-          this.array.cell[c.y][c.x].setStatus( 1 );
-          meeple.setPriority( 0 );
+        last = this.checkTargetLife( meeple );
+        if( !last ){
+          this.attackMeeple( index, last );
         }
         else
           if( meeple.var.action == 'waiting' )
@@ -446,7 +453,8 @@ class battleGround{
             this.attackMeeple( index );
         break;
     }
-      console.log( index, action, status )
+    if( action != 'waiting' )
+      console.log( index, meeple.var.priority, action, status )
   }
 
   markNeighbors( cell, wave, end ){

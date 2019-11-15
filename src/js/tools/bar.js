@@ -226,6 +226,10 @@ class bar{
     }
     //after change current points value
     updatePoints( points ){
+      if( points == 0 )
+        return;
+      if( points < 0 )
+        points = 0;
       this.points.current = points;
       this.var.ratio  = this.points.current / this.points.max;
       this.array.filled = [];
