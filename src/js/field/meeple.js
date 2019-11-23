@@ -23,9 +23,12 @@ class meeple {
       orientation: 1,
       clockwise: true,
       priority: 'sleep',//sleep spend fill convergence//'automaticAttack' specialAttack
+      complete: false,
       forward: true,
+      stopped: false,
+      scheme: 'killAllEnemies',
       action: 'waiting',
-      status: 'free',//busy
+      status: 'frozen',
       stage: null,
       timer: null,
       stop: null,
@@ -37,13 +40,13 @@ class meeple {
       },
       speed: {
         move: 0.5,
-        rotate: 0.5
+        rotate: 0.25
       },
       target: {
         cell: null,
         meeple: null
       },
-      damage: 21,
+      damage: 34,
       angle: 0,
       beat: 1 //tact
     }
@@ -179,6 +182,7 @@ class meeple {
     switch ( prior ) {
       case 0:
         this.var.priority = 'sleep';
+        this.setAction( 0 );
         break;
       case 1:
         this.var.priority = 'convergence';
@@ -188,42 +192,84 @@ class meeple {
         this.var.priority = 'attack';
         this.setAction( 4 );
         break;
+      case 3:
+        this.var.priority = 'search';
+        this.setAction( 5 );
+        break;
     }
+  }
+
+  setStatus( status, meeples ){
+    switch ( status ) {
+      case 0:
+        this.var.status = 'frozen';
+        break;
+      case 1:
+        this.var.status = 'onWay';
+        this.selectTarget( meeples );
+        //console.log( this.index, this.array.danger )
+        this.setPriority( 1, meeples );
+        break;
+      case 2:
+        this.var.status = 'atЕheReady';
+        this.setPriority( 2 );
+        break;
+      case 3:
+        this.var.status = 'enemyEliminated';
+        this.setPriority( 0 );
+        break;
+      case 4:
+        this.var.status = 'victory';
+        this.setPriority( 0 );
+        break;
+      }
   }
 
   addThreat( meeple ){
     this.array.danger.push( {
       target: meeple,
-      value: 0,
+      value: meeple*2,
     } );
+  }
 
+  removeThreat( meeple ){
+    for( let i = 0; i < this.array.danger.length; i++ ){
+      if( this.array.danger[i].target == meeple )
+          this.array.danger[i].value = -1;
+    }
   }
 
   sortThreats(){
+    let temp;
+
     for( let i = 0; i < this.array.danger.length - 1; i++ ){
-      let finish = true;
-      for( let j = 0; i < this.array.danger.length - 1 - i; j++ )
-        if ( this.array.danger[j].value > this.array.danger[j + 1].value ) {
-            let temp = this.array.danger[j];
+      for( let j = 0; j < this.array.danger.length - 1 - i; j++ )
+        if ( this.array.danger[j].value < this.array.danger[j + 1].value ) {
+            temp = this.array.danger[j];
             this.array.danger[j] = this.array.danger[j + 1];
             this.array.danger[j + 1] = temp;
-            finish = false;
         }
-
-      if ( finish )
-        break;
     }
   }
 
   selectTarget( meeples ){
     this.sortThreats();
+    if( this.allThreatsAreEliminated() ){
+      this.setStatus( 4 );
+      //this.var.stopped = true;
+      return;
+    }
+
     let index = this.array.danger[0].target;
     let cell = meeples[index].var.cell;
     this.var.target = {
       cell: cell,
       meeple: index
     };
-    //return this.var.target;
+  }
+
+  allThreatsAreEliminated(){
+    return this.array.danger[0].value == -1;
   }
 
   takeDamge( dmg ){
