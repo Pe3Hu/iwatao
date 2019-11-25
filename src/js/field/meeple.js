@@ -24,6 +24,7 @@ class meeple {
       clockwise: true,
       priority: 'sleep',//sleep spend fill convergence//'automaticAttack' specialAttack
       complete: false,
+      movesIn: null,
       forward: true,
       stopped: false,
       scheme: 'killAllEnemies',
@@ -122,9 +123,13 @@ class meeple {
     this.initColor();
   }
 
-  setCell( cell ){
-    this.var.cell = cell;
+  setCell( index ){
+    this.var.cell = index;
     this.array.dot = [];
+  }
+  
+  setNext( index ){
+    this.var.movesIn = index;
   }
 
   setAction( action ){
@@ -207,7 +212,6 @@ class meeple {
       case 1:
         this.var.status = 'onWay';
         this.selectTarget( meeples );
-        //console.log( this.index, this.array.danger )
         this.setPriority( 1, meeples );
         break;
       case 2:
@@ -243,12 +247,16 @@ class meeple {
     let temp;
 
     for( let i = 0; i < this.array.danger.length - 1; i++ ){
+      let finish = true;
       for( let j = 0; j < this.array.danger.length - 1 - i; j++ )
         if ( this.array.danger[j].value < this.array.danger[j + 1].value ) {
             temp = this.array.danger[j];
             this.array.danger[j] = this.array.danger[j + 1];
             this.array.danger[j + 1] = temp;
+            finish = false;
         }
+      if( finish )
+        return;
     }
   }
 
@@ -262,10 +270,7 @@ class meeple {
 
     let index = this.array.danger[0].target;
     let cell = meeples[index].var.cell;
-    this.var.target = {
-      cell: cell,
-      meeple: index
-    };
+    this.var.target = index;
   }
 
   allThreatsAreEliminated(){
@@ -279,7 +284,7 @@ class meeple {
 
   makeDamage( meeples ){
     let dmg = this.var.damage;
-    let victim = meeples[this.var.target.meeple];
+    let victim = meeples[this.var.target];
     victim.takeDamge( dmg );
   }
 
