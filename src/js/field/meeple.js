@@ -127,7 +127,7 @@ class meeple {
     this.var.cell = index;
     this.array.dot = [];
   }
-  
+
   setNext( index ){
     this.var.movesIn = index;
   }
@@ -286,6 +286,10 @@ class meeple {
     let dmg = this.var.damage;
     let victim = meeples[this.var.target];
     victim.takeDamge( dmg );
+  }
+
+  isAlive(){
+    return this.data['health'].current > 0;
   }
 
   draw(){

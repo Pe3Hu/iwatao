@@ -56,16 +56,16 @@ class battleGround{
     let target = 1;//this.array.cell[Math.floor(this.const.n / 2)][Math.floor(this.const.m / 2)].index;
     let grid = createVector( 0, 0 );
     this.addMeeple( grid, 0 );
-    grid = createVector( 0, 2 );
+    grid = createVector( 6, 2 );
     this.addMeeple( grid, 1 );
     grid = createVector( 2, 3 );
-    //this.addMeeple( grid, 1 );
-    /*grid = createVector( this.const.m - 1, this.const.n - 1 ) ;
     this.addMeeple( grid, 1 );
+    grid = createVector( this.const.m - 1, this.const.n - 1 ) ;
+    this.addMeeple( grid, 0 );
     grid = createVector( 4, 5 );
-    this.addMeeple( grid, 1 );*/
+    this.addMeeple( grid, 1 );
     /*grid = createVector( 0, this.const.n - 1 ) ;
-    this.addMeeple( grid );
+    this.addMeeple( grid, 1 );
     grid = createVector( this.const.m - 1, this.const.n - 1 ) ;
     this.addMeeple( grid );
     grid = createVector( 0, 3 ) ;
@@ -202,7 +202,7 @@ class battleGround{
         break;
     }
 
-    console.log( index, meeple.var.cell, stage, meeple.var.movesIn );
+    console.log( index, 'stage', meeple.var.stage, 'cell',meeple.var.cell, 'In',meeple.var.movesIn );
     //console.log( meeple.index, ':', previousCell.index, '_', nextCell.index, '|', meeple.var.stage );
   }
 
@@ -321,6 +321,7 @@ class battleGround{
 
   checkCell( grid ){
     let flag = true;
+
     if( grid.x < 0 || grid.y < 0 || grid.x > this.const.m - 1 || grid.y > this.const.n - 1 )
       flag = false;
 
@@ -329,18 +330,24 @@ class battleGround{
 
   checkGoalAchievement( meeple ){
     let target = meeple.var.target;
-    let cell = this.array.meeple[meeple.var.target].var.cell;
-    let orientation = meeple.var.orientation;
-    let vecT = this.convertIndex( target );
-    let vecC = this.convertIndex( cell );
-    let parity = ( vecC.y % 2 );
-    let flag = false;
-    vecC.add( this.array.neighbor[parity][orientation] );
+    let targetCell = this.array.meeple[target].var.cell;
+    //if target moving
+    if( this.array.meeple[target].var.movesIn != null )
+      targetCell = this.array.meeple[target].var.movesIn;
 
-    if( vecC.y == vecT.y &&
-        vecC.x == vecT.x )
+    let nextCell = meeple.var.cell;
+    let vecT = this.convertIndex( targetCell );
+    let vecN = this.convertIndex( nextCell );
+    let orientation = meeple.var.orientation;
+    let parity = ( vecN.y % 2 );
+    let flag = false;
+    vecN.add( this.array.neighbor[parity][orientation] );
+
+    if( vecN.y == vecT.y &&
+        vecN.x == vecT.x )
       flag = true;
 
+    //console.log( flag, 'meeple:', meeple.index, 'target:', target, 'c:', vecN.y, vecN.x, 't:', vecT.y, vecT.x )
     return flag;
   }
 
@@ -359,21 +366,23 @@ class battleGround{
   }
 
   takeTrack( meeple ){
-    let end = this.array.meeple[meeple.var.target].var.cell;
+    let target = meeple.var.target;
+    let end = this.array.meeple[target].var.cell;
+/*
+    //if target moving
+    if( this.array.meeple[target].var.movesIn != null )
+      end = this.array.meeple[target].var.movesIn;
+*/
+    console.log(this.array.meeple[target].var.cell, this.array.meeple[target].var.movesIn)
     let begin = meeple.var.cell;
     let marked = this.markGrid( begin, end );
-    /*if( !marked ){
-      meeple.setAction( 0 );
-    }*/
     let nearests = this.paveWay( begin, end );
     let orientation = meeple.var.orientation;
     let grid = this.convertIndex( meeple.var.cell );
     let parity = grid.y % 2;
     let turns = {};
 
-    //if target moving
-    if( this.array.meeple[meeple.var.target].var.movesIn != null )
-      end = this.array.meeple[meeple.var.target].var.movesIn;
+
 
     for( let i = 0; i < this.array.neighbor[parity].length; i++ ){
         let neighbor = grid.copy();
@@ -402,6 +411,8 @@ class battleGround{
     if( min == 3 ){
       min = Math.floor( Math.random() * 2 ) * 2 - 1;
       console.log( '_______', min )
+      if( begin.y == 0 )
+        min = -1;
     }
 
     switch ( min ) {
@@ -417,11 +428,17 @@ class battleGround{
         meeple.setAction( 3 );
         break;
     }
+    console.log(meeple.index, meeple.var.cell, '_|_',min, result, nearests, meeple.var.action)
   }
 
   doStuff( index ){
     let meeple = this.array.meeple[index];
     let targetCell = this.array.meeple[meeple.var.target].var.cell;
+
+    //if target moving
+    if( this.array.meeple[meeple.var.target].var.movesIn != null )
+      targetCell = this.array.meeple[meeple.var.target].var.movesIn;
+
     let c = this.convertIndex( meeple.var.cell );
     let t = this.convertIndex( targetCell );
     let cell = this.array.cell[c.y][c.x];
@@ -445,11 +462,12 @@ class battleGround{
             this.rotateMeeple( index, -1 );
             break;
           case 'moving':
-            if( !this.checkCell( t ) )
-              break;
 
-            /*if( !this.array.cell[t.y][t.x].var.free &&
-                this.array.cell[t.y][t.x].index == meeple.var.movesIn )
+            console.log( index, targetCell,  meeple.var.target,
+              this.array.cell[t.y][t.x].var.free, this.array.cell[t.y][t.x].index,
+              meeple.var.movesIn )
+
+            /*if( meeple.var.movesIn == null )
               this.takeTrack( meeple );*/
 
             if( this.checkGoalAchievement( meeple ) )
@@ -482,7 +500,8 @@ class battleGround{
       grid.add( this.array.neighbor[parity][i] );
 
       if( this.checkCell( grid ) )
-        if( ( this.array.cell[grid.y][grid.x].var.free || this.array.cell[grid.y][grid.x].index == end ) &&
+        if( ( this.array.cell[grid.y][grid.x].var.free ||
+              this.array.cell[grid.y][grid.x].index == end ) &&
             this.array.cell[grid.y][grid.x].var.wave == null )
           this.array.cell[grid.y][grid.x].var.wave = wave + 1;
     }
@@ -525,9 +544,10 @@ class battleGround{
     let cell = end;
     let paths = [[]];
     let nearests = [];
+    console.log( begin )
 
     //initiate all possible paths
-    while( wave > 0  ){
+    while( wave > 0 ){
       let vec = this.convertIndex( cell );
       let parity = ( vec.y % 2 );
       wave--;
@@ -615,10 +635,11 @@ class battleGround{
     let meeple = this.array.meeple[index];
     let action = meeple.var.action;
 
-    if( meeple.var.stopped )
+    if( !meeple.isAlive() )
       return;
 
     console.log(index, meeple.var.status, meeple.var.priority, meeple.var.action )
+
     switch ( meeple.var.scheme ) {
       case 'killAllEnemies':
         switch ( meeple.var.status ) {
