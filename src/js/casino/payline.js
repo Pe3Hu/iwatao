@@ -1,17 +1,17 @@
 //
 class payline{
   constructor ( index ){
-    this.index = index;
     this.offset = offset;
-    this.const = {
+    this.const = {      
+      index: index,
       a: cellSize * 2
-    }
+    };
     this.array = {
       link: []
     };
     this.var = {
       shift: 0
-    }
+    };
 
     this.init();
   }

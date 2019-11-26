@@ -1,7 +1,9 @@
 //
 class link{
   constructor ( index, center, suit , value ){
-    this.index  = index;
+    this.const = {
+      index: index
+    };
     this.center = center;
     this.status = 'forgotten'; //forgotten proposed selected
     this.data = {

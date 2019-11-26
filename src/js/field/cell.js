@@ -1,9 +1,8 @@
 //the basic element of field
 class cell {
   constructor ( index, center, grid ){
-    this.index =  index;
-    this.center = center;
     this.const = {
+      index: index,
       n: 6,
       a: cellSize,
       i: grid.y,
@@ -14,6 +13,7 @@ class cell {
       vertex: []
     };
     this.var = {
+      center: center.copy(),
       status: 'empty',
       target: null,
       meeple: null,
@@ -30,7 +30,7 @@ class cell {
       let vec = createVector(
         Math.sin( Math.PI * 2 / this.const.n * ( - i + this.const.n / 2 ) ) * this.const.a,
         Math.cos( Math.PI * 2 / this.const.n * ( - i + this.const.n / 2 ) ) * this.const.a );
-      vec.add( this.center );
+      vec.add( this.var.center );
       this.array.vertex.push( vec );
     }
   }
@@ -99,22 +99,22 @@ class cell {
 
     for( let i = 0; i < this.array.vertex.length; i++ ){
       let ii = ( i + 1 ) % this.array.vertex.length;
-      triangle( this.center.x, this.center.y,
+      triangle( this.var.center.x, this.var.center.y,
                 this.array.vertex[i].x, this.array.vertex[i].y,
                 this.array.vertex[ii].x, this.array.vertex[ii].y );
      }
 
      stroke( 0 );
      fill( 0 );
-     this.var.txt = this.index;
+     this.var.txt = this.const.index;
      if( this.var.wave != null )
       this.var.txt += '_' + this.var.wave;
-     text( this.var.txt, this.center.x, this.center.y + fontSize / 3 );
+     text( this.var.txt, this.var.center.x, this.var.center.y + fontSize / 3 );
 
      /*fill( colorMax );
      stroke( colorMax );
      if( this.var.free )
-       ellipse( this.center.x + 3, this.center.y, 5, 5 );*/
+       ellipse( this.var.center.x + 3, this.var.center.y, 5, 5 );*/
 
   }
 }

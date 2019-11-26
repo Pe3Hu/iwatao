@@ -1,9 +1,8 @@
 //
 class meeple {
   constructor ( index, center, cell, team ){
-    this.index = index;
-    this.center = center.copy();
     this.const = {
+      index: index,
       period: 12,
       frame: 2,
       team: team,
@@ -27,6 +26,7 @@ class meeple {
       movesIn: null,
       forward: true,
       stopped: false,
+      center: center.copy(),
       scheme: 'killAllEnemies',
       action: 'waiting',
       status: 'frozen',
@@ -148,7 +148,7 @@ class meeple {
         origin.normalize();
         origin.mult( this.const.r );
         vec.div( 2 );
-        vec.add( this.center.copy() );
+        vec.add( this.var.center.copy() );
         vec.sub( origin );
         this.array.dot.push( vec.copy() );
         vec.add( origin );
@@ -170,13 +170,13 @@ class meeple {
       case 4:
         this.var.action = 'attacking';
         this.array.dot = [];
-        this.array.dot.push( this.center.copy() );
+        this.array.dot.push( this.var.center.copy() );
         vec = this.array.way[this.var.orientation].copy();
         origin = this.array.way[this.var.orientation].copy();
         origin.normalize();
         origin.mult( this.const.r );
         vec.div( 2 );
-        vec.add( this.center.copy() );
+        vec.add( this.var.center.copy() );
         vec.sub( origin );
         this.array.dot.push( vec.copy() );
         break;
@@ -297,19 +297,19 @@ class meeple {
     for( let i = 0; i < this.array.vertex.length; i++ ){
       let ii = ( i + 1 ) % this.array.vertex.length;
       fill( this.var.color.h, this.var.color.s, this.var.color.l );
-      triangle( this.center.x, this.center.y,
-                this.array.vertex[i].x  + this.center.x, this.array.vertex[i].y + this.center.y,
-                this.array.vertex[ii].x + this.center.x, this.array.vertex[ii].y + this.center.y );
+      triangle( this.var.center.x, this.var.center.y,
+                this.array.vertex[i].x  + this.var.center.x, this.array.vertex[i].y + this.var.center.y,
+                this.array.vertex[ii].x + this.var.center.x, this.array.vertex[ii].y + this.var.center.y );
       if( i == this.var.orientation ){
         fill( this.var.color.h, this.var.color.s, this.var.color.l );
-        triangle( this.array.pointer[ii].x  + this.center.x, this.array.pointer[ii].y + this.center.y,
-                  this.array.vertex[i].x  + this.center.x, this.array.vertex[i].y + this.center.y,
-                  this.array.vertex[ii].x + this.center.x, this.array.vertex[ii].y + this.center.y );
+        triangle( this.array.pointer[ii].x  + this.var.center.x, this.array.pointer[ii].y + this.var.center.y,
+                  this.array.vertex[i].x  + this.var.center.x, this.array.vertex[i].y + this.var.center.y,
+                  this.array.vertex[ii].x + this.var.center.x, this.array.vertex[ii].y + this.var.center.y );
       }
      }
 
      for( let i = 0; i < this.array.bar.length; i++ )
-        this.array.bar[i].draw( this.center );
+        this.array.bar[i].draw( this.var.center );
 
      noFill();
   }

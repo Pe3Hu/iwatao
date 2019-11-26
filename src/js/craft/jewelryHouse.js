@@ -4,7 +4,7 @@ class jewelryHouse {
     this.const = {
       a: cellSize,
       l: 8
-    }
+    };
     this.array = {
       tptpt: [],
       view: [],
@@ -15,7 +15,7 @@ class jewelryHouse {
       firstShift: 0,
       secondShift: 1,
       mode: 'solo'
-    }
+    };
     this.offset = createVector();
 
     this.init();

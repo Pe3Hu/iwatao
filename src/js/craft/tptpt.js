@@ -2,8 +2,8 @@
 //деталь taipitopito
 class tptpt {
   constructor ( index, steps ){
-    this.index = index;
-    this.const = {
+    this.const = {      
+      index: index,
       pika: {
         x: 8,
         y: 8

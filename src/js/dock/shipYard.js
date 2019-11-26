@@ -121,8 +121,8 @@ class shipYard{
     let mod = this.array.module[this.var.mode][m];
     let hull = this.array.hull[this.var.hull];
     let joint = this.array.joint[this.var.joint];
-    let parent = hull.convertIndex( joint.parent.index );
-    let child = mod.convertIndex( joint.child.index );
+    let parent = hull.convertIndex( joint.parent.const.index );
+    let child = mod.convertIndex( joint.child.const.index );
 
     //update joint in locked module
     mod.setJoint( joint );
@@ -139,7 +139,7 @@ class shipYard{
     this.array.shift[this.var.mode] = this.array.id[this.var.mode].shift();
 
     for( let i = 0; i < hull.array.gate.length; i++ ){
-      let index = hull.array.gate[i].indexOf( joint.parent );
+      let index = hull.array.gate[i].const.indexOf( joint.parent );
       let way = ( i + 2 ) % hull.array.gate.length;
       //remove used gateway
       if( index != -1 )
@@ -148,14 +148,14 @@ class shipYard{
 
       for( let j = 0; j < mod.array.gate[i].length; j++ )
         //adding new options in gateway array
-        if( mod.array.gate[i][j].index != joint.child.index ){
-          let grid = mod.convertIndex( mod.array.gate[i][j].index );
+        if( mod.array.gate[i][j].const.index != joint.child.const.index ){
+          let grid = mod.convertIndex( mod.array.gate[i][j].const.index );
           grid.x += parent.x - child.x;
           grid.y += parent.y - child.y;
 
           let kind = mod.array.gate[i][j].kind;
           let sequence = mod.array.gate[i][j].sequence;
-          console.log( mod.array.gate[i][j].index, kind, sequence  )
+          console.log( mod.array.gate[i][j].const.index, kind, sequence  )
           let index = hull.convertGrid( grid );
           index += hull.array.way[i];
           hull.array.gate[i].push( new gate( index, kind, sequence, way ) );
@@ -171,8 +171,8 @@ class shipYard{
   //connect the module to the hull if it is possible
   attachToHull( module, joint ){
     let hull = this.array.hull[this.var.hull];
-    let childVec = module.convertIndex( joint.child.index );
-    let parentVec = hull.convertIndex( joint.parent.index );
+    let childVec = module.convertIndex( joint.child.const.index );
+    let parentVec = hull.convertIndex( joint.parent.const.index );
 
     //console.log( '!', module.const.type, joint.parent, joint.child )
 
@@ -224,8 +224,8 @@ class shipYard{
     let m = this.array.shift[this.var.mode];
     let mod = this.array.module[this.var.mode][m];
     let hull = this.array.hull[this.var.hull];
-    let cVec = mod.convertIndex( child.index );
-    let pVec = hull.convertIndex( parent.index );
+    let cVec = mod.convertIndex( child.const.index );
+    let pVec = hull.convertIndex( parent.const.index );
     let cBlock = mod.array.block[cVec.y][cVec.x];
     let pBlock = hull.array.grid[pVec.y][pVec.x];
     let join;
@@ -236,15 +236,15 @@ class shipYard{
     else
       return;
 
-    let childVec = mod.convertIndex( join.child.index );
-    let parentVec = hull.convertIndex( join.parent.index );
+    let childVec = mod.convertIndex( join.child.const.index );
+    let parentVec = hull.convertIndex( join.parent.const.index );
 
     for( let i = 0; i < mod.array.block.length; i++ )
       for( let j = 0; j < mod.array.block[i].length; j++ ){
         let x = j + parentVec.x - childVec.x;
         let y = i + parentVec.y - childVec.y;
         let block = mod.array.block[i][j];
-        let index = hull.array.grid[y][x].index;
+        let index = hull.array.grid[y][x].const.index;
         let partition = mod.array.block[i][j].partition;
 
         //place to merge
@@ -254,7 +254,7 @@ class shipYard{
 
       for( let i = 0; i < hull.array.gate.length; i++ )
         for( let j = 0; j < hull.array.gate[i].length; j++ ){
-          let index = hull.array.gate[i][j].index;
+          let index = hull.array.gate[i][j].const.index;
           let vec = hull.convertIndex( index );
 
           let x = vec.x - parentVec.x + childVec.x;

@@ -1,7 +1,9 @@
 //the basic element of which consists tptpt
 class pika {
   constructor ( index, center, aNum ){
-    this.index  = index;
+    this.const = {
+      index: index
+    };
     this.size = createVector( cellSize, cellSize );
     this.center = center;
     this.status = 'selected'; //forgotten proposed selected

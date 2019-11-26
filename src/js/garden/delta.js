@@ -1,7 +1,6 @@
 //the basic element of which consists plant
 class delta {
   constructor ( index, orientation, center ){
-    this.index =  index;
     this.orientation = {
       flag: orientation,
       name: null,
@@ -9,6 +8,7 @@ class delta {
     };
     this.center = center;
     this.const = {
+      index: index,
       r: cellSize / 4,
       R: cellSize / 2
     };
@@ -49,7 +49,7 @@ class delta {
         this.color = color( colorMax );
         break;
     }
-    
+
     this.initVertexs();
   }
 
@@ -98,7 +98,7 @@ class delta {
         break;
       case 'selected':
         fill( this.color );
-        if ( this.index == 0 )
+        if ( this.const.index == 0 )
           fill( 'red' );
         triangle(
           this.array.vertex[0].x + offset.x, this.array.vertex[0].y + offset.y,

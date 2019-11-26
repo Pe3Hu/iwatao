@@ -1,7 +1,9 @@
 //the basic element of which consists module
 class block {
   constructor( index, center, scale ){
-    this.index  = index;
+    this.const = {
+      index: index
+    };
     this.center = center;
     this.scale = scale;
     this.kind = null;

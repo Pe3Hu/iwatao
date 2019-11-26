@@ -1,13 +1,13 @@
 //
 class figure{
   constructor ( index, offset, suit ){
-    this.index = index;
     this.offset = offset;
     this.const = {
+      index: index,
       a: cellSize * 2,
       n: 11,
       suit: suit
-    }
+    };
     this.array = {
       link: []
     };

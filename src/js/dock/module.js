@@ -1,8 +1,8 @@
 //universal component of the ship
 class module {
   constructor( index, type, grade ){
-    this.index = index;
     this.const = {
+      index: index,
       a: cellSize / 2,
       type: type,
       block: {
@@ -775,7 +775,7 @@ class module {
 
     for( let i = 0; i < this.array.block.length; i++)
       for( let j = 0; j < this.array.block[i].length; j++ ){
-        let index = this.array.block[i][j].index;
+        let index = this.array.block[i][j].const.index;
         let kind = this.array.block[i][j].kind;
         let sequence = this.array.block[i][j].sequence;
           if( this.array.block[i][j].kind != null && this.array.block[i][j].sequence != null )

@@ -4,7 +4,7 @@ class battleCard {
     this.const = count;
     this.preparationTime = null;
     this.target = 'nearest';//nearest
-  }
+  };
 
   //drawing battle card
   draw(){

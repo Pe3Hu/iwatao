@@ -2,12 +2,12 @@
 //character development material
 class plant {
   constructor ( index, orientation ){
-    this.index = index;
     this.orientation = orientation;
     this.status = 'wait';
     this.offset = createVector();
     this.center = createVector();
     this.const = {
+      index: index,
       ring: 8,
       parts: 3,
       r: cellSize / 4,
@@ -40,7 +40,7 @@ class plant {
 
     this.initNeighbors();
 
-    this.addRandDeltas( this.index * ( this.index + 1 ) );
+    this.addRandDeltas( this.const.index * ( this.const.index + 1 ) );
 
     //console.log( this.array.trace )
   }
@@ -218,17 +218,17 @@ class plant {
     let b = this.contactByIndex( bID );
     let c = this.contactByIndex( cID );
     this.array.option.push({
-      index: a.index,
+      index: a.const.index,
       axis: 'a',
       orientation: a.orientation.flag
     });
     this.array.option.push({
-      index: b.index,
+      index: b.const.index,
       axis: 'b',
       orientation: b.orientation.flag
     });
     this.array.option.push({
-      index: c.index,
+      index: c.const.index,
       axis: 'c',
       orientation: c.orientation.flag
     });
@@ -257,18 +257,18 @@ class plant {
     for (let l = 0; l < this.array.delta[i + 1].length; l++){
       //check axis a
       if( this.array.delta[i + 1][l].center.dist( a ) < maxDist ){
-        this.array.delta[i + 1][l].neighbor.a = this.array.delta[i][j].index;
-        this.array.delta[i][j].neighbor.a = this.array.delta[i + 1][l].index;
+        this.array.delta[i + 1][l].neighbor.a = this.array.delta[i][j].const.index;
+        this.array.delta[i][j].neighbor.a = this.array.delta[i + 1][l].const.index;
       }
       //check axis b
       if( this.array.delta[i + 1][l].center.dist( b ) < maxDist ){
-        this.array.delta[i + 1][l].neighbor.b = this.array.delta[i][j].index;
-        this.array.delta[i][j].neighbor.b = this.array.delta[i + 1][l].index;
+        this.array.delta[i + 1][l].neighbor.b = this.array.delta[i][j].const.index;
+        this.array.delta[i][j].neighbor.b = this.array.delta[i + 1][l].const.index;
       }
       //check axis c
       if( this.array.delta[i + 1][l].center.dist( c ) < maxDist ){
-        this.array.delta[i + 1][l].neighbor.c = this.array.delta[i][j].index;
-        this.array.delta[i][j].neighbor.c = this.array.delta[i + 1][l].index;
+        this.array.delta[i + 1][l].neighbor.c = this.array.delta[i][j].const.index;
+        this.array.delta[i][j].neighbor.c = this.array.delta[i + 1][l].const.index;
       }
     }
   }
@@ -293,7 +293,7 @@ class plant {
   //refresh array of options
   updateOptions(){
     for( let i = 0; i < this.array.option.length; i++ ){
-      let index = this.array.option[i].index;
+      let index = this.array.option[i].const.index;
       let delta = this.contactByIndex( index );
       if( delta.status == 'forgotten' )
         delta.status = 'proposed';
@@ -316,10 +316,10 @@ class plant {
     if ( index >= this.array.option.length )
       return;
 
-    let delta = this.contactByIndex( this.array.option[index].index );
+    let delta = this.contactByIndex( this.array.option[index].const.index );
     delta.setStatus( 2 );
     this.array.trace.push({
-      index: this.array.option[index].index,
+      index: this.array.option[index].const.index,
       axis: this.array.option[index].axis,
       orientation: this.array.option[index].orientation
     });
@@ -332,19 +332,19 @@ class plant {
 
     if ( typeof a !== 'undefined' && a.status != 'selected' )
       this.array.option.push( {
-        index: a.index,
+        index: a.const.index,
         axis: 'a',
         orientation: a.orientation.flag
        });
     if ( typeof b !== 'undefined' && b.status != 'selected' )
       this.array.option.push( {
-        index: b.index,
+        index: b.const.index,
         axis: 'b',
         orientation: b.orientation.flag
       });
     if ( typeof c !== 'undefined' && c.status != 'selected' )
       this.array.option.push( {
-        index: c.index,
+        index: c.const.index,
         axis: 'c',
         orientation: c.orientation.flag
       });
@@ -396,7 +396,7 @@ class plant {
 
     //enumeration of possible options
     for (let i = 0; i < this.array.option.length; i++){
-      let index = this.array.option[i].index;
+      let index = this.array.option[i].const.index;
       let delta = this.contactByIndex( index );
       let dist = mouseVec.dist( delta.center );
       if( dist < minDist && dist < this.const.r ){

@@ -1,8 +1,8 @@
 //the basic element of which consists module
 class hull {
   constructor( index, core ){
-    this.index  = index;
     this.const = {
+      index: index,
       n: 33,
       m: 16,
       scale: 0.5,
@@ -74,7 +74,7 @@ class hull {
 
     for( let i = 0; i < this.array.gate.length; i++ )
       for( let j = 0; j < this.array.gate[i].length; j++ ){
-        let vec = this.convertIndex( this.array.gate[i][j].index );
+        let vec = this.convertIndex( this.array.gate[i][j].const.index );
         let kind = this.array.gate[i][j].kind;
         let sequence = this.array.gate[i][j].sequence;
         this.array.grid[vec.y][vec.x].setGate( kind, sequence );
