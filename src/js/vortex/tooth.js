@@ -1,8 +1,8 @@
 //protruding part of the gear
 class tooth {
   constructor ( index, center, vec ){
-    this.index =  index;
     this.const =  {
+      index: index,
       a: cellSize,
       vec: vec
     };

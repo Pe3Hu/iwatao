@@ -232,7 +232,7 @@ class meeple {
   addThreat( meeple ){
     this.array.danger.push( {
       target: meeple,
-      value: meeple*2,
+      value: meeple * 2
     } );
   }
 

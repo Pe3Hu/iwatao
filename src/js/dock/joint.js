@@ -1,10 +1,14 @@
 //indexes for establishing a connection between modules
 class joint {
-  constructor( index, parent, child ){
+  constructor( index, parent, child, begin, end ){
     this.const = {
       index: index
     };
-    this.parent = parent;
-    this.child = child;
+    this.var = {
+      parent: parent,
+      child: child,
+      begin: begin,
+      end: end
+    }
   }
 }

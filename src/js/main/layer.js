@@ -1,8 +1,10 @@
 //highlighted layer for a specific aspect of the game
 class layer {
   constructor ( index, name ){
-    this.index = index;
-    this.name = name;
+    this.const = {
+      index: index,
+      name: name
+    };
     this.elements = [];
   }
 

@@ -62,9 +62,9 @@ class battleGround{
     this.addMeeple( grid, 1 );
     grid = createVector( this.const.m - 1, this.const.n - 1 ) ;
     this.addMeeple( grid, 0 );
-    grid = createVector( 4, 5 );
+    /*grid = createVector( 4, 5 );
     this.addMeeple( grid, 1 );
-    /*grid = createVector( 0, this.const.n - 1 ) ;
+    grid = createVector( 0, this.const.n - 1 ) ;
     this.addMeeple( grid, 1 );
     grid = createVector( this.const.m - 1, this.const.n - 1 ) ;
     this.addMeeple( grid );
@@ -187,7 +187,7 @@ class battleGround{
         break;
       case 2:
         meeple.var.stage = 'atEnd';
-        if( min > step.mag() )
+        if( min >= step.mag() )
           meeple.var.center.add( step );
         else{
           meeple.var.center =  meeple.array.dot[stage].copy();
@@ -197,12 +197,12 @@ class battleGround{
           previousCell.setStatus( 0 );
           previousCell.setMeeple( null );
           meeple.setNext( null );
-          meeple.selectTarget( this.array.meeple );
+          //meeple.selectTarget( this.array.meeple );
+          console.log( index, 'stage', meeple.var.stage, 'cell', meeple.var.cell, 'In', meeple.var.movesIn );
         }
         break;
     }
 
-    console.log( index, 'stage', meeple.var.stage, 'cell',meeple.var.cell, 'In',meeple.var.movesIn );
     //console.log( meeple.const.index, ':', previousCell.const.index, '_', nextCell.const.index, '|', meeple.var.stage );
   }
 
@@ -319,6 +319,7 @@ class battleGround{
     return vec.y * this.const.m + vec.x;
   }
 
+  //is the cell within the field
   checkCell( grid ){
     let flag = true;
 
@@ -373,9 +374,14 @@ class battleGround{
     if( this.array.meeple[target].var.movesIn != null )
       end = this.array.meeple[target].var.movesIn;
 */
-    console.log(this.array.meeple[target].var.cell, this.array.meeple[target].var.movesIn)
+    //console.log('meeple', meeple.const.index, 'from',meeple.var.cell, 'to',this.array.meeple[target].var.cell, this.array.meeple[target].var.movesIn)
     let begin = meeple.var.cell;
     let marked = this.markGrid( begin, end );
+
+    //slow mode
+    /*if(!marked)
+      return;*/
+
     let nearests = this.paveWay( begin, end );
     let orientation = meeple.var.orientation;
     let grid = this.convertIndex( meeple.var.cell );
@@ -426,7 +432,7 @@ class battleGround{
         meeple.setAction( 3 );
         break;
     }
-    console.log(meeple.const.index, meeple.var.cell, '_|_',min, result, nearests, meeple.var.action)
+    //console.log(meeple.const.index, meeple.var.cell, '_|_',min, result, nearests, meeple.var.action)
   }
 
   doStuff( index ){
@@ -461,9 +467,9 @@ class battleGround{
             break;
           case 'moving':
 
-            console.log( index, targetCell,  meeple.var.target,
+            /*console.log( index, targetCell,  meeple.var.target,
               this.array.cell[t.y][t.x].var.free, this.array.cell[t.y][t.x].const.index,
-              meeple.var.movesIn )
+              meeple.var.movesIn )*/
 
             /*if( meeple.var.movesIn == null )
               this.takeTrack( meeple );*/
@@ -491,18 +497,27 @@ class battleGround{
 
   markNeighbors( cell, wave, end ){
     let vec = this.convertIndex( cell );
+    let gridE = this.convertIndex( end );
     let parity = ( vec.y % 2 );
+    let flag = false;
 
     for( let i = 0; i < this.array.neighbor[parity].length; i++ ){
       let grid = vec.copy();
       grid.add( this.array.neighbor[parity][i] );
 
-      if( this.checkCell( grid ) )
+      if( this.checkCell( grid ) ){
         if( ( this.array.cell[grid.y][grid.x].var.free ||
               this.array.cell[grid.y][grid.x].const.index == end ) &&
               this.array.cell[grid.y][grid.x].var.wave == null )
-          this.array.cell[grid.y][grid.x].var.wave = wave + 1;
+                this.array.cell[grid.y][grid.x].var.wave = wave + 1;
+
+        if( this.array.cell[grid.y][grid.x].const.index == end )
+          flag = true;
+      }
+
     }
+
+    return flag;
   }
 
   markGrid( begin, end ){
@@ -516,18 +531,15 @@ class battleGround{
         this.array.cell[i][j].var.wave = null;
 
     this.array.cell[gridB.y][gridB.x].var.wave = 0;
-    this.markNeighbors( this.array.cell[gridB.y][gridB.x].const.index, wave, end );
+    flag = this.markNeighbors( this.array.cell[gridB.y][gridB.x].const.index, wave, end );
     wave++;
 
     while( !flag && wave < max ){
       for( let i = 0; i < this.array.cell.length; i++ )
         for( let j = 0; j < this.array.cell[i].length; j++ )
           if( this.array.cell[i][j].var.free &&
-              this.array.cell[i][j].var.wave == wave ){
-            this.markNeighbors( this.array.cell[i][j].const.index, wave,end );
-             if( this.array.cell[i][j].const.index == end )
-              flag = true;
-          }
+              this.array.cell[i][j].var.wave == wave )
+            flag = this.markNeighbors( this.array.cell[i][j].const.index, wave,end );
 
       wave++;
       //console.log( 'wave number:', wave, flag, end )
@@ -542,7 +554,7 @@ class battleGround{
     let cell = end;
     let paths = [[]];
     let nearests = [];
-    console.log( begin )
+    //console.log( begin )
 
     //initiate all possible paths
     while( wave > 0 ){
@@ -636,7 +648,7 @@ class battleGround{
     if( !meeple.isAlive() )
       return;
 
-    console.log(index, meeple.var.status, meeple.var.priority, meeple.var.action )
+    //console.log(index, meeple.var.status, meeple.var.priority, meeple.var.action )
 
     switch ( meeple.var.scheme ) {
       case 'killAllEnemies':
@@ -685,7 +697,6 @@ class battleGround{
       for( let j = 0; j < this.array.cell[i].length; j++ ){
         this.array.cell[i][j].draw();
         let index = this.array.cell[i][j].var.meeple;
-        let cell = this.array.cell[i][j].const.index;
         if( index != null ){
           if( !this.var.endGame )
             this.stickScheme( index );

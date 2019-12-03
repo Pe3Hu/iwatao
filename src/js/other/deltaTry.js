@@ -1,7 +1,6 @@
 //the basic element of which consists plant
 class delta {
   constructor ( index, orientation, center, offset ){
-    this.index =  index;
     this.center = center;
     this.offset = offset;
     this.orientation = {
@@ -10,6 +9,7 @@ class delta {
       num: null
     };
     this.const = {
+      index:  index,
       a: cellSize,
       r: cellSize * Math.sqrt( 3 ) / 6,
       R: cellSize * Math.sqrt( 3 ) / 3,
@@ -45,7 +45,7 @@ class delta {
 
   convertIndex(){
     let minRing = 0;
-    let maxRing = Math.ceil( this.index / 3 );
+    let maxRing = Math.ceil( this.const.index / 3 );
     let ringSelection = 0;
     while ( minRing < maxRing ){
       ringSelection++;
@@ -53,8 +53,8 @@ class delta {
     }
     minRing = ringSelection * ( ringSelection - 1 ) / 2;
     this.const.i = ringSelection;
-    this.const.j = this.index - 1 - minRing  * 3;
-    if ( this.index == 0 )
+    this.const.j = this.const.index - 1 - minRing  * 3;
+    if ( this.const.index == 0 )
       this.const.j = 0;
   }
 

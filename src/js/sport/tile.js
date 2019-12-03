@@ -1,7 +1,9 @@
 //the basic element of court and net
 class tile{
   constructor ( index, center ){
-    this.index  = index;
+    this.const = {
+      index: index
+    };
     this.size = createVector( cellSize, cellSize );
     this.center = center;
     this.status = 'selected'; //forgotten proposed selected

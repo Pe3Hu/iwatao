@@ -1,12 +1,12 @@
 class button {
   constructor ( index, layer, name, type, center ){
-    this.index = index;
     this.layer = layer;
     this.name = name;
     this.type = type;
     this.center = center;
     this.color = color( colorButton );
-    this.const = {
+    this.const = {      
+      index: index,
       a: cellSize,
       d: cellSize * 1,
       r: cellSize * 0.4,

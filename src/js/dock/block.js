@@ -2,22 +2,26 @@
 class block {
   constructor( index, center, scale ){
     this.const = {
-      index: index
+      index: index,
+      scale: scale,
+      size: createVector( cellSize * scale, cellSize * scale ),
+      color: {
+        background: color( 0, 0, colorMax * 4 / 5 ),
+        partition: color( colorMax * 0.5, colorMax * 0.25, colorMax * 0.25 ),
+        gateway: color( colorMax * 5 / 6, colorMax, colorMax * 0.5 ),
+        gateway2: color( colorMax * 2 / 6, colorMax, colorMax * 0.5 ),
+        focus: color( colorMax / 7, colorMax, colorMax * 0.6 )
+      }
     };
-    this.center = center;
-    this.scale = scale;
-    this.kind = null;
-    this.sequence = null;
-    this.partition = null;
-    this.interior = 'floor';
-    this.content = 'empty';
-    this.status = 'forgotten';
-    this.size = createVector( cellSize * scale, cellSize * scale );
-    this.colorBackground = color( 0, 0, colorMax * 4 / 5 );
-    this.colorPartition =  color( colorMax * 0.5, colorMax * 0.25, colorMax * 0.25 );
-    this.colorGateway = color( colorMax * 5 / 6, colorMax, colorMax * 0.5 );
-    this.colorGateway2 = color( colorMax * 2 / 6, colorMax, colorMax * 0.5 );
-    this.colorFocus = color( colorMax / 7, colorMax, colorMax * 0.6 );
+    this.var = {
+      center: center,
+      kind: null,
+      sequence: null,
+      partition: null,
+      interior: 'floor',
+      content: 'empty',
+      status: 'forgotten',
+    }
   }
 
   //determine the display method
@@ -25,44 +29,43 @@ class block {
     switch ( stat ) {
       //do not show
       case 0:
-        this.status = 'forgotten';
+        this.var.status = 'forgotten';
         break;
       //show as an option
       case 1:
-        this.status = 'proposed';
+        this.var.status = 'proposed';
         break;
       //show as result
       case 2:
-        this.status = 'selected';
+        this.var.status = 'selected';
         break;
       //show as place to insert
       case 3:
-        this.status = 'expectant';
+        this.var.status = 'expectant';
         break;
-
     }
   }
 
   setGate( kind, sequence ){
-    this.kind = kind;
-    this.sequence = sequence;
-    this.interior = 'door';
+    this.var.kind = kind;
+    this.var.sequence = sequence;
+    this.var.interior = 'door';
     if( kind == null )
-      this.interior = 'floor';
+      this.var.interior = 'floor';
     else if ( sequence == undefined )
       console.log( '!' );
   }
 
   setPartition( partition ){
-    this.partition = partition;
-    this.interior = 'wall';
-    if( this.partition == null )
-      this.interior = 'floor';
+    this.var.partition = partition;
+    this.var.interior = 'wall';
+    if( this.var.partition == null )
+      this.var.interior = 'floor';
     this.setStatus( 2 );
   }
 
   setContent( content ){
-    this.content = content;
+    this.var.content = content;
   }
 
   setVisible( visible ){
@@ -71,113 +74,113 @@ class block {
 
   copy( block, type ){
     //this.visible = block.visible;
-    this.content = block.content;
-    this.interior = block.interior;
-    this.kind = block.kind;
-    this.sequence = block.sequence;
+    this.var.content = block.var.content;
+    this.var.interior = block.var.interior;
+    this.var.kind = block.var.kind;
+    this.var.sequence = block.var.sequence;
     this.setStatus( 1 );
 
     if( type == 0 )
-      this.partition = block.partition;
+      this.var.partition = block.var.partition;
   }
 
   free(){
-    return ( this.status == 'selected' || this.status == 'forgotten' )
+    return ( this.var.status == 'selected' || this.var.status == 'forgotten' )
   }
 
   //drawing block
   draw( offset ){
-    //if( this.status == 'forgotten' )
+    //if( this.var.status == 'forgotten' )
     //  return;
-    fill( this.colorBackground );
+    fill( this.const.color.background );
 
-    if( this.interior == 'door' ){
-      if( this.status == 'expectant' )
-        fill( this.colorGateway2 );
-      if( this.status == 'selected' || this.status == 'proposed' )
-        fill( this.colorGateway );
+    if( this.var.interior == 'door' ){
+      if( this.var.status == 'expectant' )
+        fill( this.const.color.gateway2 );
+      if( this.var.status == 'selected' || this.var.status == 'proposed' )
+        fill( this.const.color.gateway );
     }
-    if( this.content == 1 )
-      fill( this.colorFocus );
+    if( this.var.content == 1 )
+      fill( this.const.color.focus );
     rect(
-      offset.x + this.center.x - this.size.x / 2,
-      offset.y + this.center.y - this.size.y / 2,
-      this.size.x, this.size.y );
+      offset.x + this.var.center.x - this.const.size.x / 2,
+      offset.y + this.var.center.y - this.const.size.y / 2,
+      this.const.size.x, this.const.size.y );
 
-    fill( this.colorPartition );
-    if( this.interior == 'wall' )
-      switch ( this.partition ) {
+    fill( this.const.color.partition );
+    if( this.var.interior == 'wall' )
+      switch ( this.var.partition ) {
         case 0:
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x, this.size.y / 4);
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x, this.const.size.y / 4);
           break;
         case 1:
           rect(
-            offset.x + this.center.x + this.size.x / 4,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x / 4, this.size.y );
+            offset.x + this.var.center.x + this.const.size.x / 4,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x / 4, this.const.size.y );
           break;
         case 2:
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y + this.size.y / 4,
-            this.size.x, this.size.y / 4);
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y + this.const.size.y / 4,
+            this.const.size.x, this.const.size.y / 4);
           break;
         case 3:
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x / 4, this.size.y );
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x / 4, this.const.size.y );
           break;
         case 4:
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x, this.size.y / 4);
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x, this.const.size.y / 4);
           rect(
-            offset.x + this.center.x + this.size.x / 4,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x / 4, this.size.y );
+            offset.x + this.var.center.x + this.const.size.x / 4,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x / 4, this.const.size.y );
           break;
         case 5:
           rect(
-            offset.x + this.center.x + this.size.x / 4,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x / 4, this.size.y );
+            offset.x + this.var.center.x + this.const.size.x / 4,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x / 4, this.const.size.y );
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y + this.size.y / 4,
-            this.size.x, this.size.y / 4);
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y + this.const.size.y / 4,
+            this.const.size.x, this.const.size.y / 4);
           break;
         case 6:
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y + this.size.y / 4,
-            this.size.x, this.size.y / 4);
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y + this.const.size.y / 4,
+            this.const.size.x, this.const.size.y / 4);
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x / 4, this.size.y );
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x / 4, this.const.size.y );
           break;
         case 7:
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x / 4, this.size.y );
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x / 4, this.const.size.y );
           rect(
-            offset.x + this.center.x - this.size.x / 2,
-            offset.y + this.center.y - this.size.y / 2,
-            this.size.x, this.size.y / 4);
+            offset.x + this.var.center.x - this.const.size.x / 2,
+            offset.y + this.var.center.y - this.const.size.y / 2,
+            this.const.size.x, this.const.size.y / 4);
           break;
       }
 
     //draw text
-    textSize( fontSize * this.scale * 0.7 );
+    textSize( fontSize * this.const.scale * 0.7 );
     fill( 0 );
-    //if( this.interior != 'floor' )
-    text( this.index, offset.x + this.center.x, offset.y + this.center.y + fontSize / 6 );
+    //if( this.var.interior != 'floor' )
+    text( this.const.index, offset.x + this.var.center.x, offset.y + this.var.center.y + fontSize / 6 );
     textSize( fontSize );
   }
 }

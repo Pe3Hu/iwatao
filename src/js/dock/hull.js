@@ -60,14 +60,14 @@ class hull {
 
     let vec = this.convertIndex( index );
     this.array.grid[vec.y][vec.x].setGate( kind, sequence );
-    this.array.grid[vec.y][vec.y].setStatus( 3 );
+    this.array.grid[vec.y][vec.x].setStatus( 3 );
     this.array.gate[way].push( new gate( index, kind, sequence, way ) );
   }
 
   cleanGrid(){
     for( let i = 0; i < this.array.grid.length; i++ )
       for( let j = 0; j < this.array.grid[i].length; j++ )
-        if( this.array.grid[i][j].status != 'selected' ){
+        if( this.array.grid[i][j].var.status != 'selected' ){
           this.array.grid[i][j].setGate( null, null );
           this.array.grid[i][j].setStatus( 0 );
         }
@@ -75,8 +75,8 @@ class hull {
     for( let i = 0; i < this.array.gate.length; i++ )
       for( let j = 0; j < this.array.gate[i].length; j++ ){
         let vec = this.convertIndex( this.array.gate[i][j].const.index );
-        let kind = this.array.gate[i][j].kind;
-        let sequence = this.array.gate[i][j].sequence;
+        let kind = this.array.gate[i][j].var.kind;
+        let sequence = this.array.gate[i][j].var.sequence;
         this.array.grid[vec.y][vec.x].setGate( kind, sequence );
         this.array.grid[vec.y][vec.x].setStatus( 3 );
       }
@@ -112,7 +112,7 @@ class hull {
         noFill();
         rect( x, y, this.const.a, this.const.a );*/
 
-        //if( this.array.grid[i][j].status != 'forgotten' )
+        //if( this.array.grid[i][j].var.status != 'forgotten' )
          this.array.grid[i][j].draw( vec )
       }
   }

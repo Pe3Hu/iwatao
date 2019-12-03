@@ -15,6 +15,11 @@ class module {
       },
       m: 4
     };
+    this.var = {
+      status: 'wait',
+      joint: null,
+      offset: createVector()
+    }
     this.array = {
       gate: [ [], [], [], [] ],
       freeCorner: [],
@@ -23,9 +28,6 @@ class module {
       block: [],
       edge: []
     };
-    this.status = 'wait';
-    this.offset = createVector();
-    this.joint = null;
 
     this.init();
 
@@ -560,11 +562,11 @@ class module {
   getAdjacent( count ){
     let name = 'edge';
     let sequence = null;
-    let ids;
     let adjacents = [];
     let rand = Math.floor( Math.random() * this.array.freeEdge.length );
     let index = this.array.freeEdge[rand];
     let vec = this.convertIndex( index );
+    let ids;
 
     switch ( count ) {
       case 2:
@@ -749,25 +751,25 @@ class module {
     switch ( status ) {
       //do not show
       case 0:
-        this.status = 'wait';
+        this.var.status = 'wait';
         break;
       //show as an option
       case 1:
-        this.status = 'view';
+        this.var.status = 'view';
         break;
       //show as selected
       case 2:
-        this.status = 'edit';
+        this.var.status = 'edit';
         break;
     }
   }
 
   setOffset( offset ){
-    this.offset = offset;
+    this.var.offset = offset;
   }
 
   setJoint( joint ){
-    this.joint = joint;
+    this.var.joint = joint;
   }
 
   updateGateway(){
@@ -776,19 +778,19 @@ class module {
     for( let i = 0; i < this.array.block.length; i++)
       for( let j = 0; j < this.array.block[i].length; j++ ){
         let index = this.array.block[i][j].const.index;
-        let kind = this.array.block[i][j].kind;
-        let sequence = this.array.block[i][j].sequence;
-          if( this.array.block[i][j].kind != null && this.array.block[i][j].sequence != null )
+        let kind = this.array.block[i][j].var.kind;
+        let sequence = this.array.block[i][j].var.sequence;
+          if( this.array.block[i][j].var.kind != null && this.array.block[i][j].var.sequence != null )
             this.accountingGateway( index, kind, sequence );
       }
   }
 
   draw(){
-    let vec = this.offset.copy();
+    let vec = this.var.offset.copy();
     vec.x -= this.const.a * this.const.block.x /2;
     vec.y -= this.const.a * this.const.block.y / 2;
 
-  //  if( this.status != 'wait' )
+  //  if( this.var.status != 'wait' )
       for (let i = 0; i < this.array.block.length; i++)
         for (let j = 0; j < this.array.block[i].length; j++)
           this.array.block[i][j].draw( vec );

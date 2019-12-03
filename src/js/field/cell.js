@@ -46,6 +46,7 @@ class cell {
         this.var.status = 'empty';
         this.var.free = true;
         this.var.wave = null;
+        this.var.meeple = null;
         break;
       //show occupied cell
       case 1:

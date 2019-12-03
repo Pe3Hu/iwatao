@@ -1,10 +1,10 @@
 //character development material
 class plant {
   constructor ( index, center, orientation ){
-    this.index =  index;
     this.center = center;
     this.orientation = orientation;
     this.const = {
+      index:  index,
       ring: 3,
       parts: 3,
       a: cellSize,

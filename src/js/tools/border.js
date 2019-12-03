@@ -1,6 +1,8 @@
 class border {
   constructor ( index, layer, name, offset, size ){
-    this.index = index;
+    this.const = {
+      index: index
+    };
     this.layer = layer;
     this.name = name;
     this.offset = offset;

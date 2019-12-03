@@ -293,7 +293,7 @@ class plant {
   //refresh array of options
   updateOptions(){
     for( let i = 0; i < this.array.option.length; i++ ){
-      let index = this.array.option[i].const.index;
+      let index = this.array.option[i].index;
       let delta = this.contactByIndex( index );
       if( delta.status == 'forgotten' )
         delta.status = 'proposed';
@@ -316,10 +316,10 @@ class plant {
     if ( index >= this.array.option.length )
       return;
 
-    let delta = this.contactByIndex( this.array.option[index].const.index );
+    let delta = this.contactByIndex( this.array.option[index].index );
     delta.setStatus( 2 );
     this.array.trace.push({
-      index: this.array.option[index].const.index,
+      index: this.array.option[index].index,
       axis: this.array.option[index].axis,
       orientation: this.array.option[index].orientation
     });
@@ -396,7 +396,7 @@ class plant {
 
     //enumeration of possible options
     for (let i = 0; i < this.array.option.length; i++){
-      let index = this.array.option[i].const.index;
+      let index = this.array.option[i].index;
       let delta = this.contactByIndex( index );
       let dist = mouseVec.dist( delta.center );
       if( dist < minDist && dist < this.const.r ){

@@ -1,7 +1,9 @@
 //random event
 class halt{
   constructor ( index, center, type , grade, parent ){
-    this.index  = index;
+    this.const = {
+      index: index
+    };
     this.center = center;
     this.status = 'forgotten'; //forgotten proposed selected
     this.data = {
@@ -9,6 +11,7 @@ class halt{
       grade: null,
       parent: parent
     };
+
     this.size = createVector( cellSize, cellSize );
 
     this.setData( type, grade )

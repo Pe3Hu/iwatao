@@ -1,10 +1,10 @@
 //the basic element of vortex
 class gear {
   constructor ( index, orientation, center, teeths ){
-    this.index =  index;
     this.orientation = orientation;
     this.center = center;
     this.const = {
+      index: index,
       teeths: teeths,
       n: teeths * 2,
       a: cellSize,
