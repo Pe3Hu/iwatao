@@ -5,7 +5,7 @@ class button {
     this.type = type;
     this.center = center;
     this.color = color( colorButton );
-    this.const = {      
+    this.const = {
       index: index,
       a: cellSize,
       d: cellSize * 1,
@@ -44,7 +44,7 @@ class button {
       let d = null;
 
       //draw layer change buttons
-      if ( this.type > -1 && this.type < 8 ){
+      if ( this.type > -1 && this.type < 9 ){
         noStroke();
         switch ( this.type ) {
           case 0:
@@ -70,6 +70,9 @@ class button {
             break;
           case 7:
             fill( 130, colorMax, colorMax * 0.5 );
+            break;
+          case 8:
+            fill( 180, colorMax, colorMax * 0.5 );
             break;
         }
         rect(

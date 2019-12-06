@@ -1,10 +1,10 @@
-//the basic element of field
-class cell {
-  constructor ( index, center, grid ){
+//the basic element of land
+class plot {
+  constructor ( index, center, grid, a ){
     this.const = {
       index: index,
       n: 6,
-      a: cellSize,
+      a: a,
       i: grid.y,
       j: grid.x
     };
@@ -13,12 +13,7 @@ class cell {
     };
     this.var = {
       center: center.copy(),
-      status: 'empty',
-      target: null,
-      meeple: null,
-      free: true,
-      wave: null,
-      txt: null
+      status: 'empty'
     }
 
     this.init();
@@ -34,48 +29,26 @@ class cell {
     }
   }
 
-  init(){    
+  init(){
     this.const.r =  this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
     this.initVertexs();
   }
 
   setStatus( status ){
     switch ( status ) {
-      //show free cell
+      //show free
       case 0:
         this.var.status = 'empty';
         this.var.free = true;
         this.var.wave = null;
         this.var.meeple = null;
         break;
-      //show occupied cell
+      //show occupied
       case 1:
         this.var.status = 'taken';
         this.var.free = false;
         break;
-      //show temporarily cell
-      case 2:
-        this.var.status = 'move';
-        this.var.free = false;
-        break;
-      //show rotation cell
-      case 3:
-        this.var.status = 'rotate';
-        this.var.free = false;
-        break;
-      //show attacking cell
-      case 4:
-        this.var.status = 'attack';
-        this.var.free = false;
-        break;
     }
-  }
-
-  setMeeple( meeple ){
-    this.var.meeple = meeple;
-    this.var.free = false;
-    if( meeple = null )
-      this.setStatus( 0 );
   }
 
   draw(){
@@ -86,15 +59,6 @@ class cell {
         break;
       case 'taken':
         fill( colorMax * 0.8 );
-        break;
-      case 'move':
-        fill( 60, colorMax * 0.8, colorMax * 0.5 );
-        break;
-      case 'rotate':
-        fill( 200, colorMax * 0.8, colorMax * 0.5 );
-        break;
-      case 'attack':
-        fill( 0, colorMax * 0.8, colorMax * 0.5 );
         break;
     }
 
@@ -110,12 +74,6 @@ class cell {
      this.var.txt = this.const.index;
      if( this.var.wave != null )
       this.var.txt += '_' + this.var.wave;
-     text( this.var.txt, this.var.center.x, this.var.center.y + fontSize / 3 );
-
-     /*fill( colorMax );
-     stroke( colorMax );
-     if( this.var.free )
-       ellipse( this.var.center.x + 3, this.var.center.y, 5, 5 );*/
-
+     //text( this.var.txt, this.var.center.x, this.var.center.y + fontSize / 3 );
   }
 }

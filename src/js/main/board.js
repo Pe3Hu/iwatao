@@ -18,7 +18,7 @@ class board {
       a: cellSize
     }
     this.var = {
-      layer: 5,
+      layer: 8,
       buttonID: 0,
       borderID: 0
     }
@@ -53,6 +53,7 @@ class board {
     this.array.layer.push( new shipYard() );
     this.array.layer.push( new whirlPool() );
     this.array.layer.push( new battleGround() );
+    this.array.layer.push( new forgottenLand() );
   }
 
   initBorders(){
@@ -240,6 +241,8 @@ class board {
     type++;
     vec.y += cellSize;
     this.addButton( layer, name, type, vec.copy() );
+
+    name = 'switchToLand';
     type++;
     vec.y += cellSize;
     this.addButton( layer, name, type, vec.copy() );
