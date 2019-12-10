@@ -5,7 +5,8 @@ class forgottenLand{
       parties: 6,
       n: 24,
       m: 24,
-      k: 16,
+      k: 8,
+      o: 6,
       a: cellSize / 2
     };
     this.var = {
@@ -17,6 +18,7 @@ class forgottenLand{
       toConstruct: [],
       adjacency: [],
       neighbor: [],
+      enclave: [],
       team: [],
       plot: []
     }
@@ -59,17 +61,19 @@ class forgottenLand{
 
           this.array.plot[i].push( new plot( index, vec, grid, this.const.a ) );
 
-          if( i >= this.const.n / this.const.k && i < this.const.n * 7 / 8 &&
-              j >= this.const.m / this.const.k && j < this.const.m * 7 / 8 ){
+          if( i >= this.const.n / this.const.k &&
+              i < this.const.n * ( this.const.k - 1 ) / this.const.k &&
+              j >= this.const.m / this.const.k &&
+              j < this.const.m * ( this.const.k - 1 ) / this.const.k ){
                 let flag = true;
-                if( i >= this.const.n * 3 / 8 && i < this.const.n * 5 / 8 &&
-                    j >= this.const.m * 3 / 8 && j < this.const.m * 5 / 8 )
+                if( i >= this.const.n * ( this.const.k / 2 - 1 ) / this.const.k &&
+                    i < this.const.n * ( this.const.k / 2 + 1 ) / this.const.k &&
+                    j >= this.const.m * ( this.const.k / 2 - 1 ) / this.const.k &&
+                    j < this.const.m * ( this.const.k / 2 + 1 ) / this.const.k )
                     flag = false;
                 if( flag )
-                this.array.plot[i][j].setStatus(1);
+                  this.array.toConstruct.push( index );  //this.array.plot[i][j].setStatus(1);
               }
-          //this.array.toConstruct.push( index );
-
       }
     }
   }
@@ -80,15 +84,85 @@ class forgottenLand{
   }
 
   initEnclaves(){
-
+    this.addEnclave();
+    this.expandHorizon( 0 );
   }
 
-  addEnclave( grid ){
+  addEnclave(){
+    let rand = Math.floor( Math.random() * this.array.toConstruct.length );
+    //let index = this.array.toConstruct[rand];
+    //let vec = this.convertIndex( index );
+    let vec = createVector( 5, 6 );
+    let index = this.convertGrid( vec );
+    this.array.plot[vec.y][vec.x].setStatus( 1 );
+    this.array.enclave.push( new enclave( this.var.enclave, index ) );
+    console.log(vec.y, vec.x, index);
+    this.setHorizon( this.var.enclave, index );
 
+    this.addNeighbor( this.var.enclave, index );
+    this.var.enclave++;
   }
 
-  addNeighbor( plot ){
+  setHorizon( enclaveIndex, plotIndex ){
+    let enclave = this.array.enclave[enclaveIndex];
+    let plotVec = this.convertIndex( plotIndex );
+    let parity = ( plotVec.y % 2 );
 
+    for( let i = 0; i < this.array.neighbor[parity].length; i++ ){
+      let vec = plotVec.copy();
+      vec.add( this.array.neighbor[parity][i] );
+      let expandIndex = this.convertGrid( vec );
+
+      if( this.checkPlot( vec ) )
+        enclave.array.horiznot[i].push( expandIndex );
+    }
+  }
+
+  expandHorizon(  ){
+    let enclaveIndex = 0;
+    let array = [];
+    let enclave = this.array.enclave[enclaveIndex];
+    let orientation = Math.floor( Math.random() * this.const.o );
+    for( let i = 0; i < enclave.array.horiznot[orientation].length; i++ )
+      array.push( enclave.array.horiznot[orientation][i] )
+
+    //change status for plots of current horiznot
+    for( let i = 0; i < enclave.array.horiznot[orientation].length; i++ ){
+      let expandIndex = enclave.array.horiznot[orientation][i];
+      let vec = this.convertIndex( expandIndex );
+      this.array.plot[vec.y][vec.x].setStatus( 2 );
+    }
+
+    //remove all selected plots from current horiznot
+    for( let l = 0; l < array.length; l++ )
+      for( let i = 0; i < enclave.array.horiznot.length; i++ )
+        for( let j = 0; j < enclave.array.horiznot[i].length; j++ )
+          if( enclave.array.horiznot[i][j] === array[l] ){
+            enclave.array.horiznot[i].splice( j, 1 );
+            break;
+          }
+
+    //add new plots to all horiznots
+    for( let i = 0; i < array.length; i++ )
+      this.setHorizon( enclaveIndex, array[i] );
+
+    console.log( array, enclave.array.horiznot )
+  }
+
+  addNeighbor( enclaveIndex, plotIndex ){
+    let enclave = this.array.enclave[enclaveIndex];
+    let vec = this.convertIndex( plotIndex );
+    let orientation = 0;//Math.floor( Math.random() * this.const.o );
+    let parity = ( vec.y % 2 );
+    vec.add( this.array.neighbor[parity][orientation] );
+    let addIndex = this.convertGrid( vec );
+
+    for( let i = 0; i < enclave.array.horiznot[orientation].length; i++ )
+      if ( enclave.array.horiznot[orientation][i] === addIndex )
+        enclave.array.horiznot[orientation].splice( i, 1 );
+
+    this.setHorizon( enclaveIndex, addIndex );
+    this.array.plot[vec.y][vec.x].setStatus( 2 );
   }
 
   init(){
@@ -134,11 +208,20 @@ class forgottenLand{
   }
 
   //is the Plot within the field
-  checkPlot( grid ){
+  checkBorder( grid ){
     let flag = true;
 
     if( grid.x < 0 || grid.y < 0 || grid.x > this.const.m - 1 || grid.y > this.const.n - 1 )
       flag = false;
+
+    return flag;
+  }
+
+  checkPlot( grid ){
+    let flag = this.checkBorder( grid );
+
+    if( flag )
+      flag = this.array.plot[grid.y][grid.x].var.free;
 
     return flag;
   }
@@ -150,6 +233,5 @@ class forgottenLand{
       for( let j = 0; j < this.array.plot[i].length; j++ ){
         this.array.plot[i][j].draw();
         }
-
   }
 }

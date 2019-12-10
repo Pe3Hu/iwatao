@@ -255,7 +255,8 @@ class button {
           this.array.vertex[d][4].x, this.array.vertex[d][4].y );
       }
 
-      if ( this.type > 30 && this.type < 33 ){
+      //draw lock button
+      if ( this.type == 31 ){
         let a = 0.3;
         let b = 0.4;
         let c = 0.09;
@@ -285,16 +286,14 @@ class button {
           this.center.x + cellSize * gap / 2, this.center.y + shackle + offsetY,
           this.center.x + cellSize * radius / 2, this.center.y + shackle + offsetY );
 
-        if( this.type == 31 ){
-          triangle( this.center.x - cellSize * gap / 2, this.center.y + offsetY,
-            this.center.x - cellSize * radius / 2, this.center.y + offsetY,
-            this.center.x - cellSize * radius / 2, this.center.y + shackle + offsetY );
-          triangle( this.center.x - cellSize * gap / 2, this.center.y + offsetY,
-            this.center.x - cellSize * gap / 2, this.center.y + shackle + offsetY,
-            this.center.x - cellSize * radius / 2, this.center.y + shackle + offsetY );
-        }
+        triangle( this.center.x - cellSize * gap / 2, this.center.y + offsetY,
+          this.center.x - cellSize * radius / 2, this.center.y + offsetY,
+          this.center.x - cellSize * radius / 2, this.center.y + shackle + offsetY );
+        triangle( this.center.x - cellSize * gap / 2, this.center.y + offsetY,
+          this.center.x - cellSize * gap / 2, this.center.y + shackle + offsetY,
+          this.center.x - cellSize * radius / 2, this.center.y + shackle + offsetY );
 
-        ////draw case
+        //draw case
         offsetY += shackle;
         triangle( this.center.x + cellSize * a, this.center.y + offsetY,
           this.center.x - cellSize * a, this.center.y + offsetY,
@@ -310,6 +309,17 @@ class button {
         triangle( this.center.x, this.center.y - cellSize * keyhole / 2 + offsetY,
           this.center.x - cellSize * c, this.center.y + cellSize * d + offsetY,
           this.center.x + cellSize * c, this.center.y + cellSize * d + offsetY );
+      }
+
+      //draw expand button
+      if ( this.type == 32 ){
+        noStroke();
+        fill('yellow');
+        rect(
+          this.center.x - this.const.a / 2,
+          this.center.y - this.const.a / 2,
+          this.const.a, this.const.a
+        );
       }
     }
   }

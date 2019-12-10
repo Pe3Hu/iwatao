@@ -416,10 +416,15 @@ class board {
     vec = createVector( cellSize * ( 0.5 + ( canvasGrid.x - 4 ) / 2 - 9 ), cellSize * 7 );
     this.addButton( layer, name, type, vec.copy() );
 
-
     name = 'lockModule';
     type++;
     vec = createVector( cellSize * 3, cellSize * 7 );//( canvasGrid.x - 6 )
+    this.addButton( layer, name, type, vec.copy() );
+
+    layer = 8;
+    name = 'expandHorizon';
+    type++;
+    vec = createVector( cellSize, cellSize );
     this.addButton( layer, name, type, vec.copy() );
 
     for ( let i = 0; i < this.array.button.length; i++ )
@@ -497,6 +502,11 @@ class board {
        for( let i = offsetID; i < offsetID + count; i++ )
          this.array.button[i].onScreen = true;
         break;
+      case 8:
+        //expand horiznot
+        offsetID = 59;
+        this.array.button[offsetID].onScreen = true;
+        break;
       }
   }
 
@@ -567,6 +577,10 @@ class board {
     //lock selected module
     if( buttonID == 58 )
       this.array.layer[this.var.layer].lockModule();
+
+    //expand horiznot
+    if( buttonID == 59 )
+      this.array.layer[this.var.layer].expandHorizon();
 
     this.update();
   }

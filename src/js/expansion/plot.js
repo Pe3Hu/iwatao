@@ -13,7 +13,8 @@ class plot {
     };
     this.var = {
       center: center.copy(),
-      status: 'empty'
+      status: 'empty',
+      free: true
     }
 
     this.init();
@@ -40,14 +41,18 @@ class plot {
       case 0:
         this.var.status = 'empty';
         this.var.free = true;
-        this.var.wave = null;
-        this.var.meeple = null;
         break;
-      //show occupied
+      //show capital
       case 1:
-        this.var.status = 'taken';
+        this.var.status = 'capital';
         this.var.free = false;
         break;
+      //show domain
+      case 2:
+        this.var.status = 'domain';
+        this.var.free = false;
+        break;
+
     }
   }
 
@@ -57,8 +62,11 @@ class plot {
       case 'empty':
         fill( 120, colorMax * 0.8, colorMax * 0.5 );
         break;
-      case 'taken':
-        fill( colorMax * 0.8 );
+      case 'capital':
+        fill( 45, colorMax, colorMax * 0.5 );
+        break;
+      case 'domain':
+        fill( 30, colorMax, colorMax * 0.5 );
         break;
     }
 
@@ -72,8 +80,6 @@ class plot {
      stroke( 0 );
      fill( 0 );
      this.var.txt = this.const.index;
-     if( this.var.wave != null )
-      this.var.txt += '_' + this.var.wave;
-     //text( this.var.txt, this.var.center.x, this.var.center.y + fontSize / 3 );
+     text( this.var.txt, this.var.center.x, this.var.center.y + fontSize / 3 );
   }
 }

@@ -6,12 +6,19 @@ class enclave {
       n: 6,
     };
     this.array = {
-      plot: [ capital ]
+      plot: [ capital ],
+      horiznot: [
+        [], [], [], [], [], []
+      ]
     };
     this.var = {
       capital: capital
     }
 
     this.init();
+  }
+
+  init(){
+
   }
 }
