@@ -580,7 +580,7 @@ class board {
 
     //expand horiznot
     if( buttonID == 59 )
-      this.array.layer[this.var.layer].expandHorizon();
+      this.array.layer[this.var.layer].allHorizon();
 
     this.update();
   }

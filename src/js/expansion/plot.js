@@ -14,8 +14,12 @@ class plot {
     this.var = {
       center: center.copy(),
       status: 'empty',
-      free: true
-    }
+      enclave: null,
+      free: true,
+      hue: 0,
+      saturation: 0,
+      lightness: colorMax * 0.75
+    };
 
     this.init();
   }
@@ -35,40 +39,56 @@ class plot {
     this.initVertexs();
   }
 
-  setStatus( status ){
+  setStatus( status, enclave, hue ){
     switch ( status ) {
       //show free
       case 0:
         this.var.status = 'empty';
+        this.var.enclave = null;
         this.var.free = true;
+        this.var.hue = 0;
+        this.var.saturation = 0;
+        this.var.lightness = colorMax * 0.75;
         break;
       //show capital
       case 1:
         this.var.status = 'capital';
+        this.var.enclave = enclave;
         this.var.free = false;
+        this.var.hue = hue;
+        this.var.saturation = colorMax;
+        this.var.lightness = colorMax * 0.45;
         break;
       //show domain
       case 2:
         this.var.status = 'domain';
+        this.var.enclave = enclave;
         this.var.free = false;
+        this.var.hue = ( hue + 18 + colorMax ) % colorMax;
+        this.var.saturation = colorMax;
+        this.var.lightness = colorMax * 0.55;
         break;
 
     }
   }
 
-  draw(){
+  setColor( h, s, l ){
+    this.var.hue = h;
+    this.var.saturation = s;
+    this.var.lightness = l;
+  }
+
+  draw( gap ){
     noStroke();
-    switch ( this.var.status ) {
-      case 'empty':
-        fill( 120, colorMax * 0.8, colorMax * 0.5 );
-        break;
-      case 'capital':
-        fill( 45, colorMax, colorMax * 0.5 );
-        break;
-      case 'domain':
-        fill( 30, colorMax, colorMax * 0.5 );
-        break;
-    }
+    fill( this.var.hue, this.var.saturation, this.var.lightness );
+
+    let flag = false;
+    for( let i = 0; i < gap.length; i++ )
+      if( gap[i] == this.const.index )
+        flag = true;
+
+    //if( flag )
+    //  fill( 10 );
 
     for( let i = 0; i < this.array.vertex.length; i++ ){
       let ii = ( i + 1 ) % this.array.vertex.length;

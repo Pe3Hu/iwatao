@@ -1,6 +1,6 @@
 //the basic element of land
 class enclave {
-  constructor ( index, capital ){
+  constructor ( index, capital, color ){
     this.const = {
       index: index,
       n: 6,
@@ -13,7 +13,7 @@ class enclave {
     };
     this.var = {
       capital: capital
-    }
+    };
 
     this.init();
   }

@@ -2,7 +2,7 @@
 class forgottenLand{
   constructor(){
     this.const = {
-      parties: 6,
+      enclaves: 6,
       n: 24,
       m: 24,
       k: 8,
@@ -20,7 +20,8 @@ class forgottenLand{
       neighbor: [],
       enclave: [],
       team: [],
-      plot: []
+      plot: [],
+      hue: []
     }
 
     this.init();
@@ -72,7 +73,7 @@ class forgottenLand{
                     j < this.const.m * ( this.const.k / 2 + 1 ) / this.const.k )
                     flag = false;
                 if( flag )
-                  this.array.toConstruct.push( index );  //this.array.plot[i][j].setStatus(1);
+                  this.array.toConstruct.push( index );
               }
       }
     }
@@ -84,22 +85,61 @@ class forgottenLand{
   }
 
   initEnclaves(){
-    this.addEnclave();
-    this.expandHorizon( 0 );
+    for( let i = 0; i < 6; i++ )
+      this.addEnclave();
+  }
+
+  initHues(){
+    this.array.hue = [
+      52,
+      122,
+      192,
+      262,
+      297,
+      332
+    ];
   }
 
   addEnclave(){
+    let hue = this.array.hue[this.var.enclave];
     let rand = Math.floor( Math.random() * this.array.toConstruct.length );
-    //let index = this.array.toConstruct[rand];
-    //let vec = this.convertIndex( index );
-    let vec = createVector( 5, 6 );
-    let index = this.convertGrid( vec );
-    this.array.plot[vec.y][vec.x].setStatus( 1 );
+    let index = this.array.toConstruct[rand];
+    let vec = this.convertIndex( index );
+    /*let vec = createVector( 5, 6 );
+    let index = this.convertGrid( vec );*/
+    this.array.plot[vec.y][vec.x].setStatus( 1, this.var.enclave, hue );
     this.array.enclave.push( new enclave( this.var.enclave, index ) );
-    console.log(vec.y, vec.x, index);
-    this.setHorizon( this.var.enclave, index );
 
+    console.log( this.var.enclave, 'enclave with vec:', vec.y, vec.x, 'index', index );
+
+    this.setHorizon( this.var.enclave, index );
     this.addNeighbor( this.var.enclave, index );
+
+    let e = this.array.enclave[this.var.enclave];
+    //form an exclusion zone for the new enclave
+    let gap = [];
+    for( let i = 0; i < e.array.plot.length; i++ ){
+      gap.push( e.array.plot[i] );
+
+      for( let j = 0; j < this.array.neighbor.length; j++ ){
+          vec = this.convertIndex( e.array.plot[i] );
+          let parity = ( vec.y % 2 );
+          vec.add( this.array.neighbor[parity][j] );
+          let gapIndex = this.convertGrid( vec );
+          gap.push( gapIndex );
+      }
+    }
+
+
+    //remove used plots and their neighbors from toConstruct
+    for( let i = 0; i < gap.length; i++ )
+      for( let j = 0; j < this.array.toConstruct.length; j++ )
+        if( gap[i] == this.array.toConstruct[j] ){
+          this.array.toConstruct.splice( j, 1 );
+          break;
+        }
+
+    console.log( this.array.toConstruct.length )
     this.var.enclave++;
   }
 
@@ -118,57 +158,96 @@ class forgottenLand{
     }
   }
 
-  expandHorizon(  ){
-    let enclaveIndex = 0;
-    let array = [];
+  expandHorizon( enclaveIndex ){
+    let horiznots = [];
     let enclave = this.array.enclave[enclaveIndex];
-    let orientation = Math.floor( Math.random() * this.const.o );
-    for( let i = 0; i < enclave.array.horiznot[orientation].length; i++ )
-      array.push( enclave.array.horiznot[orientation][i] )
+    let orientations = [];
+    let orientation = null;
+    let hue = this.array.hue[enclaveIndex];
+
+    for( let i = 0; i < enclave.array.horiznot.length; i++ ){
+      //kick taken plots from horiznots
+      for( let j = enclave.array.horiznot[i].length - 1; j > -1 ; j-- ){
+        let vec = this.convertIndex( enclave.array.horiznot[i][j] );
+        if( !this.array.plot[vec.y][vec.x].var.free )
+          enclave.array.horiznot[i].splice( j, 1 );
+        }
+
+      //add to options if possible
+      if( enclave.array.horiznot[i].length > 0 )
+        orientations.push( i );
+      }
+
+    //no ways to expand
+    if( orientations.length == 0 )
+      return;
+
+    let rand = Math.floor( Math.random() * orientations.length );
+    orientation = orientations[rand];
+
+    for( let i = 0; i < enclave.array.horiznot[orientation].length; i++ ){
+      let vec = this.convertIndex( enclave.array.horiznot[orientation][i] );
+      if( this.array.plot[vec.y][vec.x].var.free )
+        horiznots.push( enclave.array.horiznot[orientation][i] );
+    }
 
     //change status for plots of current horiznot
     for( let i = 0; i < enclave.array.horiznot[orientation].length; i++ ){
       let expandIndex = enclave.array.horiznot[orientation][i];
       let vec = this.convertIndex( expandIndex );
-      this.array.plot[vec.y][vec.x].setStatus( 2 );
+
+      if( this.array.plot[vec.y][vec.x].var.free ){
+        this.array.plot[vec.y][vec.x].setStatus( 2, enclaveIndex, hue );
+        enclave.array.plot.push( this.array.plot[vec.y][vec.x].const.index );
+      }
     }
 
     //remove all selected plots from current horiznot
-    for( let l = 0; l < array.length; l++ )
+    for( let l = 0; l < horiznots.length; l++ )
       for( let i = 0; i < enclave.array.horiznot.length; i++ )
         for( let j = 0; j < enclave.array.horiznot[i].length; j++ )
-          if( enclave.array.horiznot[i][j] === array[l] ){
+          if( enclave.array.horiznot[i][j] === horiznots[l] ){
             enclave.array.horiznot[i].splice( j, 1 );
             break;
           }
 
     //add new plots to all horiznots
-    for( let i = 0; i < array.length; i++ )
-      this.setHorizon( enclaveIndex, array[i] );
+    for( let i = 0; i < horiznots.length; i++ ){
+      let vec = this.convertIndex( horiznots[i] );
+      this.setHorizon( enclaveIndex, horiznots[i] );
+    }
 
-    console.log( array, enclave.array.horiznot )
+    console.log( enclaveIndex, 'move to', orientation, enclave.array.plot.length, horiznots )
+  }
+
+  allHorizon(){
+    for( let i = 0; i < this.array.enclave.length; i++ )
+      this.expandHorizon( i );
   }
 
   addNeighbor( enclaveIndex, plotIndex ){
     let enclave = this.array.enclave[enclaveIndex];
     let vec = this.convertIndex( plotIndex );
-    let orientation = 0;//Math.floor( Math.random() * this.const.o );
+    let orientation = Math.floor( Math.random() * this.const.o );
     let parity = ( vec.y % 2 );
     vec.add( this.array.neighbor[parity][orientation] );
     let addIndex = this.convertGrid( vec );
+    let hue = this.array.hue[enclaveIndex];
 
     for( let i = 0; i < enclave.array.horiznot[orientation].length; i++ )
       if ( enclave.array.horiznot[orientation][i] === addIndex )
         enclave.array.horiznot[orientation].splice( i, 1 );
 
     this.setHorizon( enclaveIndex, addIndex );
-    this.array.plot[vec.y][vec.x].setStatus( 2 );
+    this.array.plot[vec.y][vec.x].setStatus( 2, enclaveIndex, hue );
+    enclave.array.plot.push( this.array.plot[vec.y][vec.x].const.index );
   }
 
   init(){
     this.offset = createVector( cellSize * 2, cellSize * 2 )
     this.const.r = this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
 
+    this.initHues();
     this.initNeighbors();
     this.initPlots();
     this.initTeams();
@@ -228,10 +307,8 @@ class forgottenLand{
 
   draw(){
     //this.cleanPlots();
-
     for( let i = 0; i < this.array.plot.length; i++ )
-      for( let j = 0; j < this.array.plot[i].length; j++ ){
-        this.array.plot[i][j].draw();
-        }
+      for( let j = 0; j < this.array.plot[i].length; j++ )
+        this.array.plot[i][j].draw( this.array.toConstruct );
   }
 }
