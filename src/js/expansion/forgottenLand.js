@@ -21,7 +21,8 @@ class forgottenLand{
       enclave: [],
       team: [],
       plot: [],
-      hue: []
+      hue: [],
+      fib: []
     }
 
     this.init();
@@ -100,6 +101,128 @@ class forgottenLand{
     ];
   }
 
+  init(){
+    this.offset = createVector( cellSize * 2, cellSize * 2 )
+    this.const.r = this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
+
+    this.initHues();
+    this.initNeighbors();
+    this.initPlots();
+    this.initEnclaves();
+    let sum = 278;
+    this.findFib( sum );
+    this.array.fib = [ 6, 10, 16, 26, 42, 68, 110 ];
+
+    let begins = [];
+    let ends = [];
+    let begin = 0;
+    let end;
+    sum = 0;
+    for( let i = this.array.fib.length - 1; i >= 0; i-- ){
+      end = begin + this.array.fib[i] - 1;
+      begins.push( begin );
+      ends.push( end );
+      begin = end + 1;
+      sum+=this.array.fib[i];
+    }
+    console.log( begins );
+    console.log( ends );
+    //console.log( sum );
+  }
+
+  findFib( max ){
+    let results = [];
+    let begins = [];
+    let combs = [];
+    let maxSumm = 0;
+    let maxIndex = null;
+    let maxSize = null;
+    let length = 50;
+
+
+    for( let i = 0; i < 100; i+= 0.5 ){
+      begins.push( i );
+    }
+
+    for( let i = 2; i < 3; i++ ){
+      combs.push( [] );
+      for( let j = 0; j < i; j++ ){
+        combs[i - 2].push( [] );
+          for( let l = 0; l < length; l++ )
+            combs[i - 2][j].push( begins[l] );
+      }
+    }
+    console.log( combs );
+
+    for( let i = 0; i < combs.length; i++ ){
+      let totalLength = Math.pow( length, combs[i].length );
+      let counter = 1;
+
+      while( counter < totalLength ){
+        let indexs = [];
+        let numbers = [];
+        let copy = [];
+        for( let j = 0; j < combs[i].length; j++ )
+          indexs.push( null );
+
+        let temp = counter;
+        for( let j = indexs.length - 1; j >= 0; j-- ){
+          let index = temp % length;
+          indexs[j] = index;
+          temp = Math.floor( temp / length );
+        }
+
+        for( let j = 0; j < indexs.length; j++ ){
+          numbers.push( combs[i][j][indexs[j]] );
+          copy.push( combs[i][j][indexs[j]] );
+        }
+
+        let flag = true;
+        for( let j = 0; j < numbers.length; j++ )
+          if( numbers[j] > numbers[j + 1] )
+            flag = false;
+
+        if( flag ){
+          let summ = 0;
+          flag = true;
+          for( let j = 0; j < numbers.length; j++ )
+            summ += numbers[j];
+
+          while( flag ){
+            let nextNumber = 0;
+            for( let j = 0; j < numbers.length; j++ )
+              nextNumber += numbers[j];
+
+            for( let j = numbers.length - 2; j >= 0 ; j-- )
+              numbers[j] = numbers[j + 1];
+
+            numbers[numbers.length - 1] = nextNumber;
+            copy.push( nextNumber) ;
+            summ += nextNumber;
+            if( summ > max ){
+              flag = false;
+              summ -= nextNumber;
+              copy.pop();
+              }
+            }
+
+            if( summ > maxSumm ){
+              maxSumm = summ;
+              maxSize = numbers.length;
+              maxIndex = counter;
+            }
+
+            if( summ == max )
+              results.push( copy );
+        }
+
+        counter++;
+      }
+    }
+    console.log( results )
+    return results;
+  }
+
   addEnclave(){
     let hue = this.array.hue[this.var.enclave];
     let rand = Math.floor( Math.random() * this.array.toConstruct.length );
@@ -116,30 +239,51 @@ class forgottenLand{
     this.addNeighbor( this.var.enclave, index );
 
     let e = this.array.enclave[this.var.enclave];
-    //form an exclusion zone for the new enclave
-    let gap = [];
+    //form first exclusion zone for the new enclave
+    let firstGap = [];
     for( let i = 0; i < e.array.plot.length; i++ ){
-      gap.push( e.array.plot[i] );
+      firstGap.push( e.array.plot[i] );
+      vec = this.convertIndex( e.array.plot[i] );
+      let parity = ( vec.y % 2 );
 
-      for( let j = 0; j < this.array.neighbor.length; j++ ){
-          vec = this.convertIndex( e.array.plot[i] );
-          let parity = ( vec.y % 2 );
-          vec.add( this.array.neighbor[parity][j] );
-          let gapIndex = this.convertGrid( vec );
-          gap.push( gapIndex );
+      for( let j = 0; j < this.array.neighbor[parity].length; j++ ){
+          let copy = vec.copy();
+          copy.add( this.array.neighbor[parity][j] );
+          let gapIndex = this.convertGrid( copy );
+          firstGap.push( gapIndex );
       }
     }
 
+    //expansion of the exclusion zone
+    let secondGap = [];
+    for( let i = 0; i < firstGap.length; i++ ){
+      vec = this.convertIndex( firstGap[i] );
+      let parity = ( vec.y % 2 );
+
+      for( let j = 0; j < this.array.neighbor[parity].length; j++ ){
+          let copy = vec.copy();
+          copy.add( this.array.neighbor[parity][j] );
+          let gapIndex = this.convertGrid( copy );
+          secondGap.push( gapIndex );
+      }
+    }
 
     //remove used plots and their neighbors from toConstruct
-    for( let i = 0; i < gap.length; i++ )
+    for( let i = 0; i < firstGap.length; i++ )
       for( let j = 0; j < this.array.toConstruct.length; j++ )
-        if( gap[i] == this.array.toConstruct[j] ){
+        if( firstGap[i] == this.array.toConstruct[j] ){
           this.array.toConstruct.splice( j, 1 );
           break;
         }
 
-    console.log( this.array.toConstruct.length )
+      //remove used plots and their neighbors from toConstruct
+      for( let i = 0; i < secondGap.length; i++ )
+        for( let j = 0; j < this.array.toConstruct.length; j++ )
+          if( secondGap[i] == this.array.toConstruct[j] ){
+            this.array.toConstruct.splice( j, 1 );
+            break;
+          }
+
     this.var.enclave++;
   }
 
@@ -179,8 +323,10 @@ class forgottenLand{
       }
 
     //no ways to expand
-    if( orientations.length == 0 )
+    if( orientations.length == 0 ){
+      console.log( enclaveIndex, enclave.array.plot.length );
       return;
+    }
 
     let rand = Math.floor( Math.random() * orientations.length );
     orientation = orientations[rand];
@@ -217,7 +363,7 @@ class forgottenLand{
       this.setHorizon( enclaveIndex, horiznots[i] );
     }
 
-    console.log( enclaveIndex, 'move to', orientation, enclave.array.plot.length, horiznots )
+    //console.log( enclaveIndex, 'move to', orientation, enclave.array.plot.length, horiznots )
   }
 
   allHorizon(){
@@ -243,29 +389,10 @@ class forgottenLand{
     enclave.array.plot.push( this.array.plot[vec.y][vec.x].const.index );
   }
 
-  init(){
-    this.offset = createVector( cellSize * 2, cellSize * 2 )
-    this.const.r = this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
-
-    this.initHues();
-    this.initNeighbors();
-    this.initPlots();
-    this.initTeams();
-    this.initEnclaves();
-  }
-
   cleanPlots(){
     for( let i = 0; i < this.array.plot.length; i++ )
       for( let j = 0; j < this.array.plot[i].length; j++ )
           this.array.plot[i][j].setStatus( 0 );
-  }
-
-  addTeam( team ){
-    if( team >= this.array.team.length )
-      this.array.team.push( [] );
-    if( team > this.array.team.length - 1)
-      team = this.array.team.length  - 1;
-    return team;
   }
 
   //find the grid coordinates by index

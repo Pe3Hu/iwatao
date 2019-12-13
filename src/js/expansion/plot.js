@@ -82,13 +82,15 @@ class plot {
     noStroke();
     fill( this.var.hue, this.var.saturation, this.var.lightness );
 
+    /*
     let flag = false;
     for( let i = 0; i < gap.length; i++ )
       if( gap[i] == this.const.index )
         flag = true;
 
-    //if( flag )
-    //  fill( 10 );
+    if( flag )
+      fill( 350 );
+    */
 
     for( let i = 0; i < this.array.vertex.length; i++ ){
       let ii = ( i + 1 ) % this.array.vertex.length;
