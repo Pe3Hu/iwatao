@@ -19,9 +19,7 @@ class greenHouse {
       mode: 'growth'
     }
 
-    this.initDots();
-
-    this.initPlants();
+    //this.init();
   }
 
   switchMode(){
@@ -56,6 +54,11 @@ class greenHouse {
     this.array.id.splice( this.var.firstShift, 1 );
 
     this.updatePlants( 0, 0 );
+  }
+
+  init(){
+    this.initDots();
+    this.initPlants();
   }
 
   cleanPlants(){

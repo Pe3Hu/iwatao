@@ -11,7 +11,7 @@ class gamingHouse {
 
     }
 
-    this.init();
+    //this.init();
   }
 
   init(){

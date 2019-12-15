@@ -27,7 +27,7 @@ class battleGround{
     this.offset = createVector( cellSize * 2, cellSize * 2 )
     this.const.r = this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
 
-    this.init();
+    //this.init();
   }
 
   initCells(){

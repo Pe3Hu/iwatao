@@ -429,6 +429,12 @@ class board {
     vec = createVector( cellSize, cellSize );
     this.addButton( layer, name, type, vec.copy() );
 
+    layer = 9;
+    name = 'lockAfflatus';
+    type++;
+    vec = createVector( cellSize * 14, cellSize * 1.5 );
+    this.addButton( layer, name, type, vec.copy() );
+
     for ( let i = 0; i < this.array.button.length; i++ )
       if( this.array.button[i].layer == 99 )
         this.array.button[i].onScreen = true;
@@ -509,6 +515,11 @@ class board {
         offsetID = 59;
         this.array.button[offsetID].onScreen = true;
         break;
+      case 9:
+        //lock afflatus
+        offsetID = 60;
+        this.array.button[offsetID].onScreen = true;
+        break;
       }
   }
 
@@ -583,6 +594,10 @@ class board {
     //expand horiznot
     if( buttonID == 59 )
       this.array.layer[this.var.layer].allHorizon();
+
+    //lock afflatus
+    if( buttonID == 60 )
+      this.array.layer[this.var.layer].lockAfflatus();
 
     this.update();
   }

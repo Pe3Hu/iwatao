@@ -27,6 +27,10 @@ class matrialArt{
     this.var.adherent++;
   }
 
+  lockAfflatus(){
+    this.array.adherent[this.var.chosen].lockAfflatus();
+  }
+
   draw(){
     //for( let i = 0; i < this.array.adherent.length; i++ )
     this.array.adherent[this.var.chosen].draw();

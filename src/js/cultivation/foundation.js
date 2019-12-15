@@ -20,7 +20,6 @@ class foundation{
     this.initGrades();
     this.initDroplets();
     this.initFulcrums();
-    console.log( this.const.n / 2 * this.const.a )
   }
 
   initGrades(){
@@ -55,7 +54,7 @@ class foundation{
           i * this.const.a );
         this.array.fulcrum[i].push( new fulcrum( index, center ) );
         if( i == this.const.n )
-          this.array.fulcrum[i][j].setStatus( 1 );
+          this.array.fulcrum[i][j].setStatus( 2 );
       }
     }
 
@@ -66,7 +65,7 @@ class foundation{
       ( this.const.n + 1 ) * this.const.a,
        this.const.n * this.const.a );
     this.array.fulcrum[this.array.fulcrum.length - 1].push( new fulcrum( this.const.showcase, center ) );
-    this.array.fulcrum[this.array.fulcrum.length - 1][0].setStatus( 2 );
+    this.array.fulcrum[this.array.fulcrum.length - 1][0].setStatus( 1 );
   }
 
   initDroplets(){
@@ -175,7 +174,71 @@ class foundation{
     return results;
   }
 
+  updateFulcrum(){
+    /*for( let i = 0; i < this.const.n + 1; i++ )
+      for( let j = 0; j < this.const.n + 1; j++ )*/
+  }
+
+  checkBorder( grid ){
+    let flag = true;
+
+    if( grid.x < 0 || grid.y < 0 || grid.x > this.const.n || grid.y > this.const.n )
+      flag = false;
+
+    return flag;
+  }
+
+  introduceAfflatus( afflatus, fulcrum ){
+    let small = afflatus.var.small / afflatus.const.a;
+    let big = afflatus.var.big / afflatus.const.a;
+    let width = null;
+
+    switch ( afflatus.var.turn ) {
+      case 0:
+        if( afflatus.var.clockwise )
+          width = small;
+        else
+          width = big;
+        break;
+      case 3:
+        if( afflatus.var.clockwise )
+          width = -big;
+        else
+          width = -small;
+        break;
+    };
+
+    let begin = afflatus.convertIndex( fulcrum );
+    let end = begin.copy();
+    end.x += width;
+
+    if( width < 0 ){
+      let temp = begin.copy();
+      begin = end.copy();
+      end = temp.copy();
+    }
+
+    for( let j = begin.x + 1; j <= end.x - 1; j++ )
+      this.array.fulcrum[begin.y][j].setStatus( 0 );
+
+    this.array.fulcrum[begin.y][begin.x].setStatus( 3 );
+    this.array.fulcrum[begin.y][end.x].setStatus( 3 );
+
+
+
+    //console.log(this.array.fulcrum[begin.y][end.x].const.indee)
+
+    console.log( fulcrum, width, this.array.fulcrum[begin.y][begin.x].const.index, this.array.fulcrum[begin.y][end.x].const.index )
+    //this.updateFulcrum();
+  }
+
   draw( offset ){
+    fill( colorMax * 3 / 4 );
+    //central background
+    rect(
+      offset.x + this.const.n / 4 * this.const.a, offset.y,
+      this.const.n * this.const.a / 2, this.const.n * this.const.a );
+
     for( let i = 0; i < this.array.droplet.length; i++ )
       for( let j = 0; j < this.array.droplet[i].length; j++ )
        this.array.droplet[i][j].draw( offset );

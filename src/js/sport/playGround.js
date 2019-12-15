@@ -13,7 +13,7 @@ class playGround{
 
     }
 
-    this.init();
+    //this.init();
   }
 
   init(){

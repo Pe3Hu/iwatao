@@ -21,7 +21,7 @@ class whirlPool {
       center: createVector()
     }
 
-    this.init();
+    //this.init();
 
     //this.rotateGears();
   }

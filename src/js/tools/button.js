@@ -320,6 +320,18 @@ class button {
           this.center.y - this.const.a / 2,
           this.const.a, this.const.a
         );
+
+      }
+
+      //draw afflatus lock button
+      if ( this.type == 33 ){
+        noStroke();
+        fill('red');
+        rect(
+          this.center.x - this.const.a / 2,
+          this.center.y - this.const.a / 2,
+          this.const.a / 2, this.const.a / 2
+        );
       }
     }
   }

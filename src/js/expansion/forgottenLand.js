@@ -25,7 +25,7 @@ class forgottenLand{
       fib: []
     }
 
-    this.init();
+    //this.init();
   }
 
   initNeighbors(){
