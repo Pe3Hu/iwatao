@@ -798,9 +798,9 @@ class board {
     //draw buttons
     for( let i = 0; i < this.array.button.length; i++ )
       this.array.button[i].draw( this.var.layer );
-
+/*
     //draw grid
-    /*if( this.var.layer != 5 ){
+    if( this.var.layer != 5 ){
       for( let i = 0; i < this.const.grid.x; i++ )
         for( let j = 0; j < this.const.grid.x; j++ ){
           let x = i * cellSize;

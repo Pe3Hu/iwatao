@@ -3,13 +3,14 @@ class foundation{
   constructor(){
     this.const = {
       n: 24,
-      a: cellSize * 2 / 3,
-      offset: createVector( cellSize * 1, cellSize * 1 )
+      a: cellSize * 1 / 2,
+      showcase: null
     };
     this.var = {
     };
     this.array = {
-      droplet: []
+      droplet: [],
+      fulcrum: []
     };
 
     this.init();
@@ -18,6 +19,8 @@ class foundation{
   init(){
     this.initGrades();
     this.initDroplets();
+    this.initFulcrums();
+    console.log( this.const.n / 2 * this.const.a )
   }
 
   initGrades(){
@@ -42,15 +45,38 @@ class foundation{
     //console.log( sum );
   }
 
+  initFulcrums(){
+    for( let i = 0; i < this.const.n + 1; i++ ){
+      this.array.fulcrum.push( [] );
+      for( let j = 0; j < this.const.n + 1; j++ ){
+        let index = i * this.const.n + j + i;
+        let center = createVector(
+          j * this.const.a,
+          i * this.const.a );
+        this.array.fulcrum[i].push( new fulcrum( index, center ) );
+        if( i == this.const.n )
+          this.array.fulcrum[i][j].setStatus( 1 );
+      }
+    }
+
+    //add showcase fulcrum
+    this.array.fulcrum.push( [] );
+    this.const.showcase = ( this.const.n + 1 ) * ( this.const.n + 1 );
+    let center = createVector(
+      ( this.const.n + 1 ) * this.const.a,
+       this.const.n * this.const.a );
+    this.array.fulcrum[this.array.fulcrum.length - 1].push( new fulcrum( this.const.showcase, center ) );
+    this.array.fulcrum[this.array.fulcrum.length - 1][0].setStatus( 2 );
+  }
+
   initDroplets(){
     for( let i = 0; i < this.const.n; i++ ){
       this.array.droplet.push( [] );
       for( let j = 0; j < this.const.n; j++ ){
         let index = i * this.const.n + j;
         let center = createVector(
-          this.const.offset.x + j * this.const.a,
-          this.const.offset.y + i * this.const.a,
-        );
+          ( j + 0.5 ) * this.const.a,
+          ( i + 0.5 ) * this.const.a );
         this.array.droplet[i].push( new droplet( index, this.const.a, center ) );
       }
     }
@@ -149,11 +175,13 @@ class foundation{
     return results;
   }
 
-  add
-
-  draw(){
+  draw( offset ){
     for( let i = 0; i < this.array.droplet.length; i++ )
       for( let j = 0; j < this.array.droplet[i].length; j++ )
-       this.array.droplet[i][j].draw( this.const.offset );
+       this.array.droplet[i][j].draw( offset );
+
+     for( let i = 0; i < this.array.fulcrum.length; i++ )
+       for( let j = 0; j < this.array.fulcrum[i].length; j++ )
+        this.array.fulcrum[i][j].draw( offset );
   }
 }
