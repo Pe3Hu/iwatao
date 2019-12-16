@@ -90,7 +90,6 @@ class foundation{
     let maxSize = null;
     let length = 50;
 
-
     for( let i = 0; i < 10; i+= 0.5 ){
       begins.push( i );
     }
@@ -224,10 +223,7 @@ class foundation{
     this.array.fulcrum[begin.y][begin.x].setStatus( 3 );
     this.array.fulcrum[begin.y][end.x].setStatus( 3 );
 
-
-
     //console.log(this.array.fulcrum[begin.y][end.x].const.indee)
-
     console.log( fulcrum, width, this.array.fulcrum[begin.y][begin.x].const.index, this.array.fulcrum[begin.y][end.x].const.index )
     //this.updateFulcrum();
   }
