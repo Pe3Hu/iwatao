@@ -53,8 +53,13 @@ class foundation{
           j * this.const.a,
           i * this.const.a );
         this.array.fulcrum[i].push( new fulcrum( index, center ) );
-        if( i == this.const.n )
+        if( i == this.const.n ){
           this.array.fulcrum[i][j].setStatus( 2 );
+          if( j == 0 )
+            this.array.fulcrum[i][j].updateParts( 0 );
+          if( j == this.const.n )
+            this.array.fulcrum[i][j].updateParts( 1 );
+        }
       }
     }
 
@@ -220,11 +225,20 @@ class foundation{
     for( let j = begin.x + 1; j <= end.x - 1; j++ )
       this.array.fulcrum[begin.y][j].setStatus( 0 );
 
-    this.array.fulcrum[begin.y][begin.x].setStatus( 3 );
-    this.array.fulcrum[begin.y][end.x].setStatus( 3 );
+    switch ( afflatus.var.turn ) {
+      case 0:
+        this.array.fulcrum[begin.y][begin.x].updateParts( 0 );
+        this.array.fulcrum[begin.y][end.x].updateParts( 3 );
+      case 3:
+        this.array.fulcrum[begin.y][begin.x].updateParts( 2 );
+        this.array.fulcrum[begin.y][end.x].updateParts( 1 );
+        break;
+    };
 
     //console.log(this.array.fulcrum[begin.y][end.x].const.indee)
-    console.log( fulcrum, width, this.array.fulcrum[begin.y][begin.x].const.index, this.array.fulcrum[begin.y][end.x].const.index )
+    console.log( 'i', fulcrum, 'w', width,
+                'b', this.array.fulcrum[begin.y][begin.x].const.index, 
+                'e', this.array.fulcrum[begin.y][end.x].const.index )
     //this.updateFulcrum();
   }
 

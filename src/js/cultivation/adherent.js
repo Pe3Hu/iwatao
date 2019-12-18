@@ -36,19 +36,33 @@ class adherent{
   }
 
   getAvailableFulcrums(){
-    this.array.fulcrum = [ [], [], [] ];
+    this.array.fulcrum = [ [], [], [], [] ];
     let array = this.data.foundation.array.fulcrum;
 
     for( let i = 0; i < array.length; i++ )
       for( let j = 0; j < array[i].length; j++ )
-        if( array[i][j].var.available )
-            if ( !array[i][j].var.woCouple )
+        if( array[i][j].var.available ){
+          switch ( array[i][j].var.kind ) {
+            case 0:
               this.array.fulcrum[0].push( array[i][j].const.index );
-            else if ( !array[i][j].var.woSupport  )
-                  this.array.fulcrum[1].push( array[i][j].const.index );
-                else
-                  this.array.fulcrum[2].push( array[i][j].const.index );
-
+              this.array.fulcrum[1].push( array[i][j].const.index );
+              break;
+            case 1:
+            case 2:
+              this.array.fulcrum[0].push( array[i][j].const.index );
+              break;
+            case 3:
+            case 4:
+              this.array.fulcrum[1].push( array[i][j].const.index );
+              break;
+            case 5:
+              this.array.fulcrum[2].push( array[i][j].const.index );
+              break;
+            case 6:
+              this.array.fulcrum[3].push( array[i][j].const.index );
+              break;
+          }
+        }
   }
 
   //set the possible parameters for new afflatus
@@ -128,19 +142,59 @@ class adherent{
 
         let flag = true;
         for( let j = begin.x + 1; j <= end.x - 1; j++ )
-          if( !this.data.foundation.array.fulcrum[begin.y][j].var.available )
+          if( this.data.foundation.array.fulcrum[begin.y][j].var.kind != 0 )
             flag = false;
 
         //check begin and end
-        if( !this.data.foundation.array.fulcrum[begin.y][begin.x].var.woSupport ||
-            !this.data.foundation.array.fulcrum[end.y][end.x].var.woSupport )
-          flag = false;
+        //crossing check
+        switch ( afflatus.var.turn ) {
+          case 0:
+            switch ( this.data.foundation.array.fulcrum[begin.y][begin.x].var.kind ) {
+              case 3:
+              case 4:
+              case 5:
+              case 6:
+              case 7:
+                flag = false;
+              break;
+            }
+            switch ( this.data.foundation.array.fulcrum[end.y][end.x].var.kind ) {
+              case 1:
+              case 2:
+              case 5:
+              case 6:
+              case 7:
+                flag = false;
+              break;
+            }
+            break;
+          case 3:
+            switch ( this.data.foundation.array.fulcrum[begin.y][begin.x].var.kind ) {
+              case 3:
+              case 4:
+              case 5:
+              case 6:
+              case 7:
+                flag = false;
+              break;
+            }
+            switch ( this.data.foundation.array.fulcrum[end.y][end.x].var.kind ) {
+              case 1:
+              case 2:
+              case 5:
+              case 6:
+              case 7:
+                flag = false;
+              break;
+            }
+            break;
+        };
 
         if( flag )
           options.push( this.array.fulcrum[0][i] )
       }
     }
-
+    console.log( options )
     return options;
   }
 

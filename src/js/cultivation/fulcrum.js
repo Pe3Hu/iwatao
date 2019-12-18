@@ -10,7 +10,8 @@ class fulcrum{
       woSupport: null,
       woCouple: null,
       center: center,
-      color: 'red'
+      color: 'red',
+      kind: 0
     };
     this.array = {
       eighthPart: [ 0, 1, 6, 7 ]
@@ -74,7 +75,6 @@ class fulcrum{
       case 1:
         kick = [ 6, 7 ];
         break;
-        break;
       case 2:
         kick = [ 1 ];
         break;
@@ -99,33 +99,58 @@ class fulcrum{
     if( this.array.eighthPart.length == 0 )
       this.var.available = false;
 
-    this.updateColor();
+    this.updateKind();
   }
 
-  updateColor(){
-    switch ( this.array.eighthPart ) {
-      case [ 0, 1, 6, 7 ]:
+  updateKind(){
+    let type = 0;
+    for( let i = 0; i < this.array.eighthPart.length; i++ )
+      switch ( this.array.eighthPart[i] ) {
+        case 0:
+          type += 1000;
+          break;
+        case 1:
+          type += 100;
+          break;
+        case 6:
+          type += 10;
+          break;
+        case 7:
+          type += 1;
+          break;
+      }
+
+    switch ( type ) {
+      case 1111:
+        this.var.kind = 0;
         this.var.color = color( 240, colorMax, colorMax * 0.5 );
         break;
-      case [ 0, 6, 7 ]:
+      case 1011:
+        this.var.kind = 3;
         this.var.color = color( 270, colorMax, colorMax * 0.5 );
         break;
-      case [ 0, 1, 7 ]:
+      case 1101:
+        this.var.kind = 1;
         this.var.color = color( 210, colorMax, colorMax * 0.5 );
         break;
-      case [ 6, 7 ]:
+      case 11:
+        this.var.kind = 4;
         this.var.color = color( 300, colorMax, colorMax * 0.5 );
         break;
-      case [ 0, 1, ]:
+      case 1100:
+        this.var.kind = 2;
         this.var.color = color( 180, colorMax, colorMax * 0.5 );
         break;
-      case [ 7 ]:
+      case 1:
+        this.var.kind = 6;
         this.var.color = color( 330, colorMax, colorMax * 0.5 );
         break;
-      case [ 0 ]:
+      case 1000:
+        this.var.kind = 5;
         this.var.color = color( 120, colorMax, colorMax * 0.5 );
         break;
-      case []:
+      case 0:
+        this.var.kind = 7;
         this.var.color = color( 0, colorMax, colorMax * 0.5 );
         break;
     }

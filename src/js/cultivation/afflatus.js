@@ -10,6 +10,7 @@ class afflatus{
       clockwise: clockwise,
       big: base * ratio * a,
       fulcrum: null,
+      color: null,
       ratio: ratio,
       small: base * a,
       turn: turn
@@ -82,16 +83,19 @@ class afflatus{
       case 0:
         this.var.status = 'await';
         this.var.fulcrum = null;
+        this.var.color = color( 'red' );
         break;
       //show as showcase
       case 1:
         this.var.status = 'showcase';
         this.var.fulcrum = fulcrum;
+        this.var.color = color( 'green' );
         break;
       //show as part of the foundation
       case 2:
         this.var.status = 'selected';
         this.var.fulcrum = fulcrum;
+        this.var.color = color( 'yellow' );
         break;
     }
   }
@@ -143,7 +147,7 @@ class afflatus{
         let balance = this.balanceOffset();
         fulcrum.add( balance );
       }
-
+      stroke( this.var.color )
       triangle( offset.x + fulcrum.x + this.array.vertex[0].x, offset.y + fulcrum.y + this.array.vertex[0].y,
                 offset.x + fulcrum.x + this.array.vertex[1].x, offset.y + fulcrum.y + this.array.vertex[1].y,
                 offset.x + fulcrum.x + this.array.vertex[2].x, offset.y + fulcrum.y + this.array.vertex[2].y );
