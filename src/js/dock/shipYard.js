@@ -23,7 +23,7 @@ class shipYard{
       mode: 0
     };
 
-    //this.init();
+    this.init();
   }
 
   initDots(){

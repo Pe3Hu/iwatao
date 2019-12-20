@@ -64,7 +64,7 @@ class board {
     let layer = 99;
     let name = 'layerMenu';
     let offset = createVector( cellSize * ( canvasGrid.x - 2.5 ), cellSize * 0.5 );
-    let size = createVector( cellSize * 2, cellSize * 10 );
+    let size = createVector( cellSize * 2, cellSize * 21 );
     this.addBorder( layer, name, offset, size );
 
     layer = 0;
@@ -255,13 +255,44 @@ class board {
     vec.y += cellSize;
     this.addButton( layer, name, type, vec.copy() );
 
+    //10
+    name = '';
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+    type++;
+    vec.y += cellSize;
+    this.addButton( layer, name, type, vec.copy() );
+
     layer = 0;
     vec = createVector( cellSize * ( craftView / 2 - 3.5 ), cellSize * 12 );
 
     //set the row / column shift buttons
     for ( let i = 0; i < this.const.edge.x; i++ ){
       name = 'shift';
-      type = i + 10;
+      type = i + 20;
       let borderVec = createVector();
       let stepVec = createVector();
 
@@ -448,7 +479,7 @@ class board {
   }
 
   cleanButtons(){
-    for ( let i = 10; i < this.array.button.length; i++ )
+    for ( let i = 20; i < this.array.button.length; i++ )
         this.array.button[i].onScreen = false;
   }
 
@@ -461,18 +492,18 @@ class board {
     switch ( this.var.layer ) {
       case 0:
         //edit mode button
-        offsetID = 44;
+        offsetID = 54;
         this.array.button[offsetID].onScreen = true;
 
         switch ( this.array.layer[this.var.layer].var.mode ) {
           case 'solo':
-            offsetID = 10;
+            offsetID = 20;
             count = 24;
             //change visiable status for shift buttons
             for( let i = offsetID; i < offsetID + count; i++ )
               this.detectShift( i );
 
-            offsetID = 38;
+            offsetID = 48;
             count = 2;
             //change visiable status for scroll buttons
             for( let i = offsetID; i < offsetID + count; i++ )
@@ -480,13 +511,13 @@ class board {
 
             break;
           case 'duo':
-            offsetID = 34;
+            offsetID = 44;
             count = 4;
             //change visiable status for rotate buttons
             for( let i = offsetID; i < offsetID + count; i++ )
               this.array.button[i].onScreen = true;
 
-            offsetID = 40;
+            offsetID = 50;
             count = 4;
             //change visiable status for scroll buttons
             for( let i = offsetID; i < offsetID + count; i++ )
@@ -495,29 +526,29 @@ class board {
           break;
       case 1:
         //edit mode button
-        offsetID = 45;
+        offsetID = 55;
         this.array.button[offsetID].onScreen = true;
         break;
       case 2:
         //bandit spin button
-        offsetID = 46;
+        offsetID = 56;
         this.array.button[offsetID].onScreen = true;
         break;
       case 5:
         //module edit buttons
-        offsetID = 47;
+        offsetID = 57;
         count = 12;
        for( let i = offsetID; i < offsetID + count; i++ )
          this.array.button[i].onScreen = true;
         break;
       case 8:
         //expand horiznot
-        offsetID = 59;
+        offsetID = 69;
         this.array.button[offsetID].onScreen = true;
         break;
       case 9:
         //lock afflatus
-        offsetID = 60;
+        offsetID = 70;
         this.array.button[offsetID].onScreen = true;
         break;
       }
@@ -544,59 +575,59 @@ class board {
         return;
 
     //change board layer
-    if( buttonID >= 0 && buttonID < 10 )
+    if( buttonID >= 0 && buttonID < 20 )
       this.switchLayer( buttonID );
 
     //checking the ability to move the row and column
-    if( buttonID >= 10 && buttonID < 34 )
+    if( buttonID >= 20 && buttonID < 44 )
       this.shift( buttonID );
 
     //rotate tptpts
-    if( buttonID >= 34 && buttonID < 38 )
+    if( buttonID >= 44 && buttonID < 48 )
       this.rotateTptpt( buttonID );
 
     //scroll tptpts
-    if( buttonID >= 38 && buttonID < 44 )
+    if( buttonID >= 48 && buttonID < 54 )
       this.scroll( buttonID, 0 );
 
     //change edit mode
-    if( buttonID >= 44 && buttonID < 46 )
+    if( buttonID >= 54 && buttonID < 56 )
       this.array.layer[this.var.layer].switchMode();
 
 
-    if( buttonID == 46 )
+    if( buttonID == 56 )
       this.array.layer[this.var.layer].bandit.spin();
 
     //change modules mode
-    if( buttonID >= 47 && buttonID < 51 )
+    if( buttonID >= 57 && buttonID < 61 )
         this.array.layer[this.var.layer].switchMode( buttonID );
 
     //scroll module
-    if( buttonID >= 51 && buttonID < 53 )
+    if( buttonID >= 61 && buttonID < 63 )
       this.scroll( buttonID, 1 );
 
     //generate new module
-    if( buttonID == 53 )
+    if( buttonID == 63 )
       this.array.layer[this.var.layer].addModule();
 
     //rotate edited module
-    if( buttonID >= 54 && buttonID < 56 )
+    if( buttonID >= 64 && buttonID < 66 )
       this.array.layer[this.var.layer].rotateModule( buttonID );
 
     //scroll joint
-    if( buttonID >= 56 && buttonID < 58 )
+    if( buttonID >= 66 && buttonID < 68 )
       this.array.layer[this.var.layer].shiftJoint( ( buttonID - 56.5 ) * 2 );
 
     //lock selected module
-    if( buttonID == 58 )
+    if( buttonID == 68 )
       this.array.layer[this.var.layer].lockModule();
 
     //expand horiznot
-    if( buttonID == 59 )
+    if( buttonID == 69 )
       this.array.layer[this.var.layer].allHorizon();
 
     //lock afflatus
-    if( buttonID == 60 )
+    if( buttonID == 70 )
       this.array.layer[this.var.layer].lockAfflatus();
 
     this.update();
@@ -622,8 +653,9 @@ class board {
   }
 
   detectShift( buttonID ){
-    let j = Math.floor( ( buttonID - 10 ) / this.const.edge.y );
-    let i = ( buttonID - 10 ) % this.const.edge.y;
+    let layersButtons = 20;
+    let j = Math.floor( ( buttonID - layersButtons ) / this.const.edge.y );
+    let i = ( buttonID - layersButtons ) % this.const.edge.y;
     let x = null;
     let y = null;
     let editedID = this.array.layer[this.var.layer].var.firstShift;
@@ -670,8 +702,9 @@ class board {
   }
 
   shift( buttonID ){
-    let type = Math.floor( ( buttonID - 10 ) / this.const.edge.y );
-    let num = ( buttonID - 10 ) % this.const.edge.y + 1;
+    let layersButtons = 20;
+    let type = Math.floor( ( buttonID - layersButtons ) / this.const.edge.y );
+    let num = ( buttonID - layersButtons ) % this.const.edge.y + 1;
     let editedID = this.array.layer[this.var.layer].var.firstShift;
     let editedTptpt = this.array.layer[this.var.layer].array.tptpt[editedID];
 
@@ -717,12 +750,12 @@ class board {
     let x;
     let y;
     switch ( buttonID ) {
-      case 34:
-      case 35:
+      case 44:
+      case 45:
         index = this.array.layer[this.var.layer].var.firstShift;
         break;
-      case 36:
-      case 37:
+      case 46:
+      case 47:
         index = this.array.layer[this.var.layer].var.secondShift;
         break;
     }
@@ -779,7 +812,7 @@ class board {
 
   scroll( buttonID, type ){
     let step = null;
-    let target = Math.floor( ( buttonID - 38 ) / 2 );
+    let target = Math.floor( ( buttonID - 48 ) / 2 );
 
     switch ( type ) {
       case 0:

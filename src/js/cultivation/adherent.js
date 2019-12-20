@@ -140,7 +140,7 @@ class adherent{
           end = temp.copy();
         }
 
-        let flag = true;
+        let flag = this.data.foundation.array.fulcrum[begin.y][begin.x].var.available;
         for( let j = begin.x + 1; j <= end.x - 1; j++ )
           if( this.data.foundation.array.fulcrum[begin.y][j].var.kind != 0 )
             flag = false;
@@ -194,7 +194,7 @@ class adherent{
           options.push( this.array.fulcrum[0][i] )
       }
     }
-    console.log( options )
+    console.log( 'o',options )
     return options;
   }
 
@@ -205,14 +205,15 @@ class adherent{
     switch ( type ) {
       //no requirements
       case 'standart':
-        afflatus.alignСenterOfGravity();
+        //afflatus.alignСenterOfGravity();
 
         let options = this.enumerationOfOptions();
         if( options.length > 0 ){
           let rand = Math.floor( options.length * Math.random() );
           let fulcrum = options[rand];
-
+          console.log('rand', fulcrum)
           this.data.foundation.introduceAfflatus( afflatus, fulcrum );
+
           afflatus.setStatus( 2, fulcrum );
         }
         break;

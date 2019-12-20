@@ -19,7 +19,7 @@ class greenHouse {
       mode: 'growth'
     }
 
-    //this.init();
+    this.init();
   }
 
   switchMode(){

@@ -18,7 +18,7 @@ class jewelryHouse {
     };
     this.offset = createVector();
 
-    //this.init();
+    this.init();
   }
 
   switchMode(){

@@ -83,6 +83,7 @@ class fulcrum{
         break;
       case 4:
         kick = [ 0 ];
+        break;
       case 5:
         kick = [ 7 ];
         break;
@@ -139,19 +140,19 @@ class fulcrum{
         break;
       case 1100:
         this.var.kind = 2;
-        this.var.color = color( 180, colorMax, colorMax * 0.5 );
+        this.var.color = color( 120, colorMax, colorMax * 0.5 );
         break;
       case 1:
         this.var.kind = 6;
-        this.var.color = color( 330, colorMax, colorMax * 0.5 );
+        this.var.color = color( 30, colorMax, colorMax * 0.5 );
         break;
       case 1000:
         this.var.kind = 5;
-        this.var.color = color( 120, colorMax, colorMax * 0.5 );
+        this.var.color = color( 60, colorMax, colorMax * 0.5 );
         break;
       case 0:
         this.var.kind = 7;
-        this.var.color = color( 0, colorMax, colorMax * 0.5 );
+        this.var.color = color( 0, colorMax, 0 );
         break;
     }
   }

@@ -44,7 +44,7 @@ class button {
       let d = null;
 
       //draw layer change buttons
-      if ( this.type > -1 && this.type < 9 ){
+      if ( this.type > -1 && this.type < 19 ){
         noStroke();
         switch ( this.type ) {
           case 0:
@@ -74,6 +74,21 @@ class button {
           case 8:
             fill( 180, colorMax, colorMax * 0.5 );
             break;
+          case 9:
+            fill( 0, colorMax, colorMax * 0.5 );
+            break;
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+          case 14:
+          case 15:
+          case 16:
+          case 17:
+          case 18:
+          case 19:
+            fill( 0, colorMax, colorMax * 0 );
+            break;
         }
         rect(
           this.center.x - this.const.a / 2,
@@ -83,12 +98,12 @@ class button {
       }
 
       //draw shift buttons
-      if ( this.type > 9 && this.type < 14 ){
+      if ( this.type > 19 && this.type < 24 ){
         noStroke();
         fill( this.color );
         ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
 
-        d = ( this.type - 10 ) * 2;
+        d = ( this.type - 20 ) * 2;
 
         fill( 'red' );
         triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
@@ -103,12 +118,12 @@ class button {
       }
 
       //draw rotate buttons
-      if ( this.type > 13 && this.type < 16 ){
+      if ( this.type > 23 && this.type < 26 ){
         noStroke();
         fill( this.color );
         ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
 
-        d = 5 - ( this.type - 14 ) * 2;
+        d = 5 - ( this.type - 24 ) * 2;
 
         fill( 'blue' );
         triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
@@ -123,12 +138,12 @@ class button {
       }
 
       //draw tptpt scroll buttons
-      if ( this.type > 15 && this.type < 18 ){
+      if ( this.type > 25 && this.type < 28 ){
         noStroke();
         fill( this.color );
         ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
 
-        d = ( this.type - 16 ) * 4;
+        d = ( this.type - 26 ) * 4;
 
         fill( 'green' );
         triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
@@ -143,7 +158,7 @@ class button {
       }
 
       //draw edit mode change buttons
-      if ( this.type == 18 ){
+      if ( this.type == 28 ){
         noStroke();
         fill('purple');
         rect(
@@ -153,7 +168,7 @@ class button {
         );
       }
 
-      if ( this.type == 19 ){
+      if ( this.type == 29 ){
         noStroke();
         fill('blue');
         rect(
@@ -164,26 +179,26 @@ class button {
       }
 
       //draw module mode change buttons
-      if ( this.type > 19 && this.type < 24 ){
+      if ( this.type > 29 && this.type < 34 ){
         fill( colorMax * 0.75 );
         rect(
           this.center.x - this.const.a / 2,
           this.center.y - this.const.a / 2,
           this.const.a, this.const.a  );
 
-        let txt = (this.type - 19 ) * 2;
+        let txt = (this.type - 29 ) * 2;
         //draw text
         fill( 0 );
         text( txt, this.center.x, this.center.y + fontSize / 3 );
       }
 
       //draw module scroll buttons
-      if ( this.type > 23 && this.type < 26 ){
+      if ( this.type > 33 && this.type < 36 ){
         noStroke();
         fill( this.color );
         ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
 
-        d = ( this.type - 24 ) * 4 + 2;
+        d = ( this.type - 34 ) * 4 + 2;
 
         fill( 'green' );
         triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
@@ -198,7 +213,7 @@ class button {
       }
 
       //draw generate module button
-      if ( this.type == 26 ){
+      if ( this.type == 36 ){
         noStroke();
         fill( this.color );
         ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
@@ -216,12 +231,12 @@ class button {
       }
 
       //draw module rotate buttons
-      if ( this.type > 26 && this.type < 29 ){
+      if ( this.type > 36 && this.type < 39 ){
         noStroke();
         fill( this.color );
         ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
 
-        d = 2 + ( this.type - 27.5 ) * 2;
+        d = 2 + ( this.type - 37.5 ) * 2;
 
         fill( 'blue' );
         triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
@@ -236,12 +251,12 @@ class button {
       }
 
       //draw joint shift buttons
-      if ( this.type > 28 && this.type < 31 ){
+      if ( this.type > 38 && this.type < 41 ){
         noStroke();
         fill( this.color );
         ellipse( this.center.x, this.center.y, this.const.d, this.const.d );
 
-        d = 4 + ( this.type - 29.5 ) * 2;
+        d = 4 + ( this.type - 39.5 ) * 2;
 
         fill( 'purple' );
         triangle( this.array.vertex[d][0].x, this.array.vertex[d][0].y,
@@ -256,7 +271,7 @@ class button {
       }
 
       //draw lock button
-      if ( this.type == 31 ){
+      if ( this.type == 41 ){
         let a = 0.3;
         let b = 0.4;
         let c = 0.09;
@@ -312,7 +327,7 @@ class button {
       }
 
       //draw expand button
-      if ( this.type == 32 ){
+      if ( this.type == 42 ){
         noStroke();
         fill('yellow');
         rect(
@@ -324,7 +339,7 @@ class button {
       }
 
       //draw afflatus lock button
-      if ( this.type == 33 ){
+      if ( this.type == 43 ){
         noStroke();
         fill('red');
         rect(

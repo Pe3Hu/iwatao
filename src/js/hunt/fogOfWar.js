@@ -11,7 +11,7 @@ class fogOfWar{
       mode: 'search' //'search' fight
     };
 
-    //this.init();
+    this.init();
   }
 
   init(){
