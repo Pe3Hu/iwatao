@@ -27,6 +27,9 @@ class adherent{
     this.initFoundation();
     this.initAfflatus();
     this.addAfflatus();
+
+    for( let i = 0; i < 400; i++)
+      this.lockAfflatus();
   }
 
   //set new foundation
@@ -59,6 +62,10 @@ class adherent{
               this.array.fulcrum[2].push( array[i][j].const.index );
               break;
             case 6:
+              this.array.fulcrum[3].push( array[i][j].const.index );
+              break;
+            case 7:
+              this.array.fulcrum[2].push( array[i][j].const.index );
               this.array.fulcrum[3].push( array[i][j].const.index );
               break;
           }
@@ -104,31 +111,74 @@ class adherent{
     this.var.afflatus++;
   }
 
+  checkSharpAngle(){
+    let afflatus = this.array.afflatus[this.array.afflatus.length - 1];
+    let options = [];
+    let fulcrumIndex = null;
+    let angle = null;
+
+    switch ( afflatus.var.turn ) {
+      case 1:
+        fulcrumIndex = 2;
+        angle = 0;
+        break;
+      case 2:
+        fulcrumIndex = 3;
+        angle = 1;
+        break;
+    }
+    console.log( 'turn', afflatus.var.turn, '1 :', afflatus.var.ratio, 'base', afflatus.var.base, afflatus.var.clockwise );
+    console.log( this.array.fulcrum[fulcrumIndex] )
+    for( let i = 0; i < this.array.fulcrum[fulcrumIndex].length; i++ ){
+      let index = this.array.fulcrum[fulcrumIndex][i];
+      let grid = afflatus.convertIndex( index );
+      let fulcrum = this.data.foundation.array.fulcrum[grid.y][grid.x];
+      let base = fulcrum.array.base[angle];
+      let ratio = fulcrum.array.ratio[angle];
+      let clockwise = fulcrum.array.clockwise[angle];
+
+      if( afflatus.var.ratio == ratio &&
+          afflatus.var.clockwise == clockwise ){
+            console.log( afflatus.var.ratio, ratio, afflatus.var.base, base )
+          options.push( this.array.fulcrum[fulcrumIndex][i] );
+          }
+    }
+    return options;
+  }
+
   enumerationOfOptions(){
     let afflatus = this.array.afflatus[this.array.afflatus.length - 1];
     let small = afflatus.var.small / afflatus.const.a;
     let big = afflatus.var.big / afflatus.const.a;
     let width = null;
+    let fulcrumIndex = null;
     let n = this.data.foundation.const.n + 1;
+    let options = [];
 
     switch ( afflatus.var.turn ) {
       case 0:
+        fulcrumIndex = 0;
         if( afflatus.var.clockwise )
           width = small;
         else
           width = big;
         break;
       case 3:
+        fulcrumIndex = 1;
         if( afflatus.var.clockwise )
           width = -big;
         else
           width = -small;
         break;
+      case 1:
+      case 2:
+       return this.checkSharpAngle();
+       break;
     };
 
-    let options = [];
-    for( let i = 0; i < this.array.fulcrum[0].length; i++ ){
-      let begin = afflatus.convertIndex( this.array.fulcrum[0][i] );
+    console.log( this.array.fulcrum[fulcrumIndex] )
+    for( let i = 0; i < this.array.fulcrum[fulcrumIndex].length; i++ ){
+      let begin = afflatus.convertIndex( this.array.fulcrum[fulcrumIndex][i] );
       let end = begin.copy();
       end.x += width;
       let check = this.data.foundation.checkBorder( end );
@@ -191,10 +241,10 @@ class adherent{
         };
 
         if( flag )
-          options.push( this.array.fulcrum[0][i] )
+          options.push( this.array.fulcrum[fulcrumIndex][i] )
       }
     }
-    console.log( 'o',options )
+    //console.log( 'o',options )
     return options;
   }
 
@@ -211,10 +261,11 @@ class adherent{
         if( options.length > 0 ){
           let rand = Math.floor( options.length * Math.random() );
           let fulcrum = options[rand];
-          console.log('rand', fulcrum)
-          this.data.foundation.introduceAfflatus( afflatus, fulcrum );
-
+          //console.log('rand', fulcrum)
+          fulcrum = this.data.foundation.introduceAfflatus( afflatus, fulcrum );
+          console.log('fix', fulcrum)
           afflatus.setStatus( 2, fulcrum );
+          this.getAvailableFulcrums();
         }
         break;
     }

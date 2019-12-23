@@ -463,7 +463,7 @@ class board {
     layer = 9;
     name = 'lockAfflatus';
     type++;
-    vec = createVector( cellSize * 14, cellSize * 1.5 );
+    vec = createVector( cellSize * 14.25, cellSize * 0.75 );
     this.addButton( layer, name, type, vec.copy() );
 
     for ( let i = 0; i < this.array.button.length; i++ )

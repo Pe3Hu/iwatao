@@ -3,7 +3,7 @@ class foundation{
   constructor(){
     this.const = {
       n: 24,
-      a: cellSize * 1 / 2,
+      a: cellSize,
       showcase: null
     };
     this.var = {
@@ -56,9 +56,9 @@ class foundation{
         if( i == this.const.n ){
           this.array.fulcrum[i][j].setStatus( 2 );
           if( j == 0 )
-            this.array.fulcrum[i][j].updateParts( 1 );
+            this.array.fulcrum[i][j].kickParts( 1 );
           if( j == this.const.n )
-            this.array.fulcrum[i][j].updateParts( 0 );
+            this.array.fulcrum[i][j].kickParts( 0 );
         }
       }
     }
@@ -196,6 +196,8 @@ class foundation{
     let small = afflatus.var.small / afflatus.const.a;
     let big = afflatus.var.big / afflatus.const.a;
     let width = null;
+    let height = null;
+
 
     switch ( afflatus.var.turn ) {
       case 0:
@@ -204,15 +206,38 @@ class foundation{
         else
           width = big;
         break;
+      case 1:
+        if( afflatus.var.clockwise )
+          width = big;
+        else
+          width = small;
+        break;
+      case 2:
+        if( afflatus.var.clockwise )
+          width = -small;
+        else
+          width = -big;
+        break;
       case 3:
         if( afflatus.var.clockwise )
           width = -big;
         else
           width = -small;
         break;
+    };
+
+    switch ( afflatus.var.turn ) {
       case 1:
+        if( afflatus.var.clockwise )
+          height = small;
+        else
+          height = big;
+        break;
       case 2:
-       return;
+        if( afflatus.var.clockwise )
+          height = big;
+        else
+          height = small;
        break;
     };
 
@@ -229,28 +254,51 @@ class foundation{
     for( let j = begin.x + 1; j <= end.x - 1; j++ )
       this.array.fulcrum[begin.y][j].setStatus( 0 );
 
+    //update corner points
     switch ( afflatus.var.turn ) {
       case 0:
-        this.array.fulcrum[begin.y][begin.x].updateParts( 0 );
-        this.array.fulcrum[begin.y][end.x].updateParts( 3 );
+        this.array.fulcrum[begin.y][begin.x].kickParts( 0 );
+        this.array.fulcrum[end.y][end.x].kickParts( 3, afflatus );
         break;
       case 3:
-        this.array.fulcrum[begin.y][begin.x].updateParts( 2 );
-        this.array.fulcrum[begin.y][end.x].updateParts( 1 );
+        this.array.fulcrum[begin.y][begin.x].kickParts( 2, afflatus );
+        this.array.fulcrum[end.y][end.x].kickParts( 1 );
+        break;
+      case 1:
+        this.array.fulcrum[begin.y][begin.x].kickParts( 4 );
+        for( let j = begin.x + 1; j <= end.x - 1; j++ )
+          this.array.fulcrum[begin.y - height][j].setStatus( 2 );
+        this.array.fulcrum[begin.y - height][begin.x].setStatus( 3 );
+        this.array.fulcrum[begin.y - height][begin.x].addParts( 0 );
+        this.array.fulcrum[end.y - height][end.x].setStatus( 3 );
+        this.array.fulcrum[end.y - height][end.x].addParts( 1 );
+        //update fulcrum index
+        fulcrum = this.array.fulcrum[begin.y - height][begin.x].const.index;
+        break;
+      case 2:
+        this.array.fulcrum[end.y][end.x].kickParts( 5 );
+        for( let j = begin.x + 1; j <= end.x - 1; j++ )
+          this.array.fulcrum[begin.y - height][j].setStatus( 2 );
+        this.array.fulcrum[begin.y - height][begin.x].setStatus( 3 );
+        this.array.fulcrum[begin.y - height][begin.x].addParts( 0 );
+        this.array.fulcrum[end.y - height][end.x].setStatus( 3 );
+        this.array.fulcrum[end.y - height][end.x].addParts( 1 );
+        //update fulcrum index
+        fulcrum = this.array.fulcrum[end.y - height][end.x].const.index;
         break;
     };
+    return fulcrum;
 
     //console.log(this.array.fulcrum[begin.y][end.x].const.indee)
-    console.log( 'i', fulcrum, 'w', width,
+    /*console.log( 'i', fulcrum, 'w', width,
                 'b', this.array.fulcrum[begin.y][begin.x].const.index,
-                'e', this.array.fulcrum[begin.y][end.x].const.index )
+                'e', this.array.fulcrum[begin.y][end.x].const.index )*/
     //this.updateFulcrum();
 
-
+/*
     for( let j = 0; j < 25; j++ )
       console.log( this.array.fulcrum[24][j].const.index, this.array.fulcrum[24][j].var.available, this.array.fulcrum[24][j].array.eighthPart )
-
-  }
+*/  }
 
   draw( offset ){
     fill( colorMax * 3 / 4 );

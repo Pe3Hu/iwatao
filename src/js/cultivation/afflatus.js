@@ -1,4 +1,4 @@
-//
+//piece
 class afflatus{
   constructor( index, base, ratio, turn, clockwise, n, a ){
     this.const = {
@@ -7,12 +7,13 @@ class afflatus{
       a: a
     };
     this.var = {
-      clockwise: clockwise,
       big: base * ratio * a,
-      fulcrum: null,
-      color: null,
-      ratio: ratio,
+      clockwise: clockwise,
       small: base * a,
+      fulcrum: null,
+      ratio: ratio,
+      color: null,
+      base: base,
       turn: turn
     };
     this.array = {
