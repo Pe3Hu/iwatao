@@ -14,7 +14,8 @@ class adherent{
       fulcrum: [],
       ratio: [],
       base: [],
-      turn: []
+      turn: [],
+      type: []
     };
     this.data = {
       foundation: null
@@ -28,7 +29,7 @@ class adherent{
     this.initAfflatus();
     this.addAfflatus();
 
-    for( let i = 0; i < 400; i++)
+    for( let i = 0; i < 1200; i++)
       this.lockAfflatus();
   }
 
@@ -86,20 +87,26 @@ class adherent{
       this.array.turn.push( i );
 
     this.array.clockwise = [ true, false ];
+    this.array.type = [ 3, 4 ];
   }
 
   addAfflatus(){
-    let base, ratio, turn, clockwise, rand;
-    base = this.array.base[0];
+    let type, base, ratio, turn, clockwise, rand;
+    rand = Math.floor( this.array.type.length * Math.random() );
+    type = this.array.type[rand];
     rand = Math.floor( this.array.ratio.length * Math.random() );
     ratio = this.array.ratio[rand];
     if( ratio == 1 )
-      base = this.array.base[1];
+      rand = Math.floor( ( this.array.base.length - 1 ) * Math.random() ) + 1;
+    else
+      rand = Math.floor( this.array.base.length * Math.random() );
+    base = this.array.base[rand];
+    base = this.array.base[rand];
     rand = Math.floor( this.array.turn.length * Math.random() );
     turn = this.array.turn[rand];
     rand = Math.floor( this.array.clockwise.length * Math.random() );
     clockwise = this.array.clockwise[rand];
-    this.array.afflatus.push( new afflatus( this.var.afflatus, base, ratio, turn, clockwise,
+    this.array.afflatus.push( new afflatus( this.var.afflatus, type, base, ratio, turn, clockwise,
                                             this.data.foundation.const.n + 1, this.data.foundation.const.a ) );
 
     //dont show previous afflatus's
@@ -127,20 +134,21 @@ class adherent{
         angle = 1;
         break;
     }
-    console.log( 'turn', afflatus.var.turn, '1 :', afflatus.var.ratio, 'base', afflatus.var.base, afflatus.var.clockwise );
-    console.log( this.array.fulcrum[fulcrumIndex] )
+    //console.log( 'turn', afflatus.var.turn, '1 :', afflatus.var.ratio, 'base', afflatus.var.base, afflatus.var.clockwise );
+    //console.log( this.array.fulcrum[fulcrumIndex] )
     for( let i = 0; i < this.array.fulcrum[fulcrumIndex].length; i++ ){
       let index = this.array.fulcrum[fulcrumIndex][i];
       let grid = afflatus.convertIndex( index );
       let fulcrum = this.data.foundation.array.fulcrum[grid.y][grid.x];
-      let base = fulcrum.array.base[angle];
-      let ratio = fulcrum.array.ratio[angle];
       let clockwise = fulcrum.array.clockwise[angle];
+      let height = fulcrum.array.height[angle];
+      let ratio = fulcrum.array.ratio[angle];
 
       if( afflatus.var.ratio == ratio &&
-          afflatus.var.clockwise == clockwise ){
-            console.log( afflatus.var.ratio, ratio, afflatus.var.base, base )
-          options.push( this.array.fulcrum[fulcrumIndex][i] );
+          afflatus.var.clockwise == clockwise &&
+          afflatus.var.height <= height ){
+            //console.log( afflatus.var.ratio, ratio, afflatus.var.base, base )
+            options.push( this.array.fulcrum[fulcrumIndex][i] );
           }
     }
     return options;
@@ -148,9 +156,8 @@ class adherent{
 
   enumerationOfOptions(){
     let afflatus = this.array.afflatus[this.array.afflatus.length - 1];
-    let small = afflatus.var.small / afflatus.const.a;
-    let big = afflatus.var.big / afflatus.const.a;
-    let width = null;
+    let width = afflatus.var.width;
+    let height = afflatus.var.height;
     let fulcrumIndex = null;
     let n = this.data.foundation.const.n + 1;
     let options = [];
@@ -158,17 +165,9 @@ class adherent{
     switch ( afflatus.var.turn ) {
       case 0:
         fulcrumIndex = 0;
-        if( afflatus.var.clockwise )
-          width = small;
-        else
-          width = big;
         break;
       case 3:
         fulcrumIndex = 1;
-        if( afflatus.var.clockwise )
-          width = -big;
-        else
-          width = -small;
         break;
       case 1:
       case 2:
@@ -176,7 +175,7 @@ class adherent{
        break;
     };
 
-    console.log( this.array.fulcrum[fulcrumIndex] )
+    //console.log( afflatus, this.array.fulcrum[fulcrumIndex] )
     for( let i = 0; i < this.array.fulcrum[fulcrumIndex].length; i++ ){
       let begin = afflatus.convertIndex( this.array.fulcrum[fulcrumIndex][i] );
       let end = begin.copy();
@@ -191,57 +190,77 @@ class adherent{
         }
 
         let flag = this.data.foundation.array.fulcrum[begin.y][begin.x].var.available;
-        for( let j = begin.x + 1; j <= end.x - 1; j++ )
-          if( this.data.foundation.array.fulcrum[begin.y][j].var.kind != 0 )
-            flag = false;
 
-        //check begin and end
-        //crossing check
-        switch ( afflatus.var.turn ) {
-          case 0:
-            switch ( this.data.foundation.array.fulcrum[begin.y][begin.x].var.kind ) {
-              case 3:
-              case 4:
-              case 5:
-              case 6:
-              case 7:
-                flag = false;
-              break;
-            }
-            switch ( this.data.foundation.array.fulcrum[end.y][end.x].var.kind ) {
-              case 1:
-              case 2:
-              case 5:
-              case 6:
-              case 7:
-                flag = false;
-              break;
-            }
-            break;
-          case 3:
-            switch ( this.data.foundation.array.fulcrum[begin.y][begin.x].var.kind ) {
-              case 3:
-              case 4:
-              case 5:
-              case 6:
-              case 7:
-                flag = false;
-              break;
-            }
-            switch ( this.data.foundation.array.fulcrum[end.y][end.x].var.kind ) {
-              case 1:
-              case 2:
-              case 5:
-              case 6:
-              case 7:
-                flag = false;
-              break;
-            }
-            break;
-        };
+        if( flag ){
+          for( let j = begin.x + 1; j <= end.x - 1; j++ )
+            if( this.data.foundation.array.fulcrum[begin.y][j].var.kind != 0 )
+              flag = false;
 
-        if( flag )
-          options.push( this.array.fulcrum[fulcrumIndex][i] )
+          if( flag ){
+            //height check
+            let temp = begin.copy();
+            temp.y -= height;
+            if( !this.data.foundation.checkBorder( temp ) )
+              flag = false;
+
+
+            if( flag ){
+              //check begin and end
+              switch ( afflatus.var.turn ) {
+                case 0:
+                  switch ( this.data.foundation.array.fulcrum[begin.y][begin.x].var.kind ) {
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                      flag = false;
+                    break;
+                  }
+                  switch ( this.data.foundation.array.fulcrum[end.y][end.x].var.kind ) {
+                    case 1:
+                    case 2:
+                    case 5:
+                    case 6:
+                    case 7:
+                      flag = false;
+                    break;
+                  }
+                  break;
+                case 3:
+                  switch ( this.data.foundation.array.fulcrum[begin.y][begin.x].var.kind ) {
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                      flag = false;
+                    break;
+                  }
+                  switch ( this.data.foundation.array.fulcrum[end.y][end.x].var.kind ) {
+                    case 1:
+                    case 2:
+                    case 5:
+                    case 6:
+                    case 7:
+                      flag = false;
+                    break;
+                  }
+                  break;
+              };
+
+              if( flag )
+                options.push( this.array.fulcrum[fulcrumIndex][i] )
+            }
+          }
+        }
+
+
+        //height check
+        /*let temp = begin.copy();
+        temp.y -= height;
+        if( !this.data.foundation.checkBorder( temp ) )
+          flag = false;*/
       }
     }
     //console.log( 'o',options )
@@ -257,13 +276,25 @@ class adherent{
       case 'standart':
         //afflatus.alignСenterOfGravity();
 
-        let options = this.enumerationOfOptions();
-        if( options.length > 0 ){
+        let options;
+        let flag = false;
+        let i = 0;
+        //crank until it snaps into the groove
+        while( this.const.n > i && !flag){
+          options = this.enumerationOfOptions();
+          if( options.length > 0 )
+            flag = true;
+          else
+            afflatus.rotate( true );
+          i++;
+        }
+
+        if( flag ){
           let rand = Math.floor( options.length * Math.random() );
           let fulcrum = options[rand];
           //console.log('rand', fulcrum)
           fulcrum = this.data.foundation.introduceAfflatus( afflatus, fulcrum );
-          console.log('fix', fulcrum)
+          //console.log('fix', fulcrum)
           afflatus.setStatus( 2, fulcrum );
           this.getAvailableFulcrums();
         }
@@ -278,9 +309,12 @@ class adherent{
 
   draw(){
     this.data.foundation.draw( this.const.offset );
+    this.data.foundation.drop( this.const.offset );
 
     for( let i = 0; i < this.array.afflatus.length; i++ )
       if( this.array.afflatus[i].status != 'await' )
         this.array.afflatus[i].draw( this.const.offset, this.data.foundation.array.fulcrum );
+
+
   }
 }

@@ -5,7 +5,6 @@ class fulcrum{
       index: index
     };
     this.var = {
-      coupleTurn: null,
       available: false,
       center: center,
       color: null,
@@ -15,6 +14,7 @@ class fulcrum{
       eighthPart: [],
       //right left angles
       clockwise: [ null, null ],
+      height: [ null, null ],
       ratio: [ null, null ],
       base: [ null, null ]
     };
@@ -53,6 +53,18 @@ class fulcrum{
     }
   }
 
+  setHeight( angle, height ){
+    this.array.height[angle] = height;
+  }
+
+  setAngle( fulcrum, angle, afflatus ){
+    this.array.base[angle] = fulcrum.array.base[angle];
+    this.array.ratio[angle] = fulcrum.array.ratio[angle];
+    this.array.height[angle] = fulcrum.array.height[angle] - afflatus.var.height;
+    this.array.clockwise[angle] = fulcrum.array.clockwise[angle];
+    //console.log( fulcrum.array.height[angle], afflatus.var.height )
+  }
+
   addParts( type, afflatus ){
     let add;
     switch ( type ) {
@@ -63,6 +75,12 @@ class fulcrum{
         add = [ 6, 7 ];
         break;
       case 2:
+        add = [ 0, 1, 7 ];
+        break;
+      case 3:
+        add = [ 0, 6, 7 ];
+        break;
+      case 4:
         add = [ 0, 1, 6, 7 ];
         break;
     };
@@ -93,12 +111,14 @@ class fulcrum{
         kick = [ 1 ];
         this.array.base[0] = afflatus.var.base;
         this.array.ratio[0] = afflatus.var.ratio;
+        this.array.height[0] = afflatus.var.height;
         this.array.clockwise[0] = afflatus.var.clockwise;
         break;
       case 3:
         kick = [ 6 ];
         this.array.base[1] = afflatus.var.base;
         this.array.ratio[1] = afflatus.var.ratio;
+        this.array.height[1] = afflatus.var.height;
         this.array.clockwise[1] = afflatus.var.clockwise;
         break;
       case 4:
@@ -186,7 +206,7 @@ class fulcrum{
     stroke( this.var.color );
     if( this.var.available )
       ellipse( offset.x + this.var.center.x,
-              offset.y + this.var.center.y, 15, 15 );
+              offset.y + this.var.center.y, cellSize, cellSize );
 
     stroke( 0 );
     fill( 0 );
