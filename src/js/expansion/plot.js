@@ -3,22 +3,26 @@ class plot {
   constructor ( index, center, grid, a ){
     this.const = {
       index: index,
-      n: 6,
-      a: a,
       i: grid.y,
-      j: grid.x
+      j: grid.x,
+      n: 6,
+      a: a
     };
     this.array = {
-      vertex: []
+      vertex: [],
+      dot: []
     };
     this.var = {
+      lightness: colorMax * 0.75,
       center: center.copy(),
       status: 'empty',
-      enclave: null,
-      free: true,
-      hue: 0,
       saturation: 0,
-      lightness: colorMax * 0.75
+      clockwise: null,
+      enclave: null,
+      incline: null,
+      type: null,
+      free: true,
+      hue: 0
     };
 
     this.init();
@@ -37,6 +41,61 @@ class plot {
   init(){
     this.const.r =  this.const.a / ( Math.tan( Math.PI / 6 ) * 2 );
     this.initVertexs();
+  }
+
+  setType( type, incline, clockwise ){
+    this.array.dot = [];
+    let add = [];
+    let center = null;
+    this.var.type = type;
+    this.var.incline = incline;
+    this.var.clockwise = clockwise;
+    this.var.l = type / 2;;
+
+    for( let i = 0; i < this.array.vertex.length; i++ ){
+      let ii = ( i + 1 ) % this.array.vertex.length;
+      let vec = this.array.vertex[ii].copy();
+      vec.x -= this.array.vertex[i].x;
+      vec.y -= this.array.vertex[i].y;
+      vec.x /= this.var.l;
+      vec.y /= this.var.l;
+      add.push( vec.copy() );
+    }
+
+    for( let i = 0; i < this.array.vertex.length; i++ ){
+      this.array.dot.push( [] );
+      center = this.array.vertex[i].copy();
+      this.array.dot[i].push( center.copy() );
+      for( let j = 0; j < this.var.l; j++ ){
+        /*switch ( i ) {
+          case 0:
+            x = 2 * a / type;
+            y = a / type;
+            break;
+          case 1:
+            y = 2 * a / type;
+            break;
+          case 2:
+            x = -2 * a / type;
+            y = a / type;
+            break;
+          case 3:
+            x = -2 * a / type;
+            y = -a / type;
+            break;
+          case 4:
+            y = -2 * a / type;
+            break;
+          case 5:
+            x = 2 * a / type;
+            y = -a / type;
+            break;
+        }*/
+        center.add( add[i] );
+        this.array.dot[i].push( center.copy() );
+      }
+    }
+    console.log( this.array.dot )
   }
 
   setStatus( status, enclave, hue ){
@@ -98,6 +157,39 @@ class plot {
                 this.array.vertex[i].x, this.array.vertex[i].y,
                 this.array.vertex[ii].x, this.array.vertex[ii].y );
      }
+
+      stroke( 0 );
+      fill( 0 );
+      if( this.var.l != null ){
+        let type = Math.ceil( this.var.l / 2 );
+        let parity = ( this.var.type % 3 );
+        if( parity == 0 )
+          parity = this.var.type / 6;
+        else
+          parity = 0;
+        console.log( parity, type )
+        for( let i = 0; i < type; i++ ){
+          switch ( this.var.incline ) {
+            case 0:
+              triangle( this.array.dot[5][i * 2].x, this.array.dot[5][i * 2].y,
+                        this.array.dot[5][i * 2 + 1].x, this.array.dot[5][i * 2 + 1].y,
+                        this.array.dot[3][type - i * 2].x, this.array.dot[3][type - i * 2].y );
+              triangle( this.array.dot[5][i * 2].x, this.array.dot[5][i * 2].y,
+                        this.array.dot[3][type - i * 2 + 1].x, this.array.dot[3][type - i * 2 + 1].y,
+                        this.array.dot[3][type - i * 2].x, this.array.dot[3][type - i * 2].y );
+
+              if( i + 1 <= type && parity == 0 ){
+                triangle( this.array.dot[0][i * 2 + parity].x, this.array.dot[0][i * 2 + parity].y,
+                          this.array.dot[0][i * 2 + 1 + parity].x, this.array.dot[0][i * 2 + 1 + parity].y,
+                          this.array.dot[2][type - i * 2 - parity].x, this.array.dot[2][type - i * 2 - parity].y );
+                triangle( this.array.dot[0][i * 2 + parity].x, this.array.dot[0][i * 2 + parity].y,
+                          this.array.dot[2][type - i * 2 - parity + 1].x, this.array.dot[2][type - i * 2 - parity + 1].y,
+                          this.array.dot[2][type - i * 2 - parity].x, this.array.dot[2][type - i * 2 - parity].y );
+              }
+              break;
+          };
+        }
+      }
 
      stroke( 0 );
      fill( 0 );

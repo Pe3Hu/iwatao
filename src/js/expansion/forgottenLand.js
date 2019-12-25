@@ -2,12 +2,12 @@
 class forgottenLand{
   constructor(){
     this.const = {
-      enclaves: 6,
+      enclave: 1,
       n: 24,
       m: 24,
       k: 8,
       o: 6,
-      a: cellSize / 2
+      a: cellSize * 4
     };
     this.var = {
       enclave: 0,
@@ -80,13 +80,8 @@ class forgottenLand{
     }
   }
 
-  initTeams(){
-    for( let i = 0; i < this.const.parties; i++ )
-      this.array.team.push( [] );
-  }
-
   initEnclaves(){
-    for( let i = 0; i < 6; i++ )
+    for( let i = 0; i < this.const.enclave; i++ )
       this.addEnclave();
   }
 
@@ -114,18 +109,22 @@ class forgottenLand{
   addEnclave(){
     let hue = this.array.hue[this.var.enclave];
     let rand = Math.floor( Math.random() * this.array.toConstruct.length );
-    let index = this.array.toConstruct[rand];
+    let index = 25//this.array.toConstruct[rand];
     let vec = this.convertIndex( index );
+    let clockwise = true;
+    let incline = 0;
+    let type = 4;
     /*let vec = createVector( 5, 6 );
     let index = this.convertGrid( vec );*/
     this.array.plot[vec.y][vec.x].setStatus( 1, this.var.enclave, hue );
+    this.array.plot[vec.y][vec.x].setType( type, incline, clockwise );
     this.array.enclave.push( new enclave( this.var.enclave, index ) );
 
     //console.log( this.var.enclave, 'enclave with vec:', vec.y, vec.x, 'index', index );
 
     this.setHorizon( this.var.enclave, index );
     this.addNeighbor( this.var.enclave, index );
-
+/*
     let e = this.array.enclave[this.var.enclave];
     //form first exclusion zone for the new enclave
     let firstGap = [];
@@ -171,7 +170,7 @@ class forgottenLand{
             this.array.toConstruct.splice( j, 1 );
             break;
           }
-
+*/
     this.var.enclave++;
   }
 
