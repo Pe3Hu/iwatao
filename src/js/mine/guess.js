@@ -1,5 +1,5 @@
 //
-class adit{
+class guess{
   constructor(){
     this.const = {
     };

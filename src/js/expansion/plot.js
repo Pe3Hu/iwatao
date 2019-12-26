@@ -95,7 +95,6 @@ class plot {
         this.array.dot[i].push( center.copy() );
       }
     }
-    console.log( this.array.dot )
   }
 
   setStatus( status, enclave, hue ){
@@ -194,6 +193,6 @@ class plot {
      stroke( 0 );
      fill( 0 );
      this.var.txt = this.const.index;
-     text( this.var.txt, this.var.center.x, this.var.center.y + fontSize / 3 );
+     //text( this.var.txt, this.var.center.x, this.var.center.y + fontSize / 3 );
   }
 }

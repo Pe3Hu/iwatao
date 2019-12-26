@@ -2,12 +2,12 @@
 class forgottenLand{
   constructor(){
     this.const = {
-      enclave: 1,
+      enclave: 6,
       n: 24,
       m: 24,
       k: 8,
       o: 6,
-      a: cellSize * 4
+      a: cellSize * 0.5
     };
     this.var = {
       enclave: 0,
@@ -109,11 +109,11 @@ class forgottenLand{
   addEnclave(){
     let hue = this.array.hue[this.var.enclave];
     let rand = Math.floor( Math.random() * this.array.toConstruct.length );
-    let index = 25//this.array.toConstruct[rand];
+    let index = this.array.toConstruct[rand]; //25
     let vec = this.convertIndex( index );
     let clockwise = true;
     let incline = 0;
-    let type = 4;
+    let type = 8;
     /*let vec = createVector( 5, 6 );
     let index = this.convertGrid( vec );*/
     this.array.plot[vec.y][vec.x].setStatus( 1, this.var.enclave, hue );

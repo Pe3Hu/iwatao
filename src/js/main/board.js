@@ -18,7 +18,7 @@ class board {
       a: cellSize
     }
     this.var = {
-      layer: 8,
+      layer: 10,
       buttonID: 0,
       borderID: 0
     }

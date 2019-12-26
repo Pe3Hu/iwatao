@@ -1,5 +1,5 @@
 //
-class adit{
+class mineral{
   constructor(){
     this.const = {
     };
