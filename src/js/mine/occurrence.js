@@ -3,12 +3,15 @@ class occurrence{
   constructor( index, type, center, a ){
     this.const = {
       index: index,
-      type: type,
       a: a
     };
     this.var = {
       center: center.copy(),
-      color: null
+      quality:null,
+      wealth: null,
+      color: null,
+      type: type,
+      kind: null
     };
     this.array = {
     };
@@ -17,7 +20,7 @@ class occurrence{
   }
 
   init(){
-    this.updateType( this.const.type );
+    this.updateType( this.var.type );
   }
 
   updateType( type ){

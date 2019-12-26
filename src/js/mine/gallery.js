@@ -19,7 +19,6 @@ class gallery{
 
   init(){
     this.initOccurrences();
-    console.log(this.array.occurrence)
   }
 
   initOccurrences(){
