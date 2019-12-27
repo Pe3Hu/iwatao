@@ -16,6 +16,9 @@ class earthWork{
     };
     this.table = {
       probability: [],
+      amount: [],
+      share: [],
+      type: [],
       kind: []
     }
 
@@ -32,23 +35,52 @@ class earthWork{
   }
 
   initTables(){
+    this.table.type = [ 30, 20, 10 ];
     this.table.kind = [
-      [ 0, 1, 2, 3 ],
-      [ 0, 1, 2, 3, 4 ],
-      [ 0, 1, 2, 3, 4, 5 ]
+      [ 10, 20, 30, 40 ],
+      [ 10, 20, 30, 40, 50 ],
+      [ 10, 20, 30, 40, 50, 60 ]
     ];
-    this.table.probability = [];
+    this.table.amount = [];
+    this.table.share = [];
+    let totalShare = 0;
 
+    /*for( let i = 0; i < this.table.type.length; i++ ){
+      this.table.share.push( [] );
+      for( let j = 0; j < this.table.kind[i].length; j++ ){
+        let share = this.table.kind[i][j] * this.table.type[i];
+        totalShare += share;
+        this.table.share[i].push( totalShare );
+      }
+    }
+    console.log( totalShare )*/
+
+    for( let i = 0; i < this.table.kind.length; i++ ){
+      this.table.amount.push( [] );
+      for( let j = 0; j < this.table.kind[i].length; j++ )
+        this.table.amount[i].push( 0 );
+    }
+
+    this.updateProbabilitys();
+
+    console.log(this.table.amount)
+    console.log(this.table.probability)
+  }
+
+  updateProbabilitys(){
+    this.table.probability = [];
     for( let i = 0; i < this.table.kind.length; i++ ){
       this.table.probability.push( [] );
       let total = 0;
-      for( let j = 1; j < this.table.kind[i].length + 1; j++ )
-        total += j;
+      for( let j = 0; j < this.table.kind[i].length; j++ )
+        total += this.table.kind[i][j];
 
-      for( let j = 1; j < this.table.kind[i].length + 1; j++ )
-        this.table.probability[i].push( j / total );
+      let current = 0;
+      for( let j = 0; j < this.table.kind[i].length; j++ ){
+        current += this.table.kind[i][j];
+        this.table.probability[i].push( current / total );
+      }
     }
-    console.log(this.table.probability)
   }
 
   initGallerys(){
@@ -68,7 +100,7 @@ class earthWork{
     let size = Math.floor( Math.random() * ( max - min ) );
     size += min;
     size = this.var.gallery + 1;
-    this.array.gallery.push( new gallery( this.var.gallery, size, this.var.center.copy(), this.var.occurrence, this.const.a ) );
+    this.array.gallery.push( new gallery( this.var.gallery, size, this ) );
     this.var.gallery++;
     this.var.occurrence += size;
     this.var.center.y += this.const.a;
@@ -76,6 +108,6 @@ class earthWork{
 
   draw(){
     for( let i = 0; i < this.array.gallery.length; i++ )
-        this.array.gallery[i].draw();
+      this.array.gallery[i].draw();
   }
 }

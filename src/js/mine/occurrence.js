@@ -1,6 +1,6 @@
 //
 class occurrence{
-  constructor( index, type, center, a ){
+  constructor( index, type, kind, center, a ){
     this.const = {
       index: index,
       a: a
@@ -11,6 +11,7 @@ class occurrence{
       wealth: null,
       color: null,
       type: type,
+      kind: kind,
       kind: null
     };
     this.array = {
