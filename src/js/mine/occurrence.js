@@ -9,10 +9,10 @@ class occurrence{
       center: center.copy(),
       quality:null,
       wealth: null,
+      status: null,
       color: null,
       type: type,
-      kind: kind,
-      kind: null
+      kind: kind
     };
     this.array = {
     };
@@ -34,6 +34,22 @@ class occurrence{
         break;
       case 2:
         this.var.color = color( 240, colorMax, colorMax * 0.5 );
+        break;
+    }
+  }
+
+
+  //
+  setStatus( status ){
+    switch ( status ) {
+      case 0:
+        this.status = '';
+        break;
+      case 1:
+        this.status = '';
+        break;
+      case 2:
+        this.status = '';
         break;
     }
   }
