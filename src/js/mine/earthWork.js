@@ -31,7 +31,7 @@ class earthWork{
     this.initGallerys();
     this.initAnswer();
 
-    console.log(this.array.answer)
+    //console.log(this.array.answer)
   }
 
   initTables(){
@@ -63,8 +63,8 @@ class earthWork{
 
     this.updateProbabilitys();
 
-    console.log(this.table.amount)
-    console.log(this.table.probability)
+    //console.log(this.table.amount)
+    //console.log(this.table.probability)
   }
 
   updateProbabilitys(){

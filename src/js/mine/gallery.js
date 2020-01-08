@@ -17,7 +17,7 @@ class gallery{
 
   init(){
     this.initOccurrences();
-    console.log(   this.earthWork.table.kind, this.earthWork.table.type )
+    //console.log(   this.earthWork.table.kind, this.earthWork.table.type )
   }
 
   initOccurrences(){
@@ -25,7 +25,7 @@ class gallery{
       let type = this.recognizeIndex( this.earthWork.table.type, 'share' );
       let kind = this.recognizeIndex( this.earthWork.table.probability[i], 'probability' );
       let center = this.earthWork.var.center.copy();
-      console.log(type,kind);
+      //console.log(type,kind);
       center.x +=  ( i - this.const.size / 2 ) * this.earthWork.const.a;
       this.array.occurrence.push( new occurrence( this.earthWork.var.occurrence, type, kind, center, this.earthWork.const.a ) );
       this.earthWork.var.occurrence++;

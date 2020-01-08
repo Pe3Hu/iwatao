@@ -18,7 +18,7 @@ class board {
       a: cellSize
     }
     this.var = {
-      layer: 11,
+      layer: 12,
       buttonID: 0,
       borderID: 0
     }
@@ -57,6 +57,7 @@ class board {
     this.array.layer.push( new matrialArt() );
     this.array.layer.push( new earthWork() );
     this.array.layer.push( new newWorld() );
+    this.array.layer.push( new tornSpace() );
   }
 
   initBorders(){

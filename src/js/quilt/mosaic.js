@@ -3,8 +3,8 @@ class mosaic{
   constructor( index, center ){
     this.const = {
       index: index,
-      a: cellSize,
-      b: cellSize / ( Math.sqrt(3)  - 1 ),
+      a: cellSize / 2,
+      b: null,
       n: 5
     };
     this.var = {
@@ -20,6 +20,7 @@ class mosaic{
   }
 
   init(){
+    this.const.b = this.const.a / ( Math.sqrt( 3 ) - 1 );
     this.initVectors();
     this.setKind();
   }
@@ -81,7 +82,7 @@ class mosaic{
       this.array.vertex.push( vec );
     }
 
-    console.log( this.array.vertex )
+    //console.log( this.array.vertex )
   }
 
   draw(){
